@@ -1,5 +1,5 @@
 p {
-    font-size: 1.2em;
+    font-size: medium;
 }
 a {
     text-align:right;
@@ -13,11 +13,21 @@ a:hover {
 
 form{
     text-align:center;
+    font-size: medium;
 }
 
 input.text{
-    border-radius: 0.55em;
+    border-radius: 2em;
+    width: 550px;
+    height: 15px;
+    padding: 10px;
+    font-size: medium;
 }
-text{
-    
+
+input.submit{
+    border-radius: 0.25em;
+    font-size: medium;
+    border-style: none;
+    padding: 5px;
+    background: #F8F9Fa;
 }
