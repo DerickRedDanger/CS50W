@@ -1,0 +1,23 @@
+p {
+    font-size: 1.2em;
+}
+a {
+    text-align:right;
+    color: black;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+    color: blue;
+}
+
+form{
+    text-align:center;
+}
+
+input.text{
+    border-radius: 0.55em;
+}
+text{
+    
+}
