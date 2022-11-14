@@ -1,0 +1,21 @@
+{% extends "encyclopedia/layout.html" %}
+
+{% block title %}
+    New Entry
+{% endblock %}
+
+{% block body %}
+    <div>
+        <form action="" method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="oldTitle" value="{{oldTitle}}">
+            <h5>wiki's new title: <input type="text" name="title" value="{{title1}}">
+            <br>
+            <h5 style="color:red">{{error}}<h5>
+            <br>
+            wiki's new content:<br> <textarea name="content" style="height: 70vh;width: 90%;" >{{body}}</textarea></h5>
+            <br>
+            <h5><p style="text-align: center" ><input type="submit" value="Save your edited wiki page!"></p></h5>
+        </fom>
+    </div>
+{% endblock %}
