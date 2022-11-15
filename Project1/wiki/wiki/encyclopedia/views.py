@@ -26,6 +26,7 @@ def search(request):
     titles = util.list_entries()
     if title in titles:
         body=util.get_entry(title)
+        body = testingre.read(body)
         return render(request, "encyclopedia/page.html",{
             "title":title, "body":body
         })
@@ -76,10 +77,10 @@ def newEntry(request,title1="",body="",error=""):
             return redirect("page",title=Title)
 def Random(request):
     titles = util.list_entries()
-    print(len(titles)-1)
     ran=random.randint(0,len(titles)-1)
     title=titles[ran]
     body=util.get_entry(title)
+    body = testingre.read(body)
     return render(request, "encyclopedia/page.html",{
             "title":title, "body":body
     })

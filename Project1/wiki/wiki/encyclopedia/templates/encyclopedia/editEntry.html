@@ -8,8 +8,9 @@
     <div>
         <form action="" method="POST">
             {% csrf_token %}
-            <input type="hidden" name="oldTitle" value="{{oldTitle}}">
+            
             <h5>wiki's new title: <input type="text" name="title" value="{{title1}}">
+            <input type="hidden" name="oldTitle" value="{{oldTitle}}">
             <br>
             <h5 style="color:red">{{error}}<h5>
             <br>

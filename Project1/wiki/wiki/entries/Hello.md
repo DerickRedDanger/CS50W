@@ -1,1 +1,1 @@
-Gibberish
+Hello Cs50!
