@@ -1,0 +1,20 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>{{listing.title}}</h2>
+    <p>{% if listing.image %} <img src="{{listing.image}}" alt="Auction's image'" style="width:600px;" </li>{% endif%}<p>
+    
+    <p> Description: <br>
+         {{listing.description}}</p>
+         <p> This auction is {% if listing.open == True %} open for bidding! </p>
+         <p>Initial bid = {{listing.initialBid}}</p>
+         <p> Higest bid = {{listing.hBid}}  </p>
+         {% if user.is_authenticated %}
+         <form action="" method="POST">
+         <p> Make a bid!  <input type="number" name="title" value="{{listing.hBid}}"> <input type="submit" name="bid" value="Bid!"> <p>
+         </form>
+         <form action="" method="post">
+        <p> <input type="submit" name="follow" value="Follow"> this auction to stay updated!</p>
+         {% endif%}
+            {% else %} closed! {% endif%}
+{% endblock %}

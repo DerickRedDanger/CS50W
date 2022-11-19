@@ -1,0 +1,15 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>Active Listings</h2>
+
+    <ul>
+        {% for auction in listings %}
+        {% if auction.open == True %}
+        <br>
+        <li><a href= "listing/{{auction.id}}"> {{auction.title}}</a> - {{auction.Sdescription}} - Highest bid = {{auction.hBid}} {% if auction.image %} <img src="{{auction.image}}" alt="Auction's image'" style="width:100px;" </li>{% endif%} {%endif%}
+            {% endfor%}
+    </ul>
+
+    TODO
+{% endblock %}
