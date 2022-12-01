@@ -1,0 +1,15 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+<section class="py-2 container">
+    <h2>Active Listings in the category {{Category.title}} </h2>
+    <!-- shows the open listing from the selected category-->
+    <ul>
+        {% for auction in listings %}
+        {% if auction.open == True %}
+        <br>
+        <li><a href= "{% url 'listing' auction.id %}"> {{auction.title}}</a> - {{auction.Sdescription}} - Highest bid = {{auction.hBid}} {% if auction.image %} <img src="{{auction.image}}" alt="Auction's image'" style="width:200px;" </li><br>{% endif%} {%endif%}
+            {% endfor%}
+    </ul>
+</section>
+{% endblock %}

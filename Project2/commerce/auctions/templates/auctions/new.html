@@ -1,0 +1,19 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+<section class="py-2 container text-center">
+<form style="margin-top: 30px;" action="." method="post">
+
+    <!-- crates a new listing-->    
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="hidden" name="owner" value="{{ request.user.id }}">
+    <p>Category:</p>
+    {%for title in categories%}
+    <input type="radio" name="categorie" value={{title.id}}>
+    {{title.title}}<br><br>
+    {%endfor%}
+    <input type="submit" value="Sumbit">
+</form>
+</section>
+{% endblock %}

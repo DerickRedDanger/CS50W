@@ -1,0 +1,31 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+<section class="py-2 container">
+    <h2>Listings that you are watching</h2>
+    <!-- shows the listing on your watchlist that are open-->
+    <ul>
+        <p>Active ones:</p>
+        {% for auction in listings %}
+            {% if auction.open == True %}
+        <br>
+        <li><a href= "{% url 'listing' auction.id %}"> {{auction.title}}</a> - {{auction.Sdescription}} - Highest bid = {{auction.hBid}} {% if auction.image %} <img src="{{auction.image}}" alt="Auction's image'" style="width:200px;" </li>{% endif%} 
+            {% endif%}
+        {%empty%}
+        <p> Pretty empty here ain't it? guess you aren't following a open auction.</p>
+        {%endfor%}
+        <br><br>
+    <!-- shows the listing on your watchlist that are closed-->
+        <p>Inactive ones:</p>
+        {% for auction in listings %}
+            {% if auction.open == False %}
+            <li><a href= "{% url 'listing' auction.id %}"> {{auction.title}}</a> - {{auction.Sdescription}} - Highest bid = {{auction.hBid}} {% if auction.image %} <img src="{{auction.image}}" alt="Auction's image'" style="width:200px;" </li>{% endif%}
+            {% endif%}  
+            {%empty%}
+            <p> Pretty empty here ain't it? guess you aren't following a closed auction.</p> 
+        {% endfor%}
+            
+    </ul>
+</section>
+
+{% endblock %}

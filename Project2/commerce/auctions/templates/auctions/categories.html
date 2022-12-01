@@ -1,0 +1,15 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+<section class="py-2 container">
+    <h2>Category</h2>
+    <!-- Shows the categories -->
+    <ul>
+        {% for auction in listings %}
+
+        <br>
+        <li><a href= "{{auction.id}}"> {{auction.title}}</a> - {{auction.description}}</li> 
+            {% endfor%}
+    </ul>
+</section>
+{% endblock %}

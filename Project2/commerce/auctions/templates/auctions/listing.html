@@ -1,20 +1,120 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
+
+   <!-- Shows the listing's information-->
+   <section class="py-2 container text-center">
     <h2>{{listing.title}}</h2>
-    <p>{% if listing.image %} <img src="{{listing.image}}" alt="Auction's image'" style="width:600px;" </li>{% endif%}<p>
-    
+    <p>{% if listing.image %} <img src="{{listing.image}}" alt="Auction's image'" style="width:600px; align:center;" </li>{% endif%}<p>
     <p> Description: <br>
          {{listing.description}}</p>
-         <p> This auction is {% if listing.open == True %} open for bidding! </p>
-         <p>Initial bid = {{listing.initialBid}}</p>
-         <p> Higest bid = {{listing.hBid}}  </p>
-         {% if user.is_authenticated %}
+    </section>
+
+
+      <!-- If the optional caution is filled-->
+      <section class="py-2 container text-center">
+         {%if listing.caution%}
+      <button type="button" class="text-warning bg-dark" onclick="document.getElementById('caution').style.display='block'">Caution!</button>
+         <div id="caution" style="display:none"><br>
+         <p>{% if listing.cImage %} <img src="{{listing.cImage}}" alt="caution image'" style="width:600px; align:center;" </li>{% endif%}<p>
+            <p>  
+               {{listing.caution}}</p>
+      </div>{%endif%}
+   </section>
+
+   <section class="py-2 container text-center">
+      <!-- If the user is the one that hosted this listing-->
+   {% if request.user == listing.owner and listing.open == True%}
+   <form action="/close/{{listing.id}}" method="POST">
+      {% csrf_token %}
+   <p class="table-secondary">This is a listing you've posted. would you like to <input type="submit" name="close" value="Close it?"></p>
+      {%endif%}
+   </form>
+<p> <h4> - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - </h1></p>
+ 
+
+
+      <!-- If the listing is open-->
+
+            {% if listing.open == True %}<p> <h3 class="table-primary"> This auction is open for bidding!</h3> </p>
+         <p >Initial bid = {{listing.initialBid}}</p>
+         {%if hBid != 0%}
+         <p> Highest bid = {{hBid}} </p>
+         <p> Total number of bids = {{tBid}}
+      
+           
+            {%endif%}
+         
+         
+         
+         <!--Make a Bid-->
+                  {% if user.is_authenticated %}
+                  <div>
          <form action="" method="POST">
-         <p> Make a bid!  <input type="number" name="title" value="{{listing.hBid}}"> <input type="submit" name="bid" value="Bid!"> <p>
+            {% csrf_token %}
+            <input type="hidden" name="user" value="{{ request.user.id }}">
+         <p> Wanna make a bid?  <input type="number" name="Bid" value="{{Bid}}">
+             <input type="submit" name="bid" value="Bid!"> </p>
+            <h5 style="color:red">{{error}}</h5>
          </form>
-         <form action="" method="post">
-        <p> <input type="submit" name="follow" value="Follow"> this auction to stay updated!</p>
+      </div>
+   
+
+      <!--add auction to the watchlist-->
+            <form action="follow/{{listing.id}}"  method="post">
+               <input type="hidden" name="user" value="{{ request.user.id }}">
+               {% csrf_token %}
+        <p> {% if request.user in lst%}<input type="submit" name="follow" value="Remove"> this auction from your watchlist to stay outdated!</p>
+            {%else%}<input type="submit" name="follow" value="Add"> this auction to your watchlist to stay updated!</p>
          {% endif%}
-            {% else %} closed! {% endif%}
+         {% endif%}
+            </form>
+        
+   <!-- If the auction is closed -->
+      {% else %}<p><h3 class="table-secondary"> This auction is closed! </h3></p>
+      {% if request.user.id == listing.hBidder%} <h2 class="table-warning"> Congratulations! you've won this bid for {{listing.title}}!<br> Now it's all yours!</h2>{% endif%} {% endif%}
+   </section>   
+
+   
+      <!--Make a commment-->
+      <section class="py-2 container text-center">
+      {% if user.is_authenticated %}
+      <form action="comment/{{listing.id}}"  method="post">
+         {% csrf_token %}
+         <input type="hidden" name="user" value="{{ request.user.id }}">
+         <input type="hidden" name="auction" value="{{ listing.id }}">
+         <p>Fell free to leave a comment!</p>
+         <p><textarea name="comment" rows="4" cols="80"> </textarea></p>
+         <p><input type="submit" value="Comment!"></p>
+      </form>
+      {% endif%}
+       </section>
+
+      <!-- Display comments -->
+
+      <div class="container">
+         <h2>Comments about this item:</h2>            
+         <table class="table table-bordered">
+           <thead>
+             <tr>
+               <th>User</th>
+               <th>Comment</th>
+             </tr>
+           </thead>
+           <tbody>
+            {%for Comments in Comments%}
+            <tr>
+            <td>{{Comments.user}} </td>
+            <td>{{Comments.comment}}</td>
+            </tr>
+         {%empty%}
+         <tr>
+            <td>it's pretty empty down here!</td>
+            <td>Wanna bee the first to comment?</td>
+            </tr>
+         {%endfor%}
+           </tbody>
+         </table>
+       </div>
+
 {% endblock %}

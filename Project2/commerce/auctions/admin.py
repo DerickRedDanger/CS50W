@@ -5,11 +5,11 @@ from . import models
 
 
 class UserAdmin(admin.ModelAdmin):
-    list_display = ['id','first_name','last_name','hostedAuction']
-    search_fields = ['first_name','last_name','hostedAuction']
+    list_display = ['id','first_name','last_name','watchlist']
+    search_fields = ['first_name','last_name','watchlist']
 
 class listingsAdmin(admin.ModelAdmin):
-    list_display = ['title','open','hBid','initialBid']
+    list_display = ['title','open','hBid','initialBid',]
     search_fields = ['title','open','initialBid','owner','category']
 
 class bidsAdmin(admin.ModelAdmin):
