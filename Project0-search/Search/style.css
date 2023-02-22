@@ -1,6 +1,9 @@
+
 p {
     font-size: medium;
 }
+
+/* links's Css */
 a {
     text-align:right;
     color: black;
@@ -10,7 +13,9 @@ a:hover {
     text-decoration: underline;
     color: blue;
 }
+/* ---- */
 
+/* Form's Css */
 form{
     text-align:center;
     font-size: medium;
@@ -24,10 +29,30 @@ input.text{
     font-size: medium;
 }
 
-input.submit{
+/* Button's Css */
+button{
     border-radius: 0.25em;
     font-size: medium;
     border-style: none;
     padding: 5px;
     background: #F8F9Fa;
+}
+
+button:hover{
+    border: 1px solid rgb(187, 187, 187);
+}
+/* Advanced search's button's Css */
+#adv{
+    background-color:#8AB4F8; 
+    font-size: medium;
+    color:White;
+    padding: 5px;
+    border-radius: 0.25em;
+}
+#adv:hover{
+    background-color:#a8c4f5;
+    font-size: medium;
+    color:White;
+    padding: 5px;
+    border-radius: 0.25em;
 }

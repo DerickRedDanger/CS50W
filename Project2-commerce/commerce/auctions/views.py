@@ -101,7 +101,7 @@ def listing(request,id,hBid=0, error="",):
                     "lst":lst,"Bid":Bid,"tBid":tBid,
                     "comment":comment,"Comments":Comments})
             if Bid <= hBid:
-                error = "Your bid must be higher than the highest bid!"
+                error = "your bid must be higher than the highest bid"
                 return render(request, "auctions/listing.html",{
                     "listing":listing, "hBid":hBid,"error":error,
                     "lst":lst,"Bid":Bid,"tBid":tBid,
@@ -181,3 +181,5 @@ def watchlist(request):
     user=request.user
     listing=user.watchlist.all()
     return render(request, "auctions/watchlist.html",{"listings":listing})
+
+    

@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <title>Test's index</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+        
+    </head>
+    
+    <body>
+
+<!-- Data attribute - start-->
+<script>
+    document.addEventListener('DOMContentLoaded',function(){
+    
+        document.querySelectorAll('button').forEach(function(button){
+            button.onclick = function(){
+                document.querySelector('#hello').style.color = button.dataset.color;
+                }
+            })
+        })
+    </script>
+    <h1>Data attribute</h1>
+    <h1 id = 'hello'> Hello! </h1> 
+    <button data-color='red'> Red </button>
+    <button data-color='blue'> Blue </button>
+    <button data-color='green'> Green </button>
+<br><br>
+<!-- Data attribute - end -->
+
+<!-- This value - start -->
+<script>
+    document.addEventListener('DOMContentLoaded',function(){
+        document.querySelector('select').onchange=function(){
+                document.querySelector('#hello2').style.color = this.value;
+                }
+            
+    })
+
+    
+    </script>
+    <h1>This attribute</h1>
+    <h1 id = 'hello2'> Hello again! </h1>
+    <select>
+    <option value='black'> Black </option>
+    <option value='red'> Red </option>
+    <option value='blue'> Blue </option>
+    <option value='green'> Green </option>
+    </select>
+
+<!-- This value - end -->
+
+<!-- onsubmit - start -->
+<script>
+       
+    document.addEventListener('DOMContentLoaded',function() {
+        document.querySelector('form').onsubmit = () => {
+            const task = document.querySelector('#task').value;
+            const li = document.createElement('li');
+            li.innerHTML = task;
+
+            document.querySelector('#tasks').append(li);
+            // printing into the JavaScript console (F12 -> console tab)
+            console.log(task);
+            
+            // Stop the form from submitting a web request
+            return false;
+                    }
+            });
+    </script>
+
+    <h1> Task </h1>
+    <ul id="tasks">
+    </ul>
+    <form>
+        <input id="task" placeholder="New Task" type="test">
+        <input type="submit">
+    </form>
+<!-- onsubmit - end -->
+
+<!-- localStorage - start-->
+<script>
+    
+    if(!localStorage.getItem('counter')){
+        localStorage.setItem('counter',0);
+    }
+
+    
+    function count(){
+       var counter = localStorage.getItem('counter');
+       counter++;
+       document.querySelector('#counting').innerHTML = counter;
+       localStorage.setItem('counter',counter);
+    }
+
+    document.addEventListener('DOMContentLoaded',function() {
+        document.querySelector('#count').onclick = count;
+        document.querySelector('#counting').innerHTML = localStorage.getItem('counter');
+    });
+
+    </script>
+
+    <h2> Counting </h2>
+    <h1 id="counting"> 0 </h1>
+    <button id="count">Count</button>
+<!-- localStorage - end-->
+
+<!-- singlepage - start-->
+<!-- more in views.py-->
+<style>
+    </style>
+    <script>
+    window.onpopstate = function(event){
+        console.log(event.state.section);
+        showSection(event.state.section)
+    }
+
+    function showSection(num){
+
+        fetch(`section/${num}`)
+        .then(response => response.text())
+        .then(text => {
+            console.log(text); 
+            document.querySelector('#content').innerHTML=text;
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.section').forEach(button=>{
+            button.onclick = function() {
+                const num = this.dataset.section;
+                history.pushState({section: num},"",`section${num}`)
+                showSection(this.dataset.section)
+            }
+        })
+    });
+    </script>
+    <h1> Single page application </h1>
+    <button class="section" data-section='1'> Section 1</button>
+    <button class="section" data-section='2'> Section 2</button>
+    <button class="section" data-section='3'> Section 3</button>
+    <button class="section" data-section='4'> Section 4</button>
+    <div id='content'>
+    </div>
+<!-- single page - end-->
+
+<!-- animation - start-->
+<style>
+    #animation {
+        position: relative;
+        animation-name: grow;
+        animation-duration: 10s;
+        animation-fill-mode: fowards;
+        animation-iteration-count: infinite;
+        animation-play-state: paused;
+        background-color: white;
+     }
+
+    @keyframes grow {
+        0%{
+            font-size:20px;
+            left:0%;
+            top:0px;
+            background-color: red;
+        }
+
+        33%{
+            font-size: 30px;
+            left:40%;
+            top:0px;
+            transform: rotate(20deg);
+            background-color: yellow;
+        }
+
+        66%{
+            font-size: 1px;
+            left:0%;
+            top:40px;
+            transform: rotate(180deg);
+            background-color: blue;
+        }
+
+        100%{
+            font-size:20px;
+            left:0%;
+            top:0px;
+            transform: rotate(-360deg);
+            background-color: white;
+        }
+    }
+    </style>
+    <script>
+    document.addEventListener('DOMContentLoaded', function(){
+        const test = document.querySelector('#animation');
+        
+        document.querySelector('#start').onclick = () => {
+            if (test.style.animationPlayState =='paused') {
+                test.style.animationPlayState = 'running';
+            } else {
+                test.style.animationPlayState ='paused';
+            }
+        }
+    });
+    </script>
+    <h1>Animation</h1>
+    <h1 id='animation'>I am an animation</h1>
+    <button id='start'>Start/Stop the animation</button>
+<!-- animation - end-->
+
+
+<!-- Scroll - start-->
+<script>
+    window.onscroll= () =>{
+    if (window.innerHeight + window.scrollY >= document.body.offsetHeight){
+        document.querySelector('#end').style.background = "green";
+    }else{
+        document.querySelector('#end').style.background = "blue";
+    }
+    }
+    </script>
+    <h1>scroll</h1>
+        <p>10</p><p>9</p><p>8</p><p>7</p><p>6</p>
+        <p>5</p><p>4</p><p>3</p><p>2</p><p>1</p>
+        <p id='end'>You reached the end of the page!</p>
+
+<!-- scroll - end-->
+
+<!-- Post - start-->
+<script>
+    //start with first post
+    let counter = 1;
+    
+    //load posts 20 at time
+    const quantity = 20;
+    
+    // when DOM loads, render the first 20 post
+    document.addEventListener("DOMContentLoaded",load);
+
+    // when the user reaches the end of the page,Load next set of posts
+    window.onscroll= () =>{
+        if (window.innerHeight + window.scrollY >= document.body.offsetHeight){
+            load();
+        }
+    }
+    
+//Add a function to listen to clicks and hide the post
+document.addEventListener('click', event =>{
+    const element = event.target;
+    if (element.className === "hide"){
+        element.parentElement.style.animationPlayState = 'running';
+        element.parentElement.addEventListener('animationend', () =>{
+            element.parentElement.remove();
+        });
+
+    }
+});
+
+    // Load function
+    function load(){
+        // set start and end post numbers, update counter
+        const start = counter;
+        const end = start + quantity - 1;
+        counter = end + 1;
+
+        //get new posts and add posts
+        fetch(`posts?start=${start}&end=${end}`)
+        .then(response => response.json())
+        .then(data => {
+            data.post.forEach(add_post);
+        })
+    };
+
+    // Add a new post with given contents to DOM
+    function add_post(contents){
+
+        // create new post, giving it a class and setting it's inner html
+        const post = document.createElement('div');
+        post.className = 'post';
+        post.innerHTML = `${contents} <button class="hide">Hide</button>`;
+        
+
+        // Add post to DOM
+        document.querySelector('#posts').append(post);
+    };
+
+    
+    </script>
+    <style>
+@keyframes hide{
+    0% {
+        opacity: 1;
+        height: 100%;
+        line-height: 100%;
+        padding: 20px;
+        margin-bottom: 10px;
+    }
+    80% {
+        opacity: 0;
+        height: 100%;
+        line-height: 100%;
+        padding: 20px;
+        margin-bottom: 10px;
+    }
+    100%{
+        opacity: 0;
+        height: 0px;
+        line-height: 0px;
+        padding: 0px;
+        margin-bottom: 0px;
+    }
+}
+
+        .post {
+            background-color: green;
+            padding: 20px;
+            margin-bottom: 10px;
+            animation-name: hide;
+            animation-duration: 2s;
+            animation-fill-mode: fowards;
+            animation-play-state: paused;
+        }
+
+        .hide{
+            float: right;
+        }
+    </style>
+    <H1>Post</h1>
+    <div id="posts">
+    </div>
+<!-- post - start-->
+</body>
+</html>

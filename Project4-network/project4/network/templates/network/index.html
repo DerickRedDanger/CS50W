@@ -1,0 +1,685 @@
+{% extends "network/layout.html" %}
+
+{% block script %}
+<style>
+    
+    @keyframes hide{
+        0% {
+            opacity: 1;
+            height: 100%;
+            line-height: 100%;
+            padding: 20px;
+            margin: 20px;
+            border: 3px solid #1a1adb;
+        }
+        80% {
+            margin: 20px;
+            opacity: 0;
+            height: 100%;
+            line-height: 100%;
+            padding: 20px;
+            border: 3px solid #1a1adb;
+            display:none
+            
+        }
+        100%{
+            margin: 0px;
+            opacity: 0;
+            height: 0%;
+            line-height: 0px;
+            padding: 0px;
+            border: 0px solid #1a1adb;
+            
+        }
+    }
+    
+            .post{
+                animation-name: hide;
+                animation-duration: 1s;
+                animation-fill-mode: both;
+                animation-play-state: paused;
+            }
+    
+            .hide{
+                float: right;
+            }
+
+
+</style>
+<script>
+// the above is the style for the hide function
+// Variables
+
+    //Id of the user's pesonal page, 0 if not in a personal page
+    //like in all posts or following.
+    let id = 0
+
+    // Variable to number each post
+    let c = 0
+
+    // variable to check if it was the first time loading posts
+    // Used to make the load function only reset posts when there are posts
+    let z = 0
+    
+    //Set privacy status to load public, personal or follow only post
+    //on Dom load, open on public
+    let privacy = "public"
+    
+    // Set variable for use on following
+    let Element;
+
+    //Save the user for later use
+    let User;
+    try{ User = {{ request.user.id }}}
+    //if user is not logged
+    catch{ User = -1}
+    
+    //variable for current page, default to 1
+    let page = 1
+
+    //variable for max number of pages, default to 1  
+    let pages = 1
+//
+// when DOM loads, render the first page
+    document.addEventListener("DOMContentLoaded",load(privacy,id));
+//
+// on click event handler for page buttons
+    document.addEventListener('click', event =>{
+        const element = event.target;
+
+        // If click on all posts
+        if (element.className == "nav-link all"){
+                // remove personal page's information, if any
+                document.getElementById("header").style.display = "none"
+            
+                // changes the title to public
+                document.getElementById("title").innerHTML="Public Post"
+                
+                // if user isn't logged, doesn't show the option to create new post
+                if(User!= -1){
+                    document.getElementById("np").style.display = "block"
+                }
+
+                //set page, Id and number of posts to default and privacy to public
+                page = 1
+                c=0
+                id=0
+                privacy="public"
+                // delete all posts
+                document.getElementById("posts").innerHTML=""
+                // load posts with privacy set to public
+                load(privacy,id)
+            };
+
+        // If click on following posts
+        if (element.className == "nav-link following"){
+            document.getElementById("header").style.display = "none"
+            document.getElementById("title").innerHTML="following Post"
+            page = 1
+            c=0
+            id=0
+            privacy="following"
+            document.getElementById("posts").innerHTML=""
+            // load posts with privacy set to following
+            load(privacy,id)
+        };
+
+        // If click on pagination
+        if (element.className == "page-link"){
+            //change the page value to the one in the pagination
+            page = element.dataset.page
+            // loads post with the set privacy and the new page
+            load(privacy,id)
+            
+        };
+
+         // If click on a posts owner or the user's profile name (going to a profile page)
+         if (element.className == "user" ||element.className == "nav-link user"){
+            page = 1
+            console.log(`element = ${element}`)
+            // change the profile page style to block
+            document.getElementById("header").style.display = "block"
+            if(User!= -1){
+                document.getElementById("np").style.display = "none"
+            }
+            c=0
+            
+            // get the id for the owner of this profile page
+            id = element.dataset.user
+            // set privacy to personal
+            privacy="personal"
+            // load the profile page information
+            Profile(id)
+            // load posts from this profile page owerner based on
+            // it's relationship to the user ( if owner or follower)
+            load("personal",id)
+
+  
+            
+        };
+
+         // If click on follow/unfollow inside personal page
+         if (element.className == "follow"){
+            page = 1
+            // get the follow value (depends if it was follow or unfollow)
+            follow = element.value
+            c=0
+           
+            console.log("un/follow")
+            // update the information on the server
+            Follow(follow,id)
+            console.log("reload page")
+            Profile(id)
+        };
+
+
+        // If on profile page and click on edit description
+        if (element.className == "editp"){
+            // hides the non editable information
+            document.getElementById("description").style.display = "none"
+            document.getElementById("follow").style.display = "none"
+            if(User!= -1){
+                document.getElementById("np").style.display = "none"
+            }
+            // shows the editable on and remove the readonly
+            document.getElementById("editarea").style.display = "block";
+            document.getElementById("editarea").readOnly = false;
+            document.getElementById("save").style.display = "block";
+            document.getElementById("cancel").style.display = "block";
+         
+        };
+
+        // if on profile page and click on a save button
+        if (element.className == "editsave"){
+            // save the changes
+            const description = document.getElementById("editarea").value;
+            // chang the information in the server
+            fetch(`/description/${id}`,{
+                method:'PUT',
+                body: JSON.stringify({
+                    description:description,
+                })
+            }).then(response=>{
+                c=0;
+                // reload pofile page and posts
+                Profile(id);
+                load("personal",id)})
+        
+        };
+
+    // if on profile page and click on a cancel button
+        if (element.className == "editcancel"){ 
+            // if click on cancel edit, make sure the user didn't click by accident
+            document.getElementById("cancel").style.display = "none";
+            document.getElementById("confirm").style.display = "block";
+
+            };
+    // if on profile page and click on a confirm button
+    if (element.className == "editconfirm"){
+        // if they confirm they want to cancel edit, reset information
+        // hide the editable one and show the non editable
+        document.getElementById("editarea").style.display = "none";
+        document.getElementById("editarea").readOnly = true;
+        element.style.display = "none";
+        document.getElementById("save").style.display = "none";
+        document.getElementById("follow").style.display = "block"
+        };
+
+    });
+
+//
+// post related on click functions
+    document.addEventListener('click', event =>{
+    const element = event.target;
+
+    //If click on the newpost/cancel new post button
+    if (element.className == "newpost"){
+        // if click to cancel new post, hide the new post creation option
+        if (document.getElementById("post").style.display == "block"){
+            element.innerHTML="Create a new post"
+            document.getElementById("post").style.display = "none"
+            
+        }else{
+            // if click on new post, show the new post creation form
+            element.innerHTML="Cancel new post"
+            document.getElementById("post").style.display = "block";
+        };
+        
+
+    }
+
+    //If click on a post's edit button
+    if (element.className == "edit"){
+        let cl = element.dataset.id;
+        // shows the editable version of the posts info
+        document.getElementById("Select"+cl).style.display = "block";
+        document.getElementById("Image"+cl).style.display = "block";
+        document.getElementById("image"+cl).readOnly = false;
+        document.getElementById("save"+cl).style.display = "block";
+        document.getElementById("cancel"+cl).style.display = "block";        
+        document.getElementById("textarea"+cl).style.display = "block";
+        document.getElementById("textarea"+cl).readOnly = false;
+        document.getElementById("select"+cl).disabled = false;
+        // hides the non editable version
+        element.style.display = "none";
+        document.getElementById("text"+cl).style.display = "none";
+
+    }
+    // if click on a save button
+    if (element.className == "save"){
+        // save the post information into variables
+        let cl = element.dataset.id;
+        let id = element.dataset.post;
+        const post = document.getElementById("textarea"+cl).value;
+        const image = document.getElementById("image"+cl).value;
+        const privacy = document.getElementById("select"+cl).value;
+        const np = document.getElementById("np"+cl).value;
+        // send them to the server
+        fetch(`/edit`,{
+            method:'PUT',
+            body: JSON.stringify({
+                post:post,
+                image:image,
+                privacy:privacy,
+                np:np,
+            })
+        }).then(data=>{
+            // reloads the post
+            reload(id,cl)})
+        
+    };
+    // if click on a hide button
+    if (element.className == "hide"){
+        // get the post's id from the element's dataset than
+        // hide and remove the post 
+        let cl = element.dataset.id;
+        element.parentElement.style.animationPlayState = 'running';
+        element.parentElement.addEventListener('animationend', () =>{
+            element.parentElement.remove();
+        });};
+
+    // if click on a like button
+    if (element.className == "like" || element.className == "dislike"){
+        // get the posts Id and position
+        let cl = element.dataset.id;
+        let id = element.dataset.post;
+        // check if it was like or unlike
+        if(element.className=="like"){
+            element.value ="liking";
+        }else if(element.className=="dislike"){
+            element.value ="unliking";
+        };
+        // send info to the server
+        fetch(`/like/${id}`,{
+            method:'PUT',
+            body: JSON.stringify({
+                like:element.className,
+                User:User,
+            })
+        }).then(like=>{
+            // reload page
+        reload(id,cl);
+        });
+        
+
+
+        };
+    // if click on a cancel edit button
+    if (element.className == "cancel"){
+        let cl = element.dataset.id;
+        // show the confirm cancel buttom
+        document.getElementById("cancel"+cl).style.display = "none";
+        document.getElementById("confirm"+cl).style.display = "block";
+
+        };
+    // if click on a confirm cancel button
+    if (element.className == "confirm"){
+        // reset post to the original
+        let cl = element.dataset.id;
+        document.getElementById("Select"+cl).style.display = "none";
+        document.getElementById("mod"+cl).reset();
+        document.getElementById("Image"+cl).style.display = "none";
+        document.getElementById("image"+cl).readOnly = true;
+        document.getElementById("text"+cl).style.display = "block";
+        document.getElementById("textarea"+cl).style.display = "none";
+        document.getElementById("textarea"+cl).readOnly = true;
+        document.getElementById("select"+cl).disabled = true;
+        element.style.display = "none";
+        document.getElementById("save"+cl).style.display = "none";
+        document.getElementById("edit"+cl).style.display = "block";
+
+        };
+    });
+//
+// Load function
+    function load(privacy,id){
+        // If the first time loading post, don't reset Posts innerhtml
+        if(z != 0){
+            document.getElementById("posts").innerHTML=""
+    }
+        z = 1
+        //get new posts 
+        fetch(`getpposts?page=${page}&privacy=${privacy}&user=${id}`)
+        .then(response => response.json())
+        .then(data =>{
+            for (let i in data.nu){
+
+                    //and add posts
+                    // data.nu[i] in there is the varible for
+                    // posti while -1 means to append to the end of posts
+                    add_post(data[data.nu[i]],-1)
+                    console.log(data[data.nu[i]])
+                
+            }
+           
+            // updates the information about the present page
+            // and maximum amount of pages
+            page = data["page"];
+            pages = data["pages"];
+
+            // reloads the pagination
+            pagination();
+        })
+        };
+//
+// Pagination function
+    //function to create/update the pagination
+    function pagination(){
+        // resets the pagination
+        document.querySelector('#pagination').innerHTML=""
+        // create the previous button,
+        // setting it to disabled if it's the first page
+        let previous = document.createElement('span')
+        if (page == 1){
+            previous.innerHTML =`<li class="page-item disabled">
+                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+            </li>`
+            document.querySelector('#pagination').append(previous);
+        } else {
+            previous.innerHTML =`<li class="page-item">
+                <a class="page-link" href="#" data-page ="${page - 1}">Previous</a>
+            </li>`
+            document.querySelector('#pagination').append(previous);
+        }
+        
+        // create the numbered pages button,
+        // setting to active the current page
+        for (let I = 1; I <= pages; I++) {
+            let pagi = document.createElement('span')
+            console.log(I)
+            if (page == I){
+                pagi.innerHTML=`<li class="page-item active" aria-current="page">
+                    <a class="page-link" href="#"> ${I} <span class="sr-only">(current)</span></a>`
+                document.querySelector('#pagination').append(pagi);
+            } else {
+                pagi.innerHTML=`<li class="page-item"><a class="page-link" href="#" data-page ="${I}"> ${I} </a></li>`
+                document.querySelector('#pagination').append(pagi);
+            }
+        }
+        // creates the next button, 
+        // setting to disabled if current page is the last
+        let next = document.createElement('span')
+        if (page == pages){
+            next.innerHTML =`<li class="page-item disabled">
+                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Next</a>
+            </li>`
+            document.querySelector('#pagination').append(next);
+        } else {
+            next.innerHTML =`<li class="page-item">
+                <a class="page-link" href="#" data-page ="${page + 1}">Next</a>
+            </li>`  
+            document.querySelector('#pagination').append(next);
+        }
+        
+        }
+//
+// Reload function
+    // Function that reloads posts once they were modified
+    // taking as input the posts id and it's position on the page
+    function reload(id,position){
+
+            //get the updated version of this post
+            fetch(`getpost/${id}`)
+            .then(response => response.json())
+            .then(data =>{
+            //than send the new info to add_post function
+            add_post(data,position);
+            
+            })
+            };
+
+
+    
+// add_ post function
+    // function made to add posts to the page.
+    // if given a position(instead of the default -1) 
+    // it will overwrite the post that was in that position
+    //(usually to reload said post)
+    function add_post(post,position){
+        // fail safe in case it receives a empty post, 
+        // like trying to add more post when
+        // all avaliable post were already added, break
+        if(post == undefined){
+            console.log("loaded all avaliable posts")
+            console.log("no more posts to load")
+            c = -1
+            return ("no more posts to load")
+        }
+
+        // variable to number the post's position
+        let x;
+        // If not reloading a post, the number in the post is equal to C
+        if(position =="-1"){
+            x = c;
+
+        // If reloading a post, the number is equal to the one it's overwriting
+        } else {
+            x = position;
+        }
+
+        // create new post, giving it the class div, giving it a class, id
+        // and setting it's inner html
+        const posts = document.createElement('div');
+        posts.className = `n${x}`;
+        posts.id = `nm${x}`
+
+       
+
+        //If the post has a image, show it
+        let Img;
+        if (post.Im == "true"){
+            Img = `<p> <img src="${post.image}" alt="posts image" style="width:300px; align:center;"> </p>`
+        }else{
+            Img = ''
+        }
+        // If the user is the one that posted, allow it to be edited
+        if (post.own =="true"){
+            own=`<input type="button" id="edit${x}" class ="edit" data-id='${x}' value="Edit post">
+            <input type="button" id="save${x}" class ="save" style="display:none" data-id='${x}' data-post='${post.id}' value="Save post">
+            <input type="button" id="cancel${x}" class ="cancel" style="display:none" data-id='${x}' value="Cancel">
+            <input type="button" id="confirm${x}" class ="confirm" style="display:none" data-id='${x}' value="Confirm cancel">`
+        }else{
+            own=''
+        }
+         
+        // If the user is logged show like/unlike option
+        // If not logged, don't show either
+        if (User == "-1"){
+            like=""
+        }else if (post.like == "true"){
+            like = `<input type="button" class="like" id="like${x}" data-id='${x}' data-post='${post.id}' value="Like" style="display:none;"> 
+            <input type="button" class="dislike" id="dislike${x}" data-id='${x}' data-post='${post.id}' value="Unlike" style="display:block;"> <br>`
+        }else{
+            like = `<input type="button" class="like" id="like${x}" data-id='${x}' data-post='${post.id}' value="Like" style="display:block;"> 
+            <input type="button" class="dislike" id="dislike${x}" data-id='${x}' data-post='${post.id}' value="Unlike" style="display:none;"> <br>`
+        }
+        // Post's Inner Html
+        posts.innerHTML = `
+        <form id="mod${x}" class="post"> 
+        From <a class="user" data-user='${post.ownerid}' href="#" >${post.owner}</a><br>
+        
+        <input type="button" class="hide" data-id='${x}' value="Hide"> <br>
+         {% csrf_token %}
+            <br>
+        ${Img}
+        
+            <p id="text${x}">${post.post}</p>
+                <p><textarea id="textarea${x}" name='post' style="display:none" readonly  cols="90" rows="4">${post.post}</textarea></p>
+            <p id="Image${x}" style="display:none" >Image's link:<input type="url" readonly id="image${x}"  name="image" maxlength="300" value="${post.image}"></p><br>
+            <p id="Select${x}" style="display:none" >
+                Privacy:<br> <br>
+            <select id="select${x}" disabled name="privacy" id="id_privacy">
+                <option value="pu" selected="">Public</option>
+              
+                <option value="pr">Private</option>
+              
+                <option value="fo">Following</option>
+              
+              </select></p>
+              ${post.timestamp}
+            likes: ${post.likes} <br><br>
+            ${like}
+            ${own}
+            <input type="hidden" name="np" id="np${x}" value="${post.id}" readonly">
+            
+    
+        </form>`;
+
+        //Than add the post to DOM
+        //  If throught load, append at the end of the DOM
+        if (position =="-1"){
+            document.querySelector('#posts').append(posts);
+            c++;
+
+        // if throught reload, overwrite the original post
+        } else {
+        
+            document.getElementById("mod"+position).innerHTML = posts.innerHTML;
+
+        }
+        
+        };
+
+//
+//Function to load th profile page
+    // takes the page's owner id
+    function Profile(id){
+        // reset page to 1
+        page = 1
+        console.log(`Profile`)
+            // get the user's information'
+        fetch(`/profile/${id}`)
+        .then(response=> response.json())
+        .then(data=>{
+            console.log(`follow = ${data.f}`) 
+ 
+        // than update the pages information
+
+        // Check if the user is logged, owns the page, or if the follows or not the owner
+        // and adds edit/follow/unfollow or nothing accordingly
+        if (data.f =="owner"){
+            console.log ("User owns the page")
+            follow=`Followers = ${data.followers}<br>
+            <div id="follow" >Would you like to 
+            <input type="button" class="editp" id ="editp" data-id="${data.id}" Value="edit" > 
+            your profile page ?</div>
+            <textarea id="editarea" name='post' style="display:none" readonly  cols="90" rows="4">${data.description}</textarea>
+            <input type="button" id="save" class ="editsave" style="display:none"  id="save" value="Save post">
+            <input type="button" id="cancel" class ="editcancel" style="display:none"  id="cancel" value="Cancel">
+            <input type="button" id="confirm" class ="editconfirm" style="display:none" value="Confirm cancel">
+            `  
+        
+        }else if(data.f=="nfollowing"){
+            console.log (`data.f = ${data.f}`)
+            follow=`Followers = ${data.followers}<br>
+            If you like what they are sharing and wanna stay 
+            update for more, why not <input type="button" class="follow" id ="follow${id}" data-id="${id}" Value="follow" > them?`
+        
+        }else if(data.f=="following"){
+            console.log (`data.f = ${data.f}`)
+            follow=`Followers = ${data.followers}<br>
+            If you no longer like what they are sharing,feel free 
+            to <input type="button" class="follow" id ="follow${id}" data-id="${id}" Value="unfollow" > them!`
+        
+        }else if(data.f=="notlogged"){
+            console.log (`data.f = ${data.f}`)
+            follow=`Followers = ${data.followers}<br>
+            Please log in if you'd like to follow ${data.username}`
+        }    
+
+        // Loads the information in the page
+        document.getElementById("header").innerHTML=`<div id="description">${data.description}</div><br>
+        ${follow}<br> `
+        // change the page's title
+        document.getElementById("title").innerHTML= data.username+"'s posts "
+    })}
+//
+// Follow function
+    // function to update whether the user follows or not the page owner
+    // takes two variabes, wheter the useer will follow/unfollow and the page owner's id
+    function Follow(follow,id){
+            console.log(`following or not= ${follow}`)
+            // delete all posts on the page
+            document.getElementById("posts").innerHTML=""
+
+            // checks to make sure follow is one of the two options
+            // If un/following put the new info into the database,
+            if (follow =="follow"||follow =="unfollow"){
+                fetch(`/follow/${id}/${follow}`,{
+                    method:'PUT',
+                    body: JSON.stringify({
+                        follow:follow,
+                    })
+                })
+                //----------------------
+                // than reload the page
+                .then(json =>{Profile(id)})
+                // and load the posts again
+                .then(json => {load("personal",id)})         
+        //----------------------
+            }
+    };
+
+</script>
+{% endblock %}
+
+
+{% block body %}
+<br><h4><p id="title"> Public Post</p></h4>
+    <div id= "header" >
+    </div>
+    {% if user.is_authenticated %}
+    <div id="np">
+        <button style="float:right" class="newpost" id="npb">Create a new post</button>
+        <br><br>
+        <form id="post" style="margin-top: 30px; display:none" action="/posts" method="post">
+        <h4> Make your post! </h4>
+            {% csrf_token %}
+            {{ npost.as_p }}
+            <input type="hidden" name="owner" value="{{ request.user.id }}">
+        <input type="submit" value="Sumbit">
+            </form>
+        </div> 
+        {% endif %} 
+    <div id="posts"> </div>
+
+
+
+
+
+
+    <nav aria-label="Page navigation example">
+        <ul class="pagination" id = "pagination">
+
+
+         
+
+
+        </ul>
+      </nav>
+
+
+
+   
+    
+{% endblock %}

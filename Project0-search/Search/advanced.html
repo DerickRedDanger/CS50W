@@ -3,13 +3,17 @@
     <head>
         <title>Advanced search</title>
         <link rel="stylesheet" href="style.css">
+        <!-- Advanced search's image Css, had to customise this one -->
         <style>
-            img {
+
+    img {
+
   display: block;
   margin-left: auto;
   margin-right: auto;
   width: 50%;
-}
+
+    }
 
         </style>
     </head>
@@ -18,13 +22,14 @@
         
         
             <img src="google adv.gif" alt="Google logo" style=" width:600px; ">
-        <form style="text-align: left; white-space: pre-wrap; "  action="https://www.google.com/search">
+            
+            <form style="text-align: left; white-space: pre-wrap; "  action="https://www.google.com/search">
             <p><b>Find pages with...</b><br>
             All these words:                    <input type="text" style="width: 550px; height: 20px;" name="as_q"><br>
             This exact word or phrase:   <input type="text" style="width: 550px; height: 20px;" name="as_epq"><br>
             Any of these words:             <input type="text" style="width: 550px; height: 20px;" name="as_oq"><br>
             None of these words:           <input type="text" style="width: 550px; height: 20px;" name="as_eq"><br>
-            <input type="submit" class="submit" style="background-color:#8AB4F8 ; color:White; border-radius: 0.25em" value="Advanced Search"></p>
+            <button type="submit" id="adv" class="submit" value="Advanced Search">Advanced Search</button></p>
         </form>
     </body>
 </html>

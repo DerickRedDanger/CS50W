@@ -98,7 +98,7 @@ function load_mailbox(mailbox) {
                 body: JSON.stringify({
                     read: true,
                 })
-                
+                `Count is now ${counter}`
               })
       
               
@@ -179,3 +179,5 @@ document.querySelector('#emails-view').append(reply);
   // Show the mailbox name
   document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
 }
+
+
