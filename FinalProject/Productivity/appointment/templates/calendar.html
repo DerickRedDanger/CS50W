@@ -1,0 +1,11 @@
+{% extends 'base_calendar.html' %}
+
+
+{% block content %}
+<div class="clearfix">
+	<a class="btn btn-info" style="float: left" href="/calendar/{{ context.previous }}/{{context.p_year}}"> Previous Month </a>
+												
+	<a class="btn btn-info" style="float: right" href="/calendar/{{ context.next }}/{{context.n_year}}"> Next Month </a>
+</div>
+{{ context.calendar }}
+{% endblock %}
