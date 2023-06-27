@@ -1,0 +1,5 @@
+Cd to FinalProject
+use Scripts/Activate.ps1 in the command line to star the venv
+Cd Productivity
+python manage.py runserver
+to close venvi " deactivate "

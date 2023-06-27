@@ -1,0 +1,99 @@
+{% extends 'base_calendar.html' %}
+
+
+{% block content %}
+
+<form id="task" style="margin-top: 30px;" action="/daily/" method="post">
+    <h4> Creating a new daily task: </h4>
+    {% csrf_token %}
+        <p>
+    <label for="id_task">Event's name:</label>
+    <input type="text" name="task" maxlength="200" required="" id="id_task">
+  </p>
+
+  <p>
+    <label for="id_weekday">Weekday:</label>
+    <select name="weekday" id="id_weekday" multiple="">
+  <option value="1">Sunday</option>
+
+  <option value="2">Monday</option>
+
+  <option value="3">Tuesday</option>
+
+  <option value="4">Wednesday</option>
+
+  <option value="5">Thursday</option>
+
+  <option value="6">Friday</option>
+
+  <option value="7">Saturday</option>
+
+</select>
+  </p>
+  
+  <p>
+    <label for="id_start_time">Starting time:</label>
+    <input type="text" name="start_time" value="" placeholder="Hour:Minute" required="" id="id_start_time">
+      <span class="helptext">Format: Hour:Minute</span>
+  </p>
+
+  
+  <p>
+    <label for="id_end_time">Ending time:</label>
+    <input type="text" name="end_time" value="" placeholder="Hour:Minute" required="" id="id_end_time">
+      <span class="helptext">Format: Hour:Minute</span>
+  </p>
+
+  
+  <p>
+    <label for="id_quick_description">Quick description:</label>
+    <textarea name="quick_description" cols="60" rows="3" id="id_quick_description"></textarea>
+  </p>
+
+  
+  <p>
+    <label for="id_description">Detailed description:</label>
+    <textarea name="description" cols="90" rows="5" id="id_description"></textarea>
+  </p>
+
+  
+  <p>
+    <label for="id_notes">Task's Notes:</label>
+    <textarea name="notes" cols="60" rows="3" id="id_notes"></textarea>
+      <span class="helptext">Textual Notes</span>
+  </p>
+
+  
+  <p>
+    <label for="id_urgency">How urgent is this task? Can it wait/be postponed?</label>
+    <select name="urgency" id="id_urgency">
+  <option value="vh">very hight</option>
+
+  <option value="h">hight</option>
+
+  <option value="m" selected="">medium</option>
+
+  <option value="l">low</option>
+
+</select>
+  </p>
+
+  
+  <p>
+    <label for="id_importance">How vital is this task ? Will It bring great benefits if done? Great demerits if not done?</label>
+    <select name="importance" id="id_importance">
+  <option value="vh">very hight</option>
+
+  <option value="h">hight</option>
+
+  <option value="m" selected="">medium</option>
+
+  <option value="l">low</option>
+
+</select>
+  </p>
+
+    <input type="submit" value="Sumbit">
+        </form>
+
+{% endblock %}

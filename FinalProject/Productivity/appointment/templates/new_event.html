@@ -4,11 +4,119 @@
 {% block content %}
 
 <form id="event" style="margin-top: 30px;" action="/new/" method="post">
-    <h4> Make your event! </h4>
-        {% csrf_token %}
-        {{ event.as_p }}
-        {{ error }}
-    <input type="submit" value="Sumbit">
-        </form>
+  <h4> Creating a new event: </h4>
+  {% csrf_token %}
+      <p>
+  <label for="id_title">Event's name:</label>
+  <input type="text" name="title" maxlength="200" required="" id="id_title">
+  
+  
+</p>
+
+
+<p>
+
+  <label for="id_day">Day of the event:</label>
+  <input type="date" name="day"  required="" id="id_day">
+  
+</p>
+
+
+<p>
+  <label for="id_start_time">Starting time:</label>
+  <input type="time" name="start_time" required="" id="id_start_time">
+</p>
+
+
+<p>
+  <label for="id_end_time">Ending time:</label>
+  <input type="time" name="end_time" required="" id="id_end_time"> 
+</p>
+
+
+<p>
+  <label for="id_description">Event's description:</label><br>
+  <textarea name="description" cols="90" rows="5" id="id_description"></textarea>
+</p>
+
+
+<p>
+  <label for="id_notes">Notes about the event:</label><br>
+  <textarea name="notes" cols="90" rows="3" id="id_notes"></textarea>
+</p>
+
+
+<p>
+  <label for="id_repeat">Do you want this event to repeat ?</label><br>
+  <select name="repeat" id="id_repeat">
+<option value="nvr" selected="">No</option>
+
+<option value="day">Daily</option>
+
+<option value="wek">Weekly</option>
+
+<option value="mth">Monthly</option>
+
+<option value="yea">Yearly</option>
+
+<option value="wkd">Specific weekdays</option>
+
+</select>
+  
+</p>
+
+<p>
+  <label for="id_repeat_wkd">Repeat on which weekdays ?</label><br>
+  <span class="helptext">Hold Shift or Control to select more than one option</span><br>
+
+  <select name="repeat_wkd" id="id_repeat_wkd" multiple="">
+<option value="1">Sunday</option>
+
+<option value="2">Monday</option>
+
+<option value="3">Tuesday</option>
+
+<option value="4">Wednesday</option>
+
+<option value="5">Thursday</option>
+
+<option value="6">Friday</option>
+
+<option value="7">Saturday</option>
+
+</select>
+
+  
+</p>
+
+<p>
+  <label for="id_repeatd">How many times ?</label><br>
+  <select name="repeatd" id="id_repeatd">
+<option value="frv" selected="" >Forever</option>
+
+<option value="spc">Specific number of times</option>
+
+<option value="utl">Util</option>
+
+</select>
+  
+  
+</p>
+
+
+<p>
+  <label for="id_repeatutil">Repeat util:</label>
+  <input type="date" name="repeatutil" required="" id="id_repeatutil">
+</p>
+
+
+<p>
+  <label for="id_repeatnumber">Number of repetitions:</label>
+  <input type="number" name="repeatnumber" id="id_repeatnumber" value="0">
+</p>
+
+
+  <input type="submit" value="Sumbit">
+      </form>
 
 {% endblock %}

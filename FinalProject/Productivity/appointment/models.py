@@ -7,46 +7,260 @@ from django.urls import reverse
 
 # for calendar and daily/weekly activities
     # Events and appoitments for the callendar
-class Event(models.Model):
 
-    x = datetime.now()
-    Year=x.year
-    Month=x.month
-    Day=x.day
-    start=f"{x.hour}:{x.minute}"
-    y = x + timedelta(minutes=1)
-    end=f"{y.hour}:{y.minute}"
-    
-
-
-    title = models.CharField(u"Event's name",max_length=200,)
-    day = models.DateField(u'Day of the event',default=f"{Year}-{Month}-{Day}", help_text=u"Format: year-month-day")
-    start_time = models.TimeField(u'Starting time',default=f"{start}", help_text=u"Format: hour:minute")
-    end_time = models.TimeField(u'Ending time',default=f"{end}", help_text=u"Format: hour:minute")
-    description = models.TextField(u"Event's description",blank=True, null=True)
-    notes = models.TextField(u'Textual Notes', help_text=u'Textual Notes', blank=True, null=True)
-    repeat = models.IntegerField(u'number of repetitions',default=1,null=True, blank=True)
-
-    #repeatnumber = models.IntegerField(default=1, null=True, blank=True)
-    #repeatupto = models.DateTimeField(null=True, blank=True)
-    # Event's Priority:
-    veryhight="vh"
-    high="h"
-    medium="m"
-    low="l"
-    priority_choices = [
+# Choices for Urgency/Importance
+veryhight="vh"
+high="h"
+medium="m"
+low="l"
+priority_choices = [
         (veryhight, 'very hight'),
         (high, 'hight'),
         (medium, 'medium'),
         (low, 'low'),
     ]
+# setting up basic date data
+x = datetime.now()
+Year=x.year
+Month=x.month
+Day=x.day
+start=f"{x.hour}:{x.minute}"
+y = x + timedelta(minutes=1)
+end=f"{y.hour}:{y.minute}"
+
+
+class WeekDay(models.Model):
+    day = models.CharField(max_length=10)
+    number = models.IntegerField()
     
-    priority = models.CharField(
+    
+    def __str__(self):
+        return f"{self.day}"
+class Event(models.Model):
+
+    title = models.CharField(u"Event's name",max_length=200,)
+    day = models.DateField(u'Day of the event',default=f"{Year}-{Month}-{Day}", help_text=u"Format: year-month-day",)
+    start_time = models.TimeField(u'Starting time',default=f"{start}", help_text=u"Format: hour:minute")
+    end_time = models.TimeField(u'Ending time',default=f"{end}", help_text=u"Format: hour:minute")
+    description = models.TextField(u"Event's description",blank=True, null=True)
+    notes = models.TextField(u'Textual Notes', help_text=u'Textual Notes', blank=True, null=True)
+    
+    importance = models.CharField(u"How vital is this event ? will It bring great benefits if done? Great demerits if not done?",
         max_length=2,
         choices= priority_choices,
         default=medium,
     )
+    urgency = models.CharField(u"How urgent is this event ? can it wait/be delayed?",
+        max_length=2,
+        choices= priority_choices,
+        default=medium,
+    )
+
+    #----------------!!--------------------
+
+    #repeat choices:
+    nvr="nvr"
+    dly="day"
+    wek="wek"
+    mth="mth"
+    yea="yea"
+    wkd="wkd"
+    evd="edv"
+    repeat_choices = [
+        (nvr, 'never'),
+        (dly, 'daily'),
+        (wek, 'weekly'),
+        (mth, 'monthly'),
+        (yea, 'yearly'),
+        (wkd, 'specific weekdays'),
+    ]
+
+    repeat= models.CharField(u'when to repeat ?',
+        max_length=3,
+        choices= repeat_choices,
+        default=nvr,
+    )
     
+    repeat_wkd = models.ManyToManyField(
+        WeekDay,
+        related_name="Todayevent",
+        blank=True,
+        default=str(x.strftime('%w'))
+        )
+    
+    #repeat duration choices:
+    frv="frv"
+    spc="spc"
+    utl="utl"
+    repeatd_choices = [
+        (frv, 'Forever'),
+        (spc, 'Specific number of times'),
+        (utl, 'Util'),
+    ]
+
+    repeatd = models.CharField(u'How many times ?',
+        max_length=3,
+        choices= repeatd_choices,
+        default=frv,
+    )  
+    repeatutil = models.DateField(u'Repeat util',default=f"{Year}-{Month}-{Day}", help_text=u"Format: year-month-day")
+    repeatnumber = models.IntegerField(u'number of repetitions',default=1,null=True, blank=True)
+ #--------------------!!------------------
+    
+    def check_overlap(self, fixed_start, fixed_end, new_start, new_end):
+        overlap = False
+        if new_start == fixed_end or new_end == fixed_start:    #edge case
+            overlap = False
+        elif (new_start >= fixed_start and new_start <= fixed_end) or (new_end >= fixed_start and new_end <= fixed_end): #innner limits
+            overlap = True
+        elif new_start <= fixed_start and new_end >= fixed_end: #outter limits
+            overlap = True
+ 
+        return overlap
+ 
+    #def get_absolute_url(self):
+    #    url = reverse('admin:%s_%s_change' % (self._meta.app_label, self._meta.model_name), args=[self.id])
+    #    return u'<a href="%s">%s</a>' % (url, str(self.start_time))
+ 
+    def clean(self):
+        print(self.end_time)
+        print(type(self.end_time))
+        print(self.start_time)
+        print(type(self.start_time))
+        self.end_time = datetime.strptime(self.end_time, '%H:%M').time()
+        print(self.end_time)
+        print(type(self.end_time))
+        print(self.start_time)
+        print(type(self.start_time))
+        if self.end_time <= self.start_time:
+            raise ValidationError('Ending times must after starting times')
+ 
+        events = Event.objects.filter(day=self.day).exclude(id=self.id)
+        if events.exists():
+            for event in events:
+                if self.check_overlap(event.start_time, event.end_time, self.start_time, self.end_time):
+                    raise ValidationError(
+                        f'There is an overlap with another event: {event.title} on {event.day}, {event.start_time} - {event.end_time})')
+        
+        repeatedevents = EventRepetiton.objects.filter(day=self.day)
+        if repeatedevents.exists():
+            for repevent in repeatedevents:
+                if self.check_overlap(repevent.original.start_time,repevent.original.end_time, self.start_time, self.end_time):
+                    raise ValidationError(
+                        f'There is an overlap with a repeating event: {repevent.original.title} on {repevent.original.day}, {repevent.original.start_time} - {repevent.original.end_time})')
+    def __str__(self):
+        return f"{self.title}"
+class EventRepetiton(models.Model):
+
+    original=models.ForeignKey(
+        Event, 
+        on_delete=models.CASCADE,
+        related_name="Repetitions"
+    )
+
+    day = models.DateField(u'Day of the event',default=f"{Year}-{Month}-{Day}", help_text=u"Format: year-month-day")
+
+    def check_overlap(self, fixed_start, fixed_end, new_start, new_end):
+        overlap = False
+        if new_start == fixed_end or new_end == fixed_start:    #edge case
+            overlap = False
+        elif (new_start >= fixed_start and new_start <= fixed_end) or (new_end >= fixed_start and new_end <= fixed_end): #innner limits
+            overlap = True
+        elif new_start <= fixed_start and new_end >= fixed_end: #outter limits
+            overlap = True
+ 
+        return overlap
+ 
+    #def get_absolute_url(self):
+    #    url = reverse('admin:%s_%s_change' % (self._meta.app_label, self._meta.model_name), args=[self.id])
+    #    return u'<a href="%s">%s</a>' % (url, str(self.start_time))
+ 
+    def clean(self):
+        
+        events = Event.objects.filter(day=self.day)
+        if events.exists():
+            for event in events:
+                if self.check_overlap(event.start_time, event.end_time, self.original.start_time, self.original.end_time):
+                    raise ValidationError(
+                        f'There is an overlap with another event: {event.title} on {event.day}, {event.start_time} - {event.end_time})')
+        
+        repeatedevents = EventRepetiton.objects.filter(day=self.day).exclude(id=self.id)
+        if repeatedevents.exists():
+            for repevent in repeatedevents:
+                if self.check_overlap(repevent.original.start_time,repevent.original.end_time, self.original.start_time, self.original.end_time):
+                    raise ValidationError(
+                        f'There is an overlap with a repeating event: {repevent.original.title} on {repevent.original.day}, {repevent.original.start_time} - {repevent.original.end_time})')
+
+    def __str__(self):
+        return f"{self.original.title} - R - {self.day}"
+class DailyTask(models.Model):
+
+    task = models.CharField(u"Event's name",max_length=200,)
+
+    #weekday choices:
+    mon="1"
+    tue="2"
+    wed="3"
+    thu="4"
+    fri="5"
+    sat="6"
+    sun="0"
+    weekday_choices = [
+        (mon, 'monday'),
+        (tue, 'tuesday'),
+        (wed, 'wednesday'),
+        (thu, 'thursday'),
+        (fri, 'friday'),
+        (sat, 'saturday'),
+        (sun, 'sunday'),
+    ]
+
+    weekday = models.ManyToManyField(
+        WeekDay,
+        related_name="Todaytask",
+        blank=True,
+        )
+
+    start_time = models.TimeField(u'Starting time',default=f"{start}", help_text=u"Format: hour:minute")
+    end_time = models.TimeField(u'Ending time',default=f"{end}", help_text=u"Format: hour:minute")
+    quick_description = models.TextField(u"quick description",blank=True, null=True)
+    description = models.TextField(u"detailed description",blank=True, null=True)
+    notes = models.TextField(u"task's Notes", help_text=u'Textual Notes', blank=True, null=True)
+    
+    urgency = models.CharField(u"How urgent is this task ? Can it wait/be delayed?",
+        max_length=2,
+        choices= priority_choices,
+        default=medium,
+    )
+    importance = models.CharField(u"How vital is this task ? Will It bring great benefits if done? Great demerits if not done?",
+        max_length=2,
+        choices= priority_choices,
+        default=medium,
+    )
+
+    #repeat choices:
+    #nvr="nvr"
+    #day="day"
+    #wek="wek"
+    #mth="mth"
+    #yea="yea"
+    #wkd="wkd"
+    #evd="edv"
+    #repeat_choices = [
+    #    (nvr, 'never'),
+    #    (wek, 'weekly'),
+    #    (mth, 'monthly'),
+    #    (yea, 'yearly'),
+    #    (wkd, 'specific weekdays'),
+    #]
+
+    #repeat= models.CharField(u'Repeat ?',
+    #    max_length=3,
+    #    choices= repeat_choices,
+    #    default=nvr,
+    #)
+
+
     def check_overlap(self, fixed_start, fixed_end, new_start, new_end):
         overlap = False
         if new_start == fixed_end or new_end == fixed_start:    #edge case
@@ -66,13 +280,123 @@ class Event(models.Model):
         if self.end_time <= self.start_time:
             raise ValidationError('Ending times must after starting times')
  
-        events = Event.objects.filter(day=self.day)
-        if events.exists():
-            for event in events:
-                if self.check_overlap(event.start_time, event.end_time, self.start_time, self.end_time):
+        tasks = DailyTask.objects.filter(weekday=self.weekday)
+        if tasks.exists():
+            for task in tasks:
+                if self.check_overlap(task.start_time, task.end_time, self.start_time, self.end_time):
                     raise ValidationError(
-                        'There is an overlap with another event: ' + str(event.day) + ', ' + str(
-                            event.start_time) + '-' + str(event.end_time))
+                        f'There is an overlap with another task: {task.task}, {task.start_time} - {task.end_time})')
+
+
+
+    def __str__(self):
+        return f"{self.task}"
+class ListToDo(models.Model):
+    name = models.CharField(u"Event's name",max_length=200,)
+    quick_description = models.TextField(u"quick description",blank=True, null=True)
+    description = models.TextField(u"detailed description",blank=True, null=True)
+    steps = models.ManyToManyField(
+        "self", symmetrical=False,
+        related_name="bigtask",
+        blank=True,
+        )
+    
+    #Duration choices
+    minutes="mi"
+    hours="hs"
+    days="ds"
+    weeks="wk"
+    months="mn"
+    years="ys"
+    perpetual="Pe"
+    duration_choices = [
+        (minutes, "Minutes"),
+        (hours, "Hours"),
+        (days, "Days"),
+        (weeks, "Weeks"),
+        (months, "Months"),
+        (years, "Years"),
+        (perpetual, "Perpetual"),
+    ]
+    duration = models.CharField(u"How long do you expect this to take ?",
+        max_length=2,
+        choices= duration_choices,
+        default=hours,
+    )
+    urgency = models.CharField(u"How urgent is this task ? can it wait/be delayed?",
+        max_length=2,
+        choices= priority_choices,
+        default=medium,
+    ) # Very hight, hight, medium, low
+    importance = models.CharField(u"How vital is this task ? will It bring great benefits if done? Great demerits if not done?",
+        max_length=2,
+        choices= priority_choices,
+        default=medium,
+    )
+
+    #progress choices:
+    nts="nt"
+    start="st"
+    inp="ip"
+    done="dn"
+    fo="fo"
+    fn="fn"
+    har="hd"
+    progress_choices = [
+        (nts, "Not Started"),
+        (start, "Started"),
+        (inp, "In Progress"),
+        (done, "Done"),
+        (fo, "forgotten"),
+        (fn, "forgottten and not started"),
+        (har,"Hardship"),
+    ]
+    progress= models.CharField(u"What's the progress on this task? ",
+        max_length=2,
+        choices=progress_choices,
+        default=nts
+    )
+    notes = models.TextField(u"task's Notes", help_text=u'Textual Notes', blank=True, null=True)
+    last_update = models.DateField(auto_now = True)
+
+    def __str__(self):
+        return f"{self.name}"
+
+class WhatToDoToday(models.Model):
+
+    # need_to_do's choices:
+    Hv="Hv" # I need to do today / Piority and rewarding things/ things that can't wait
+    Dn="Dn" # I don't need to do today / Piority but not as rewarding and can wait compared to the others
+    Bw="Bw" # I need to do and will bring great rewards/ The most complex and most rewarding
+    Dl="Dl" # Needs to be done, but i don't need to do it myself
+    it="it" # if enough  time, task that aren't priority, but don't take much effort or long time, 
+    # thus can be done in low production moments, but NOT during times of rest
+    need_choices = [
+        (Hv, 'Have to do today'),
+        (Dn, "Don't have to do today"),
+        (Bw, 'Big Win'),
+        (Dl, 'Can delegate'),
+        (it, 'If enough time'),
+    ]
+
+    Name = models.CharField(u"Name",max_length=50,)
+    day = models.DateField(u"the day i (don't) have to do this",default=f"{Year}-{Month}-{Day}", help_text=u"Format: year-month-day")
+    todo = models.ManyToManyField(
+        ListToDo,
+        related_name="days_done"
+        )
+    need = models.CharField(
+        max_length=2,
+        choices= need_choices,
+        default=Hv,)
+    #--------------- create this's task's start and ending time
+    #remembering it will be comapred to the daily tasks and events time
+    #so use time, not date
+    start_time = models.TimeField(u'Starting time',default=f"{start}", help_text=u"Format: hour:minute")
+    end_time = models.TimeField(u'Ending time',default=f"{end}", help_text=u"Format: hour:minute")
+    #--------------
+    done = models.BooleanField(default=False)
+    
 
 
 class day(models.Model):
@@ -171,7 +495,7 @@ class review(models.Model):
             # In a scale of 1-10 how confident are you on your progress toward your goal?
             # What had the most positive impact in your goals in this period?
             # are you on the right path?
-            # where there walls?
+            # were there walls?
             # is your rhythm good, slow or fast?
             # on what can you seek help?
         # failure analysis
