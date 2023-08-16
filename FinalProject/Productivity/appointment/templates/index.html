@@ -1,0 +1,803 @@
+{% extends 'base_calendar.html' %}
+{% block script%}
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+
+<style>
+    
+      .list{
+          line-height: 100%;
+          padding: 20px;
+          margin: 5px;
+          border: 3px solid #1a1adb;
+      }
+
+      .delete{
+          float: right;
+      }
+
+      .add{
+        float: right;
+        }
+
+      .hiden{
+        display:none;
+      }
+
+      .more{
+        float: right;
+    }
+
+
+
+
+    
+    .overlay {
+      height: 100%;
+      width: 0;
+      position: fixed;
+      z-index: 1;
+      top: 0;
+      left: 0;
+      background-color: rgb(0,0,0);
+      background-color: rgba(0,0,0, 0.9);
+      overflow-x: hidden;
+      transition: 0.5s;
+      color:grey
+    }
+    
+    .overlay-content {
+      position: relative;
+      top: 25%;
+      width: 100%;
+      text-align: center;
+      margin-top: 30px;
+    }
+    
+    .overlay a {
+      padding: 8px;
+      text-decoration: none;
+      font-size: 36px;
+      color: #818181;
+      display: block;
+      transition: 0.3s;
+    }
+    
+    .overlay a:hover, .overlay a:focus {
+      color: #f1f1f1;
+    }
+    
+    .overlay .closebtn {
+      position: absolute;
+      top: 20px;
+      right: 45px;
+      font-size: 60px;
+    }
+    
+    @media screen and (max-height: 450px) {
+      .overlay a {font-size: 20px}
+      .overlay .closebtn {
+      font-size: 40px;
+      top: 15px;
+      right: 35px;
+      }
+    }
+
+
+ 
+
+
+
+</style>
+
+<script>
+
+
+  // when DOM loads, render the first page
+  let start='start'
+  document.addEventListener("DOMContentLoaded",today(start));
+  //  document.addEventListener("DOMContentLoaded",todo());
+  //
+  
+
+  // on click event handler for page buttons
+  document.addEventListener('click', event =>{
+    const element = event.target;
+
+    // If click on description
+      if (element.className == "desciption"){
+        // get the id of the popup
+        let id = element.dataset.id;
+        console.log(id);
+        // shows/hides the description
+        let description = document.getElementById("description"+id);
+        console.log(description);
+        if (description.style.display=="block" ){
+          description.style.display = "none";
+        } else {
+          description.style.display = "block"
+        };
+      };
+    //
+    // If click on note
+      if (element.className == "notes"){
+        // get the id of the popup
+        let id = element.dataset.id;
+        console.log(id);
+        // shows/hides the notes
+        let notes = document.getElementById("notes"+id);
+        console.log(notes);
+        if (notes.style.display=="block" ){
+          notes.style.display = "none";
+        } else {
+          notes.style.display = "block"
+        }
+        };
+    //
+    // If click on more
+      if (element.className == "more"){
+        // get the id of the popup
+        let id = element.dataset.id;
+        console.log("id")
+        console.log(id);
+        let des = document.getElementById("des"+id);
+        console.log("des")
+        console.log(des);
+        let not = document.getElementById("not"+id);
+        console.log("not")
+        console.log(not);
+        let notes = document.getElementById("notes"+id);
+        let description = document.getElementById("description"+id);
+        // shows/hides the description
+        if (element.value == "More info"){
+          element.value = "Less info";
+          try{
+            des.style.display = "block";
+          }catch{}
+          try{
+            not.style.display = "block";
+          }catch{}
+          
+          
+        } else if (element.value == "Less info") {
+          element.value = "More info";
+          try{
+            des.style.display = "none";
+          }catch{}
+          try{
+            not.style.display = "none";
+          }catch{}
+          try{
+            description.style.display = "none";
+          }catch{}
+          try{
+            notes.style.display = "none"
+          }catch{}
+        };
+      };
+    //
+  });
+
+
+  // functions
+
+      let toda = '';
+      let daily = '';
+      let event = '';
+  
+  function today(start){
+
+    //
+    if(start == "start"){
+    document.getElementById('table').innerHTML=`
+    <tr>
+      <th>Time</th>
+      <th>Task</th>
+      <th>Daily</th>
+      <th>Event</th>
+    </tr>`
+    fetch('/planner')
+    .then(response=>response.json())
+    .then(data=>{
+      console.log('Today - start');
+    
+      //Variables created to check if the same task happened in a row
+      //replacing the repetitions with the color of the task
+
+      // --------- not working, gotta fix this ---------
+      
+
+
+      // runs through all the time blocks of the day
+      for (let n in data.leng){
+
+        //creating the html
+        
+        //let row = document.createElement('tr');
+        //console.log(`row.innnerHTML = ${row.innnerHTML}`);
+      
+        //creating the html variable for the tasks
+        
+        let todahtml = '<td> - </td>';
+        let dailyhtml = '<td> - - - </td>';
+        let eventhtml = '<td> - </td>' ;
+        
+        try{
+          todahtml = Tabledata(toda,data.todaylist,data,data.s[n],data.e[n],"today");
+          //console.log(`todahtml = ${todahtml}`);
+          //console.log('worked')
+        } catch{
+          todahtml = '<td> - </td>';
+          //console.log(`todahtml = ${todahtml}`);
+          //console.log("didn't work")
+        };
+
+        try{
+          dailyhtml = Tabledata(daily,data.dailylist,data,data.s[n],data.e[n],"daily");
+          //console.log(`dailyhtml = ${dailyhtml}`);
+        } catch{
+          dailytml = '<td> - </td>' ;
+          //console.log(`dailyhtml = ${dailyhtml}`);
+        };
+        
+        try{
+          eventhtml = Tabledata(event,data.eventlist,data,data.s[n],data.e[n],"event");
+          //console.log(`eventhtml = ${eventhtml}`);
+        } catch{
+          eventhtml = '<td> - </td>';
+          //console.log(`eventhtml = ${eventhtml}`);
+        };
+        if(eventhtml == '<td> - </td>'){
+          try{ 
+            console.log("revent");
+            console.log(data.reventlist);
+            eventhtml = Tabledata(event,data.reventlist,data,data.s[n],data.e[n],"revent")
+            //console.log(`eventhtml = ${eventhtml}`);
+          } catch{
+            eventhtml = '<td> - </td>'
+            //console.log(`eventhtml = ${eventhtml}`);
+          }
+        };
+
+        //console.log(`row = ${row}`);
+        //console.log(`row.innnerHTML = ${row.innnerHTML}`);
+        let row = document.createElement('tr');
+        row.innerHTML= `
+            <td>${data.s[n]} - ${data.e[n]}</td>
+              ${todahtml}
+              ${dailyhtml}
+              ${eventhtml}
+          `;
+          //console.log(`row = ${row}`);
+          //console.log(`row.innnerHTML = ${row.innnerHTML}`);
+          document.querySelector('#table').append(row);
+          //console.log(`table = ${document.querySelector('#table').innerHTML}`);
+          
+
+        }
+      
+
+
+
+
+
+     
+
+    })
+  }}
+  // shows the todo list
+  function todo(){
+    
+  }
+
+
+  let hour = 0
+  let min = 0
+
+
+  function Tabledata(lasttitle,list,data,start,end,type){
+    //console.log(lasttitle);
+    //console.log(list);
+    //console.log(data);
+    //console.log(start);
+    //console.log(end);
+    var html = '<td> - </td>';
+
+    for (let m of list){
+      
+      //console.log(`start =${start}`);
+      //console.log(`end =${end}`);
+      //console.log(`data[m] =${data[m]}`);
+      //console.log(`data.m =${data.m}`);
+      //console.log(`list = ${list}`);
+      //console.log(`m = ${m}`);
+      
+      //console.log(`title = ${data[m].title}`)
+      //console.log(`start: ${start} - ${type}:${data[m].start_time}` )
+      //console.log(`end: ${end} - ${type}:${data[m].end_time}` )
+
+      //console.log(`toda =${toda}`);
+      //console.log(`event =${event}`);
+      //console.log(`daily =${daily}`);
+
+
+        var startin=0;
+        var endin=0;
+
+        var hours=0;
+        var mins=0;
+        
+        var houre=0;
+        var mine=0;
+        
+        var hourds=0;
+        var minds=0;
+        
+        var hourde=0;
+        var minde=0;
+        //console.log(`${start[0]}`)
+        //console.log(`${start[1]}`)
+        //console.log(`${start[2]}`)
+        //console.log(`${start[3]}`)
+        //console.log(`${start[4]}`)
+        //console.log(`hours = ${hours}:`);
+        //console.log(`minutes =${mins}`);
+
+        //console.log("start")
+        datetime_time(start);
+        hours=Number(hour);
+        mins=Number(min);
+        
+        //console.log(hour);
+        //console.log(min);
+
+        //console.log("end")
+        datetime_time(end);
+        houre=Number(hour);
+        mine=Number(min);
+        
+        //console.log(hour);
+        //console.log(min);
+
+        //console.log("data[m].start_time")
+        datetime_time(data[m].start_time);
+        hourds=Number(hour);
+        minds=Number(min);
+        
+       // console.log(hour);
+        //console.log(min);
+
+        //console.log("data[m].end_time")
+        datetime_time(data[m].end_time);
+        hourde=Number(hour);
+        minde=Number(min);
+
+        //console.log(hour);
+        //console.log(min);
+       
+        //console.log(` +++ start: ${start} >= ${type}:${data[m].start_time}` );
+        //console.log(` start type: ${nu(start)} >= ${type} type:${typeof(data[m].start_time)}` );
+
+
+      if (hours > hourds || hours == hourds && mins > minds||hours == hourds && mins == minds){
+        startin = 1
+        //console.log("startin")
+      }else{
+        //console.log(`${hours}:${mins}`);
+        //console.log(`${hourds}:${minds}`);
+      };
+      if (houre < hourde || houre == hourde && mine < minde || houre == hourde && mine == minde){
+        endin = 1
+        //console.log("endin")
+      } else{
+        //console.log(`${houre}:${mine}`);
+        //console.log(`${hourde}:${minde}`);
+      };
+   
+      if (startin == 1 && endin == 1){
+        //console.log(` name  =${data[m].title}`);
+        //console.log(`this is a ${type}`);
+        //console.log(`start =${hours}:${mins}`);
+        //console.log(`data start =${hourds}:${minds}`);
+        //console.log(`end=${houre}:${mine}`);
+        //console.log(`data end =${hourde}:${minde}`);
+        //console.log(`lasttitle = ${lasttitle}`);
+        if(lasttitle == data[m].title){
+          console.log(`data[m].title = ${data[m].title}`)
+          console.log(`data[m].original = ${data[m].original}`)
+          html = `<td style="background-color:${data[m].color}">  </td>`
+          //console.log(`data[m] =${data[m].title} - colooor`);
+          break
+        } else {
+          
+          if(type=="today"){
+            toda = data[m].title 
+            //console.log(`toda =${toda}`);
+            //console.log('type = today')
+
+          }else if(type=="daily"){
+            daily = data[m].title
+            //console.log(`daily =${daily}`);
+            //console.log("type = daily")
+            
+          }else if(type=="event"){
+            event = data[m].title
+            //console.log(`event =${event}`);
+            //console.log('type = event')
+          }else if(type=="revent"){
+            console.log("revent function")
+            console.log(`data[m].title = ${data[m].title}`)
+            event = data[m].title
+            //console.log(`event =${event}`);
+            //console.log('type = event')
+          };
+          console.log(`data[m] =${data[m].title}`);
+          console.log(`data[m].color =${data[m].color}`);
+          html = `<td style="text-decoration-line: underline;
+          text-decoration-style: wavy;
+          text-decoration-color: ${data[m].color};">${data[m].title}</td>`
+          console.log(`html = ${html}`)
+          break
+        }
+
+        
+      }
+
+
+
+
+
+  }
+  return html
+  }
+
+  function datetime_time(time){
+    //console.log("datetime worked")
+    number={}
+    if(time[1] == ':'){
+      hour = time[0];
+      min = time[2]+ time[3]
+    } else {
+      hour = time[0]+ time[1]
+      min = time[3]+ time[4]
+    };
+ 
+  }
+
+</script>
+
+{% endblock %}
+
+{% block content %}
+
+<p>
+  <label for="id_steps">This is the planner:</label>
+  <br>
+  <!-- Not sure if Using form is the best idea, since i will have
+  to make this url excempt from csrf, which is less secure.
+  Should look for other options later on.-->
+
+  <main class="d-flex flex-nowrap">
+    
+<!-- First Column -->
+   <div label="alltodo" class="d-flex flex-column flex-shrink-0 p-3 text-bg-dark" class="d-flex flex-column flex-shrink-0 p-3 text-bg-dark" style="width: 350px; height: 700px; overflow-y: auto;">
+  {% for item in alltodo %}
+      <div label="item">
+
+  <form data-id="{{item.id}}" class="list">
+  
+  {{item.title}}
+  &nbsp;<!-- Same as adding 1 space -->
+
+  <!-- conditionals to add symbols which makes reading the item's conditions faster
+  for the sake of making the daily creation of the timebox faster-->
+
+  <!-- conditionals for ungency-->
+    {% if item.urgency == "vh" and item.progress != "dn"%} <span class="glyphicon glyphicon-time" style="color:red"></span>&nbsp;
+    {% elif item.urgency == "h" and item.progress != "dn"%} <span class="glyphicon glyphicon-time" style="color:orange"></span>&nbsp;
+    {% elif item.urgency == "m" and item.progress != "dn"%} <span class="glyphicon glyphicon-time" style="color:green"></span>&nbsp;
+    {% elif item.urgency == "l" and item.progress != "dn"%} <span class="glyphicon glyphicon-time" style="color:blue"></span>&nbsp;
+    {% elif item.urgency == "vl" and item.progress != "dn"%} <span class="glyphicon glyphicon-time" style="color:LightBlue"></span>&nbsp;{% endif %}
+
+  <!-- conditionals for importance-->
+    {% if item.importance == "vh" and item.progress != "dn"%} <span class="glyphicon glyphicon-alert" style="color:red"></span>&nbsp;
+    {% elif item.importance == "h" and item.progress != "dn"%} <span class="glyphicon glyphicon-alert" style="color:orange"></span>&nbsp;
+    {% elif item.importance == "m" and item.progress != "dn"%} <span class="glyphicon glyphicon-alert" style="color:green"></span> &nbsp;
+    {% elif item.importance == "l" and item.progress != "dn"%} <span class="glyphicon glyphicon-alert" style="color: blue"></span>&nbsp;
+    {% elif item.importance == "vl" and item.progress != "dn"%} <span class="glyphicon glyphicon-alert" style="color: LightBlue"></span>&nbsp;
+    {% elif item.importance == "cr" and item.progress != "dn"%} <span class="glyphicon glyphicon-question-sign" style="color: orange"></span>&nbsp;{% endif %}
+  
+  <!-- conditionals for duration-->
+    {% if item.duration == "mi" and item.progress != "dn"%} <span class="glyphicon glyphicon-apple"> &nbsp;</span>
+    {% elif item.duration == "hs" and item.progress != "dn"%} <span class="glyphicon glyphicon-step-forward">&nbsp;</span>
+    {% elif item.duration == "ds" and item.progress != "dn"%} <span class="glyphicon glyphicon-fast-forward">&nbsp;</span>
+    {% elif item.duration == "wk" and item.progress != "dn"%} <span class="glyphicon glyphicon-forward">&nbsp;</span>
+    {% elif item.duration == "mn" and item.progress != "dn"%} <span class="glyphicon glyphicon-play">&nbsp;</span>
+    {% elif item.duration == "ys" and item.progress != "dn"%} <span class="glyphicon glyphicon-cog">&nbsp;</span>
+    {% elif item.duration == "pe" and item.progress != "dn"%} <span class="glyphicon glyphicon-retweet">&nbsp;</span>{% endif %}
+  <!-- conditionals for progress-->
+    {% if item.progress == "dn"%} <span class="glyphicon glyphicon-ok" style="color: green"> </span> 
+    {% elif item.progress == "nt"%} <span class="glyphicon glyphicon-off"> </span>  
+    {% elif item.progress == "ip"%} <span class="glyphicon glyphicon-play-circle"> </span>  
+    {% elif item.progress == "fo"%} <span class="glyphicon glyphicon-question-sign"> </span>  
+    {% elif item.progress == "fn"%} <span class="glyphicon glyphicon-off" style="color: red"> </span>  
+    {% elif item.progress == "hd"%} <span class="glyphicon glyphicon-wrench"> </span> {% endif %} 
+  
+    <input type="button" class = "add" id ='add{{item.id}}' value="Add to today's task">
+  <br><br>
+  Short description: {{item.quick_description}} 
+  <input type="button" class = "more" id =' more{{item.id}}' data-id ='{{item.id}}' value="More info">
+  {% if item.description %}
+  <input type="button" class = "desciption" id="des{{item.id}}" data-id ='{{item.id}}' value="Description:" style="display:none"> 
+  <span class = "hiden" id="description{{item.id}}"><br>{{item.description}}<br></span> 
+  {% endif %}
+  {% if item.notes%}
+  <input type="button" class = "notes" id = "not{{item.id}}" data-id ='{{item.id}}' value="Notes:" style="display:none"> 
+  <span class = "hiden" id="notes{{item.id}}"> <br> {{item.notes}} <br></span>
+  {% endif %}
+
+  </form>
+      </div>
+    {% endfor %}
+  </div>
+
+<!-- Second Column -->
+<div class="d-flex flex-column flex-shrink-0 p-3 text-bg-dark" style="width: 600px; height: 700px; overflow-y: auto;">
+  <table id="table" style="width:100%">
+    <tr>
+      <th>Time</th>
+      <th>Task</th>
+      <th>Daily</th>
+      <th>Event</th>
+    </tr>
+    <!-- Use for on whattodotoday model with start/end time, done, todo and name
+    Change the time, limiting it to increments of 15 minutes and 
+    precreating a table from 6 to 20, with each hour being divided in 4
+    -->
+    <div>
+      <td>4:45 - 5:00</td>
+      <td> - </td>
+      <td> - </td>
+      <td> - </td>
+    </div>
+    <div id="tablex"></div>
+ 
+  </table>
+  
+  
+  test1
+ </div>
+
+
+ <div class="d-flex flex-column flex-shrink-0 p-3 text-bg-dark" style="width: 280px;">
+  test2
+ </div>
+
+</main>
+
+<input type="button" class = "desciption" data-id ='0' value="Symbol's dictionary"> 
+  <div class = 'hiden'id="description0">
+    <div>
+      Urgency:
+      Very Hight = <span class="glyphicon glyphicon-time" style="color:red"></span>
+       / High = <span class="glyphicon glyphicon-time" style="color:orange"></span>
+       / Medium = <span class="glyphicon glyphicon-time" style="color:green"></span>
+       / Low = <span class="glyphicon glyphicon-time" style="color:blue"></span>
+       / Very low = <span class="glyphicon glyphicon-time" style="color:LightBlue"></span>
+    </div>
+
+      <div>
+        Importance:
+        Essential = <span class="glyphicon glyphicon-alert" style="color:red"></span>
+         / Important = <span class="glyphicon glyphicon-alert" style="color:orange"></span>
+         / Desirable = <span class="glyphicon glyphicon-alert" style="color:green" ></span>
+         / Curiosity/interest = <span class="glyphicon glyphicon-alert" style="color: blue"></span>
+         / Trivial = <span class="glyphicon glyphicon-alert" style="color: LightBlue"></span>&nbsp;
+         / Circumstantial = <span class="glyphicon glyphicon-question-sign" style="color: orange">
+      </div>
+
+      <div>
+        Duration:
+        Minutes = <span class="glyphicon glyphicon-apple"></span>
+         / Hours = <span class="glyphicon glyphicon-step-forward"></span>
+         / Days = <span class="glyphicon glyphicon-fast-forward"></span>
+         / Weeks = <span class="glyphicon glyphicon-forward"></span>
+         / Months = <span class="glyphicon glyphicon-play"></span>
+         / Years = <span class="glyphicon glyphicon-cog"></span>
+         / Perpetual = <span class="glyphicon glyphicon-retweet"></span>
+      </div>
+
+      <div>
+        Progress:
+        Done = <span class="glyphicon glyphicon-ok" style="color: green"></span>
+         / Not Started = <span class="glyphicon glyphicon-off"> </span> 
+         / In progress = <span class="glyphicon glyphicon-play-circle"> </span> 
+         / Forgotten = <span class="glyphicon glyphicon-question-sign"> </span> 
+         / Forgotten and not started = <span class="glyphicon glyphicon-off" style="color: red"> </span> 
+         / Hardship = <span class="glyphicon glyphicon-wrench"> </span> 
+      </div>
+  </div>
+<!-- Curtain -->
+  <div id="myNav" class="overlay">
+    <a class="closebtn" onclick="closeNav()">&times;</a>
+    <div class="overlay-content">
+      <form action="planner" style="font-size:30px;" method="put">
+        
+        {% csrf_token %}
+
+    <p>
+        <label for="id_name">Name of the task:</label>
+        <input type="text" name="name" maxlength="50" required="" Style="background-color:gray; color:white" id="id_name">
+        
+        
+      </p>
+    
+
+      <p>
+        <label for="id_todo">Todo:</label>
+        <select name="todo" Style="background-color:gray; color:white" required="" id="id_todo">
+      <option value="" selected="">---------</option>
+
+      {% for list in alltodo %}
+
+      <option value="{{list.id}}">{{list.title}}</option>
+      
+      {% endfor %}
+    
+      
+    </select>
+        
+        
+      </p>
+    
+      
+      <p>
+        <label for="id_need">Need:</label>
+        <select name="need" Style="background-color:gray; color:white" id="id_need">
+      <option value="Hv" selected="">Have to do today</option>
+    
+      <option value="Dn">Don't have to do today</option>
+    
+      <option value="Bw">Big Win</option>
+    
+      <option value="Dl">Can delegate</option>
+    
+      <option value="it">If enough time</option>
+    
+    </select>
+        
+        
+      </p>
+
+      <p>
+      <label for="id_start_time">Starting time:</label>
+      <select name="start_time" Style="background-color:gray; color:white" required="" id="id_start_time">
+    <option value="" selected="">---------</option>
+
+    {% for time in start %}
+
+    <option value="{{time}}">{{time}}</option>
+    
+
+    {% endfor %}
+  
+    
+  </select>
+</p>
+      
+
+    <p>
+
+        <label for="id_end_time">Ending time:</label>
+        <select name="end_time" Style="background-color:gray; color:white" required="" id="id_end_time">
+      <option value="" selected="">---------</option>
+  
+      {% for time in end %}
+      
+      <option value="{{time}}">{{time}}</option>
+      
+      {% endfor %}
+    </select>
+         
+  </p>
+    
+  <p>
+
+    <input type="submit" Style="background-color:gray; color:black" value="Submit">
+  
+  </p>
+    </form>
+    </div>
+  </div>
+  
+  
+  <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776; open</span>
+  
+  <script>
+  function openNav() {
+    document.getElementById("myNav").style.width = "100%";
+  }
+  
+  function closeNav() {
+    document.getElementById("myNav").style.width = "0%";
+  }
+  </script>
+
+
+
+
+
+ <!-- Snack bar test-->
+
+<!-- Use a button to open the snackbar -->
+<button onclick="myFunction()">Show Snackbar</button>
+
+<!-- The actual snackbar -->
+<div id="snackbar">Some text some message</div>
+
+<style>
+/* The snackbar - position it at the bottom and in the middle of the screen */
+#snackbar {
+  visibility: hidden; /* Hidden by default. Visible on click */
+  min-width: 550px; /* Set a default minimum width */
+  margin-left: -275px; /* Divide value of min-width by 2 */
+  background-color: #333; /* Black background color */
+  color: #fff; /* White text color */
+  text-align: center; /* Centered text */
+  border-radius: 6px; /* Rounded borders */
+  padding: 16px; /* Padding */
+  position: fixed; /* Sit on top of the screen */
+  z-index: 1; /* Add a z-index if needed */
+  left: 50%; /* Center the snackbar */
+  bottom: 30px; /* 30px from the bottom */
+}
+
+/* Show the snackbar when clicking on a button (class added with JavaScript) */
+#snackbar.show {
+  visibility: visible; /* Show the snackbar */
+  /* Add animation: Take 0.5 seconds to fade in and out the snackbar.
+  However, delay the fade out process for 2.5 seconds */
+  -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+  animation: fadein 0.5s, fadeout 0.5s 2.5s;
+}
+
+/* Animations to fade the snackbar in and out */
+@-webkit-keyframes fadein {
+  from {bottom: 0; opacity: 0;}
+  to {bottom: 30px; opacity: 1;}
+}
+
+@keyframes fadein {
+  from {bottom: 0; opacity: 0;}
+  to {bottom: 30px; opacity: 1;}
+}
+
+@-webkit-keyframes fadeout {
+  from {bottom: 30px; opacity: 1;}
+  to {bottom: 0; opacity: 0;}
+}
+
+@keyframes fadeout {
+  from {bottom: 30px; opacity: 1;}
+  to {bottom: 0; opacity: 0;}
+}
+
+</style>
+
+<script>
+function myFunction() {
+  // Get the snackbar DIV
+  var x = document.getElementById("snackbar");
+
+  // Add the "show" class to DIV
+  x.className = "show";
+
+  // After 3 seconds, remove the show class from DIV
+  setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+}
+</script>
+
+
+{% endblock %}

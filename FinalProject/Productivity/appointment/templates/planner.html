@@ -1,0 +1,176 @@
+{% extends 'base_calendar.html' %}
+{% block script%}
+
+<style>
+/* The animation for hiding  */
+  @keyframes hide{
+      0% {
+          opacity: 1;
+          height: 100%;
+          line-height: 100%;
+          padding: 20px;
+          margin: 20px;
+          border: 3px solid #1a1adb;
+      }
+      80% {
+          margin: 20px;
+          opacity: 0;
+          height: 100%;
+          line-height: 100%;
+          padding: 20px;
+          border: 3px solid #1a1adb;
+          display:none
+          
+      }
+      100%{
+          margin: 0px;
+          opacity: 0;
+          height: 0%;
+          line-height: 0px;
+          padding: 0px;
+          border: 0px solid #1a1adb;
+          
+      }
+  }
+  
+  .list{
+        animation-name: hide;
+        animation-duration: 1s;
+        animation-fill-mode: both;
+        animation-play-state: paused;
+        }
+  
+  .hide{
+        float: right;
+        }
+
+/* The animation for showing  */
+
+  @keyframes show{
+
+            0%{
+              margin: 0px;
+              opacity: 0;
+              height: 0%;
+              line-height: 0px;
+              padding: 0px;
+              border: 0px solid #1a1adb;
+              
+          }
+
+            80% {
+                margin: 20px;
+                opacity: 0;
+                height: 100%;
+                line-height: 100%;
+                padding: 20px;
+                border: 3px solid #1a1adb;
+                display:none
+                
+            }
+
+            100% {
+              opacity: 1;
+              height: 100%;
+              line-height: 100%;
+              padding: 20px;
+              margin: 20px;
+              border: 3px solid #1a1adb;
+          }
+
+        }
+
+        .daily{
+          animation-name: show;
+          animation-duration: 1s;
+          animation-fill-mode: both;
+          animation-play-state: paused;
+      }
+
+      .delete{
+          float: right;
+      }
+
+      /* Popup container */
+.popup {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+/* The actual popup (appears on top) */
+.popup .popuptext {
+  visibility: hidden;
+  width: 160px;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 8px 0;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -80px;
+}
+
+/* Popup arrow */
+.popup .popuptext::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+}
+
+/* Toggle this class when clicking on the popup container (hide and show the popup) */
+.popup .show {
+  visibility: visible;
+  -webkit-animation: fadeIn 1s;
+  animation: fadeIn 1s
+}
+
+/* Add animation (fade in the popup) */
+@-webkit-keyframes fadeIn {
+  from {opacity: 0;}
+  to {opacity: 1;}
+}
+
+@keyframes fadeIn {
+  from {opacity: 0;}
+  to {opacity:1 ;}
+}
+
+      
+    </style>
+
+{% endblock %}
+
+{% block content %}
+
+<p>
+  <label for="id_steps">This is the planner:</label>
+  <br>
+  <!-- Not sure if Using form is the best idea, since i will have
+  to make this url excempt from csrf, which is less secure.
+  Should look for other options later on.-->
+    {% for iten in alltodo %}
+
+
+<form data-id="{{iten.id}}" class="list">{{iten.name}} <br>
+  Short description: {{iten.quick_description}} <br>
+  Urgency: {{iten.urgency}}<br>
+  Importance: {{iten.importance}} <br>
+  Progress: {{Iten.progress}} <br>
+  Notes: {{iten.notes}} <br>
+<input type="button" class = "hide" id ='add ${iten.id}' value="Add to today's task">
+</form>
+    {% endfor %}
+
+</select>
+</p>
+
+{% endblock %}

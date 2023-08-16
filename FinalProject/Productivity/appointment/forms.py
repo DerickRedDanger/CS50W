@@ -4,7 +4,7 @@ from . import models
 class eventForm(forms.ModelForm):
     class Meta:
         model = models.Event
-        fields = ['title','day','start_time','end_time','description','notes','repeat','repeat_wkd','repeatd','repeatutil','repeatnumber']
+        fields = ['title','day','start_time','end_time','description','notes','repeat','repeat_wkd','repeatd','repeatutil','repeatnumber','color',]
         widgets = {
             'day' : forms.DateInput(attrs = {'placeholder': 'Year-Month-Day'}),
             'start_time' : forms.TimeInput(attrs = {'placeholder': 'Hour:Minute'}),
@@ -34,12 +34,12 @@ class eventForm(forms.ModelForm):
         end_time=data.get("end_time")
         start_time=data.get("start_time")
         Day=data.get("day")
-        print(f"start_time = {start_time}")
-        print(f"end_time = {end_time}")
-        print(f"day = {Day}")
-        print(f"cleaned_data = {data}")
-        print(type(end_time))
-        print(type(start_time))
+        #print(f"start_time = {start_time}")
+        #print(f"end_time = {end_time}")
+        #print(f"day = {Day}")
+        #print(f"cleaned_data = {data}")
+        #print(type(end_time))
+        #print(type(start_time))
         if end_time <= start_time:
             self.add_error("end_time", "Ending time must be after starting time")
         try:
@@ -49,13 +49,13 @@ class eventForm(forms.ModelForm):
         if events.exists():
             for event in events:
                 if self.check_overlap(event.start_time, event.end_time, start_time, end_time):
-                    self.add_error("title", f"This event overlaps with the event: {event.title} that starts at {event.start_time} and ends at {event.end_time}")
+                    self.add_error("title", f"This event overlaps with the event: ''{event.title}'' that starts at {event.start_time} and ends at {event.end_time}")
 
 
 class DailyTaskForm(forms.ModelForm):
     class Meta:
         model = models.DailyTask
-        fields = ['task','weekday','start_time','end_time','quick_description','description','notes','urgency','importance',]
+        fields = ['title','weekday','start_time','end_time','quick_description','description','notes','urgency','importance','color',]
         widgets = {
             
             'start_time' : forms.TimeInput(attrs = {'placeholder': 'Hour:Minute'}),
@@ -67,10 +67,15 @@ class DailyTaskForm(forms.ModelForm):
 class ListToDoForm(forms.ModelForm):
     class Meta:
         model = models.ListToDo
-        fields = ['name','quick_description','description','steps','duration','urgency','importance','progress','notes']
+        fields = ['title','quick_description','description','steps','duration','urgency','importance','progress','notes','color',]
 
         widgets={
             'quick_description': forms.Textarea(attrs={'cols': 60, 'rows': 3}),
             'description': forms.Textarea(attrs={'cols': 90, 'rows': 5}),
             'notes':forms.Textarea(attrs={'cols': 60, 'rows': 3}),
         }
+
+class WhatToDoTodayForm(forms.ModelForm):
+    class Meta:
+        model = models.WhatToDoToday
+        fields = ['title','day','todo','need','start_time','end_time','done',]

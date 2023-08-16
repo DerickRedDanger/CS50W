@@ -1,0 +1,117 @@
+<script>
+    // runs through all todo task from today
+    for (let m in data.todaylist){
+        console.log(data.s[n])
+        console.log(data.s[n])
+        if (data.s[n] >= data.m.start_time && data.e[n] <= data.m.end_time){
+          if(toda == item.name){
+            todahtml = `<td style="background-color:${item.color}"></td>`
+            break
+
+          } else {
+            toda = item.name
+            todahtml = `<td style="text-decoration-line: underline;
+            text-decoration-style: wavy;
+            text-decoration-color: ${item.color};">${item.name} - ${item.todo}</td>`
+            break
+          }
+
+          
+        }
+    }
+
+
+      for (let item in data.todo_today){
+        if (data.s[n] >= item.start_time && data.e[n] <= item.end_time){
+          if(toda == item.name){
+            todahtml = `<td style="background-color:${item.color}"></td>`
+            break
+
+          } else {
+            toda = item.name
+            todahtml = `<td style="text-decoration-line: underline;
+            text-decoration-style: wavy;
+            text-decoration-color: ${item.color};">${item.name} - ${item.todo}</td>`
+            break
+          }
+
+          
+        }
+    }
+      // runs through all daily task from today
+      for (let item in data.daily_today){
+      if (data.s[n] >= item.start_time && data.e[n] <= item.end_time){
+        if(toda == item.task){
+          todahtml = `<td style="background-color:${item.color}"></td>`
+          break
+
+        } else {
+          toda = item.task
+          todahtml = `<td style="text-decoration-line: underline;
+          text-decoration-style: wavy;
+          text-decoration-color: ${item.color};">${item.task}</td>`
+          break
+        }
+        
+      }
+  }
+      // runs through all events for today
+      for (let item in data.event_today){
+    if (data.s[n] >= item.start_time && data.e[n] <= item.end_time){
+      if(toda == item.title){
+        todahtml = `<td style="background-color:${item.color}"></td>`
+        break
+
+      } else {
+        toda = item.title
+        todahtml = `<td style="text-decoration-line: underline;
+        text-decoration-style: wavy;
+        text-decoration-color: ${item.color};">${item.title}</td>`
+        break
+      }
+      
+    }
+}
+
+// runs through all repeated events for today
+//-----------------------------------------//
+// Gotta modify this so that it goes from the repeated event to
+// the original one
+// ----------------------------------------//
+if (eventhtml == ''){
+for (let item in data.repeated_event_today){
+  if (data.s[n] >= item.original.start_time && data.e[n] <= item.original.end_time){
+    if(toda == item.id){
+      todahtml = `<td style="background-color:${item.color}"></td>`
+      break
+
+    } else {
+      toda = item.id
+      todahtml = `<td style="text-decoration-line: underline;
+      text-decoration-style: wavy;
+      text-decoration-color: ${item.color};">${item.title}</td>`
+      break
+    }
+    
+  }
+}}
+
+</script>
+
+
+
+
+
+
+
+
+
+
+if(start[1] == ':'){
+  console.log(`${start[0]}::${start[2]}${start[3]}`);
+  hours = start[0];
+  mins = start[2]+ start[3]
+  //mins = number(`${start[2]}${start[3]}`);
+  console.log(`hours = ${hours}:`);
+  console.log(`minutes =${mins}`);
+}

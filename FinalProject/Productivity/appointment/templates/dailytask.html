@@ -7,43 +7,62 @@
     <h4> Creating a new daily task: </h4>
     {% csrf_token %}
         <p>
-    <label for="id_task">Event's name:</label>
-    <input type="text" name="task" maxlength="200" required="" id="id_task">
+    <label for="id_title">Event's name:</label>
+    <input type="text" name="title" maxlength="200" required="" id="id_task">
   </p>
 
   <p>
     <label for="id_weekday">Weekday:</label>
     <select name="weekday" id="id_weekday" multiple="">
-  <option value="1">Sunday</option>
+      
+  <option value="2">Sunday</option>
 
-  <option value="2">Monday</option>
+  <option value="3">Monday</option>
 
-  <option value="3">Tuesday</option>
+  <option value="4">Tuesday</option>
 
-  <option value="4">Wednesday</option>
+  <option value="5">Wednesday</option>
 
-  <option value="5">Thursday</option>
+  <option value="6">Thursday</option>
 
-  <option value="6">Friday</option>
+  <option value="7">Friday</option>
 
-  <option value="7">Saturday</option>
+  <option value="8">Saturday</option>
 
 </select>
   </p>
   
   <p>
     <label for="id_start_time">Starting time:</label>
-    <input type="text" name="start_time" value="" placeholder="Hour:Minute" required="" id="id_start_time">
-      <span class="helptext">Format: Hour:Minute</span>
+    <select name="start_time"  required="" id="id_start_time">
+  <option value="" selected="">---------</option>
+  
+  {% for time in start %}
+  
+  <option value="{{time}}">{{time}}</option>
+  
+  
+  {% endfor %}
+  
+  
+  </select>
   </p>
-
+    
   
   <p>
-    <label for="id_end_time">Ending time:</label>
-    <input type="text" name="end_time" value="" placeholder="Hour:Minute" required="" id="id_end_time">
-      <span class="helptext">Format: Hour:Minute</span>
+  
+      <label for="id_end_time">Ending time:</label>
+      <select name="end_time"  required="" id="id_end_time">
+    <option value="" selected="">---------</option>
+  
+    {% for time in end %}
+    
+    <option value="{{time}}">{{time}}</option>
+    
+    {% endfor %}
+  </select>
+       
   </p>
-
   
   <p>
     <label for="id_quick_description">Quick description:</label>
@@ -82,16 +101,26 @@
   <p>
     <label for="id_importance">How vital is this task ? Will It bring great benefits if done? Great demerits if not done?</label>
     <select name="importance" id="id_importance">
-  <option value="vh">very hight</option>
+      <option value="vh">Essential</option>
 
-  <option value="h">hight</option>
+      <option value="h">Important</option>
+    
+      <option value="m" selected="">Desirable</option>
+    
+      <option value="l">Curiosity/interest</option>
+    
+      <option value="vl">Trivial</option>
 
-  <option value="m" selected="">medium</option>
-
-  <option value="l">low</option>
+      <option value="cr">Circumstantial</option>
 
 </select>
   </p>
+
+  <p>
+    <label for="id_color">Select this task's color:</label>
+    <input type="color" name="color" id="id_color" value="#ff0000">
+  </p>
+
 
     <input type="submit" value="Sumbit">
         </form>

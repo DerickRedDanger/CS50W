@@ -1,0 +1,58 @@
+Change the new_event,dailytask and listtodo page to be able to both create a new and edit a old
+
+
+finish the snack bar at the end of the index.html
+
+Create   the add to today's task so that it also updates the added tasks last update date
+
+Create the filter and sort function for all list to do{
+    sort_order=[]
+    onchange: check if this button is in the sort_order:
+        if it's: remove
+        if it's not: append to the end of it
+        if sort leng is higher than 3, remove one.
+    Runs Sort(sort_order[0],sort_order[1],sort_order[2])
+
+    Sort (first sort, second, third):
+        sort based on the first.
+        sort the ones with the same first (maybe same priority), than move to the next one with different ones
+        repeat till all are done.
+        if the sort isn't in sort_order: do nothing
+}
+
+create a auto function to set the progress of stuff to do that hasn't being done, modified
+or added to dotoday in a week to forgotten (maybe add a configuration to change this value)'
+
+--- when adding the snackbar, create the below
+
+Gotta add a function that checks the datetime of the day selected and asks if
+they want at that day number or at that weekday of the month
+(like the second monday of the month or the last day of the month
+(when selecing a the last day of a month)
+the page about switch in javascript may come in handy)
+
+create a function that pops a snackbar when the user tries to creat a new event
+with forever and daily/weekday/weekly, asking them to change it or use daily task
+---
+
+
+Add explanation/description about the importance
+
+create a table on index for the listtodo that allows to scroll through it's list
+without scrolling the window, also add diferent options for order it by and filters
+
+In cellphones, allows the index to focus only in the list or parts of the daily stuff at time (?)
+Moves the listtodo to a sidenav (?)https://www.w3schools.com/howto/howto_js_sidenav.asp
+
+add a mini calendar to the top right and
+create a sidenav that show a few of the closest important event and
+ the most urgents stuff https://www.w3schools.com/howto/howto_js_sidenav.asp
+
+Create a deadline option on urgency, which also open option telling when the
+urgency show change compared to how close the deadline is.
+
+and all the manytomany parts.
+(in doubts ?  check views.test and models.daily.clean) 
+
+
+remember to set the auto test date to month + 1

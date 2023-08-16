@@ -4,6 +4,8 @@ from django.db import models
 from datetime import datetime,timedelta
 from django.core.exceptions import ValidationError
 from django.urls import reverse
+from django.db.models.signals import pre_save, post_save
+from . import models_util
 
 # for calendar and daily/weekly activities
     # Events and appoitments for the callendar
@@ -13,12 +15,39 @@ veryhight="vh"
 high="h"
 medium="m"
 low="l"
+verylow="vl"
+circumstantial="cr"
 priority_choices = [
-        (veryhight, 'very hight'),
-        (high, 'hight'),
-        (medium, 'medium'),
-        (low, 'low'),
+        (veryhight, 'Essential'),
+        (high, 'important'),
+        (medium, 'desirable'),
+        (low, 'Curiosity/interest'),
+        (verylow,'trivial'),
+        (circumstantial,'circumstantial')
     ]
+
+
+
+
+
+veryclose="vh"
+close="h"
+medium="m"
+far="l"
+veryfar = "vl"
+urgency_choices = [
+    (veryclose, 'Very Close'),
+    (close, 'close'),
+    (medium, 'Medium'),
+    (far,"far"),
+    (veryfar, "Very far"),
+
+    ]
+
+
+
+
+
 # setting up basic date data
 x = datetime.now()
 Year=x.year
@@ -28,6 +57,9 @@ start=f"{x.hour}:{x.minute}"
 y = x + timedelta(minutes=1)
 end=f"{y.hour}:{y.minute}"
 
+class datetracking(models.Model):
+    title = models.CharField(max_length=50, unique=True)
+    day = models.DateField()
 
 class WeekDay(models.Model):
     day = models.CharField(max_length=10)
@@ -35,10 +67,10 @@ class WeekDay(models.Model):
     
     
     def __str__(self):
-        return f"{self.day}"
+        return f"{self.day} - {self.id}"
 class Event(models.Model):
 
-    title = models.CharField(u"Event's name",max_length=200,)
+    title = models.CharField(u"Event's name",max_length=200, unique=True)
     day = models.DateField(u'Day of the event',default=f"{Year}-{Month}-{Day}", help_text=u"Format: year-month-day",)
     start_time = models.TimeField(u'Starting time',default=f"{start}", help_text=u"Format: hour:minute")
     end_time = models.TimeField(u'Ending time',default=f"{end}", help_text=u"Format: hour:minute")
@@ -46,11 +78,6 @@ class Event(models.Model):
     notes = models.TextField(u'Textual Notes', help_text=u'Textual Notes', blank=True, null=True)
     
     importance = models.CharField(u"How vital is this event ? will It bring great benefits if done? Great demerits if not done?",
-        max_length=2,
-        choices= priority_choices,
-        default=medium,
-    )
-    urgency = models.CharField(u"How urgent is this event ? can it wait/be delayed?",
         max_length=2,
         choices= priority_choices,
         default=medium,
@@ -103,9 +130,92 @@ class Event(models.Model):
         choices= repeatd_choices,
         default=frv,
     )  
-    repeatutil = models.DateField(u'Repeat util',default=f"{Year}-{Month}-{Day}", help_text=u"Format: year-month-day")
+    repeatutil = models.DateField(u'Repeat util',default=f"{Year}-{Month}-{Day}", help_text=u"Format: year-month-day",null=True, blank=True)
     repeatnumber = models.IntegerField(u'number of repetitions',default=1,null=True, blank=True)
+    color = models.CharField(u"Color in the planner/calendar",max_length= 9,blank=True,null=True)
  #--------------------!!------------------
+    
+    def serialize(self):
+        
+        return {
+            "id": self.id,
+            "start_time": self.start_time,
+            "end_time": self.end_time,
+            "title": self.title,
+            "color": self.color,
+        }
+
+
+    def check_overlap(self, fixed_start, fixed_end, new_start, new_end):
+        overlap = False
+        if new_start == fixed_end or new_end == fixed_start:    #edge case
+            overlap = False
+        elif (new_start >= fixed_start and new_start <= fixed_end) or (new_end >= fixed_start and new_end <= fixed_end): #innner limits
+            overlap = True
+        elif new_start <= fixed_start and new_end >= fixed_end: #outter limits
+            overlap = True
+ 
+        return overlap
+ 
+    #def get_absolute_url(self):
+    #    url = reverse('admin:%s_%s_change' % (self._meta.app_label, self._meta.model_name), args=[self.id])
+    #    return u'<a href="%s">%s</a>' % (url, str(self.start_time))
+ 
+    def clean(self):
+        #print(self.end_time)
+        #print(type(self.end_time))
+        #print(self.start_time)
+        #print(type(self.start_time))
+        #self.end_time = datetime.strptime(self.end_time, '%H:%M').time()
+        #print(self.end_time)
+        #print(type(self.end_time))
+        #print(self.start_time)
+        #print(type(self.start_time))
+        if self.end_time <= self.start_time:
+            raise ValidationError('Ending times must be after starting times')
+ 
+        events = Event.objects.filter(day=self.day).exclude(id=self.id)
+        if events.exists():
+            for event in events:
+
+                # event isn't updating because it isn't being validated.
+                # below is the likely reason, make it so that it try to
+                # check if self.id == event.id, if it's, ignore this event.
+                try:
+                    if self.id == event.id:
+                        print("self.id == event.id")
+                        continue
+                finally:
+                    if self.check_overlap(event.start_time, event.end_time, self.start_time, self.end_time):
+                        raise ValidationError(
+                            f'There is an overlap with another event: {event.title} on {event.day}, {event.start_time} - {event.end_time})')
+        
+        repeatedevents = EventRepetiton.objects.filter(day=self.day).exclude(original=self.id)
+        if repeatedevents.exists():
+            for repevent in repeatedevents:
+                if self.check_overlap(repevent.original.start_time,repevent.original.end_time, self.start_time, self.end_time):
+                    raise ValidationError(
+                        f'There is an overlap with a repeating event: {repevent.original.title} on {repevent.original.day}, {repevent.original.start_time} - {repevent.original.end_time})')
+    
+    def __str__(self):
+        return f"{self.title}"
+    
+# Event's Post_save at models_util:
+post_save.connect(models_util.event_post_save,sender=Event)
+    
+    
+
+class EventRepetiton(models.Model):
+
+    original=models.ForeignKey(
+        Event, 
+        on_delete=models.CASCADE,
+        related_name="Repetitions"
+    )
+
+    day = models.DateField(u'Day of the event',default=f"{Year}-{Month}-{Day}", help_text=u"Format: year-month-day")
+    start_time = models.TimeField(u'Starting time',default=f"{start}", help_text=u"Format: hour:minute")
+    end_time = models.TimeField(u'Ending time',default=f"{end}", help_text=u"Format: hour:minute")
     
     def check_overlap(self, fixed_start, fixed_end, new_start, new_end):
         overlap = False
@@ -122,59 +232,17 @@ class Event(models.Model):
     #    url = reverse('admin:%s_%s_change' % (self._meta.app_label, self._meta.model_name), args=[self.id])
     #    return u'<a href="%s">%s</a>' % (url, str(self.start_time))
  
-    def clean(self):
-        print(self.end_time)
-        print(type(self.end_time))
-        print(self.start_time)
-        print(type(self.start_time))
-        self.end_time = datetime.strptime(self.end_time, '%H:%M').time()
-        print(self.end_time)
-        print(type(self.end_time))
-        print(self.start_time)
-        print(type(self.start_time))
-        if self.end_time <= self.start_time:
-            raise ValidationError('Ending times must after starting times')
- 
-        events = Event.objects.filter(day=self.day).exclude(id=self.id)
-        if events.exists():
-            for event in events:
-                if self.check_overlap(event.start_time, event.end_time, self.start_time, self.end_time):
-                    raise ValidationError(
-                        f'There is an overlap with another event: {event.title} on {event.day}, {event.start_time} - {event.end_time})')
+
+    def serialize(self):
         
-        repeatedevents = EventRepetiton.objects.filter(day=self.day)
-        if repeatedevents.exists():
-            for repevent in repeatedevents:
-                if self.check_overlap(repevent.original.start_time,repevent.original.end_time, self.start_time, self.end_time):
-                    raise ValidationError(
-                        f'There is an overlap with a repeating event: {repevent.original.title} on {repevent.original.day}, {repevent.original.start_time} - {repevent.original.end_time})')
-    def __str__(self):
-        return f"{self.title}"
-class EventRepetiton(models.Model):
+        return {
+            "id": self.original.id,
+            "start_time": self.start_time,
+            "end_time": self.end_time,
+            "title": self.original.title,
+            "color": self.original.color,
+        }
 
-    original=models.ForeignKey(
-        Event, 
-        on_delete=models.CASCADE,
-        related_name="Repetitions"
-    )
-
-    day = models.DateField(u'Day of the event',default=f"{Year}-{Month}-{Day}", help_text=u"Format: year-month-day")
-
-    def check_overlap(self, fixed_start, fixed_end, new_start, new_end):
-        overlap = False
-        if new_start == fixed_end or new_end == fixed_start:    #edge case
-            overlap = False
-        elif (new_start >= fixed_start and new_start <= fixed_end) or (new_end >= fixed_start and new_end <= fixed_end): #innner limits
-            overlap = True
-        elif new_start <= fixed_start and new_end >= fixed_end: #outter limits
-            overlap = True
- 
-        return overlap
- 
-    #def get_absolute_url(self):
-    #    url = reverse('admin:%s_%s_change' % (self._meta.app_label, self._meta.model_name), args=[self.id])
-    #    return u'<a href="%s">%s</a>' % (url, str(self.start_time))
- 
     def clean(self):
         
         events = Event.objects.filter(day=self.day)
@@ -189,13 +257,13 @@ class EventRepetiton(models.Model):
             for repevent in repeatedevents:
                 if self.check_overlap(repevent.original.start_time,repevent.original.end_time, self.original.start_time, self.original.end_time):
                     raise ValidationError(
-                        f'There is an overlap with a repeating event: {repevent.original.title} on {repevent.original.day}, {repevent.original.start_time} - {repevent.original.end_time})')
+                        f'There is an overlap with a repeating event: {repevent.original.title} on {repevent.day}, {repevent.start_time} - {repevent.end_time})')
 
     def __str__(self):
         return f"{self.original.title} - R - {self.day}"
 class DailyTask(models.Model):
 
-    task = models.CharField(u"Event's name",max_length=200,)
+    title = models.CharField(u"Event's name",max_length=200,)
 
     #weekday choices:
     mon="1"
@@ -229,14 +297,17 @@ class DailyTask(models.Model):
     
     urgency = models.CharField(u"How urgent is this task ? Can it wait/be delayed?",
         max_length=2,
-        choices= priority_choices,
+        choices= urgency_choices,
         default=medium,
     )
+
+
     importance = models.CharField(u"How vital is this task ? Will It bring great benefits if done? Great demerits if not done?",
         max_length=2,
         choices= priority_choices,
         default=medium,
     )
+    color = models.CharField(u"Color in the planner",max_length= 9,blank=True,null=True)
 
     #repeat choices:
     #nvr="nvr"
@@ -260,6 +331,16 @@ class DailyTask(models.Model):
     #    default=nvr,
     #)
 
+    def serialize(self):
+        
+        return {
+            "id": self.id,
+            "start_time": self.start_time,
+            "end_time": self.end_time,
+            "title": self.title,
+            "color": self.color,
+            
+        }
 
     def check_overlap(self, fixed_start, fixed_end, new_start, new_end):
         overlap = False
@@ -279,20 +360,20 @@ class DailyTask(models.Model):
     def clean(self):
         if self.end_time <= self.start_time:
             raise ValidationError('Ending times must after starting times')
- 
-        tasks = DailyTask.objects.filter(weekday=self.weekday)
+            #zones__in=[<id1>]
+        tasks = DailyTask.objects.filter(weekday__in=[self.weekday.all().get().id]).exclude(id=self.id)
         if tasks.exists():
             for task in tasks:
                 if self.check_overlap(task.start_time, task.end_time, self.start_time, self.end_time):
                     raise ValidationError(
-                        f'There is an overlap with another task: {task.task}, {task.start_time} - {task.end_time})')
+                        f'There is an overlap with another task: {task.title}, {task.start_time} - {task.end_time}) on {task.weekday.all()}')
 
 
 
     def __str__(self):
-        return f"{self.task}"
+        return f"{self.title}"
 class ListToDo(models.Model):
-    name = models.CharField(u"Event's name",max_length=200,)
+    title = models.CharField(u"Event's name",max_length=200,)
     quick_description = models.TextField(u"quick description",blank=True, null=True)
     description = models.TextField(u"detailed description",blank=True, null=True)
     steps = models.ManyToManyField(
@@ -325,7 +406,7 @@ class ListToDo(models.Model):
     )
     urgency = models.CharField(u"How urgent is this task ? can it wait/be delayed?",
         max_length=2,
-        choices= priority_choices,
+        choices= urgency_choices,
         default=medium,
     ) # Very hight, hight, medium, low
     importance = models.CharField(u"How vital is this task ? will It bring great benefits if done? Great demerits if not done?",
@@ -336,7 +417,6 @@ class ListToDo(models.Model):
 
     #progress choices:
     nts="nt"
-    start="st"
     inp="ip"
     done="dn"
     fo="fo"
@@ -344,7 +424,6 @@ class ListToDo(models.Model):
     har="hd"
     progress_choices = [
         (nts, "Not Started"),
-        (start, "Started"),
         (inp, "In Progress"),
         (done, "Done"),
         (fo, "forgotten"),
@@ -357,10 +436,24 @@ class ListToDo(models.Model):
         default=nts
     )
     notes = models.TextField(u"task's Notes", help_text=u'Textual Notes', blank=True, null=True)
+    color = models.CharField(u"Color in the planner",max_length= 9,blank=True,null=True)
     last_update = models.DateField(auto_now = True)
 
+    def serialize(self):
+        return {
+            "id": self.id,
+            "title": self.title,
+            "quick_description": self.quick_description,
+            "duration": self.duration,
+            "urgency": self.urgency,
+            "importance": self.importance,
+            "progress": self.progress,
+            "notes": self.notes,
+            "color": self.color,
+        }
+
     def __str__(self):
-        return f"{self.name}"
+        return f"{self.title}"
 
 class WhatToDoToday(models.Model):
 
@@ -379,25 +472,40 @@ class WhatToDoToday(models.Model):
         (it, 'If enough time'),
     ]
 
-    Name = models.CharField(u"Name",max_length=50,)
+    title = models.CharField(u"Name",max_length=50,)
     day = models.DateField(u"the day i (don't) have to do this",default=f"{Year}-{Month}-{Day}", help_text=u"Format: year-month-day")
-    todo = models.ManyToManyField(
+    todo = models.ForeignKey(
         ListToDo,
-        related_name="days_done"
+        related_name="days_done",
+        on_delete=models.CASCADE,
+        null=True,
         )
     need = models.CharField(
         max_length=2,
         choices= need_choices,
         default=Hv,)
+    color = models.CharField(u"Color in the planner",max_length= 9,blank=True,null=True)
+
     #--------------- create this's task's start and ending time
-    #remembering it will be comapred to the daily tasks and events time
+    #remembering it will be compared to the daily tasks and events time
     #so use time, not date
     start_time = models.TimeField(u'Starting time',default=f"{start}", help_text=u"Format: hour:minute")
     end_time = models.TimeField(u'Ending time',default=f"{end}", help_text=u"Format: hour:minute")
     #--------------
     done = models.BooleanField(default=False)
     
+    def serialize(self):
+        
+        return {
+            "id": self.id,
+            "start_time": self.start_time,
+            "end_time": self.end_time,
+            "title": self.title,
+            "color": self.color,
+        }
 
+    def __str__(self):
+        return f"{self.title} - {self.todo}"
 
 class day(models.Model):
 # divide in block of 30/10 mins each and paint the ones with tasks/appointments
@@ -628,3 +736,5 @@ class pomodoro(models.Model):
 # mindfullness
 class mindfulness(models.Model):
     pass
+
+
