@@ -68,6 +68,10 @@ class WeekDay(models.Model):
     
     def __str__(self):
         return f"{self.day} - {self.id}"
+    
+class EventTool(models.Model):
+    pass
+
 class Event(models.Model):
 
     title = models.CharField(u"Event's name",max_length=200, unique=True)

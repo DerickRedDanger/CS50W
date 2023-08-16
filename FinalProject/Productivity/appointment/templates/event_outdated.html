@@ -86,12 +86,8 @@
 
 {% block content %}
 <!-- if this is the page of a existing event -->
-{% if event.id %}
+  {% if event.id %}
     <form id="event" style="margin-top: 30px;" action="/event/{{event.id}}" method="post" >
-    {% else %}
-    <form id="event" style="margin-top: 30px;" action="/event/0" method="post" >
-    {% endif %}
-    
       <h4> Creating a new event: </h4>
 
   {% csrf_token %}
@@ -299,4 +295,170 @@
 
   <input type="submit" value="Sumbit">
       </form>
-      {% endblock %}
+
+<!-- if this is the page to create a new event -->
+
+{% else %}
+      <form id="event" style="margin-top: 30px;" action="/event/0" method="post">
+        <h4> Creating a new event: </h4>
+
+        {% csrf_token %}
+      <p>
+  <label for="id_title">Event's name:</label>
+  <input type="text" name="title" maxlength="200" required="" id="id_title">
+  {{event.errors.title}}
+  
+</p>
+
+
+<p>
+
+  <label for="id_day">Day of the event:</label>
+  <input type="date" name="day"  required="" id="id_day">
+  {{event.errors.day}}
+</p>
+
+<p>
+  <label for="id_start_time">Starting time:</label>
+  <select name="start_time"  required="" id="id_start_time">
+<option value="" selected="">---------</option>
+
+{% for time in start %}
+
+<option value="{{time}}">{{time}}</option>
+
+{% endfor %}
+</select>
+{{event.errors.start_time}}
+</p>
+  
+
+<p>
+
+    <label for="id_end_time">Ending time:</label>
+    <select name="end_time"  required="" id="id_end_time">
+  <option value="" selected="">---------</option>
+
+  {% for time in end %}
+  
+  <option value="{{time}}">{{time}}</option>
+  
+  {% endfor %}
+</select>
+{{event.errors.end_time}}
+</p>
+
+<p>
+  <label for="id_description">Event's description:</label><br>
+  <textarea name="description" cols="90" rows="5" id="id_description"></textarea>
+  {{event.errors.description}}
+</p>
+
+
+<p>
+  <label for="id_notes">Notes about the event:</label><br>
+  <textarea name="notes" cols="90" rows="3" id="id_notes"></textarea>
+  {{event.errors.notes}}
+</p>
+
+<p>
+  <label for="id_importance">How vital is this task ? will It bring great benefits if done? Great demerits if not done?</label>
+  <select name="importance" id="id_importance">
+    <option value="vh">Essential</option>
+
+    <option value="h">important</option>
+  
+    <option value="m" selected="">desirable</option>
+  
+    <option value="l">Curiosity/interest</option>
+  
+    <option value="vl">trivial</option>
+
+    <option value="cr">Circumstantial</option>
+
+</select>
+{{event.errors.importance}}
+</p>
+
+<p>
+  <label for="id_repeat">Do you want this event to repeat ?</label><br>
+  <select name="repeat" id="id_repeat" onchange="rp()">
+<option value="nvr" selected="">Never</option>
+
+<option value="day" >Daily</option>
+
+<option value="wek">Weekly</option>
+
+<option value="mth">Monthly</option>
+
+<option value="yea">Yearly</option>
+
+<option value="wkd">Specific weekdays</option>
+
+</select>
+{{event.errors.repeat}}
+</p>
+
+<p id ="SW" style="display:none">
+  <label for="id_repeat_wkd">Repeat on which weekdays ?</label><br>
+  <span class="helptext">Hold Shift or Control to select more than one option</span><br>
+
+  <select name="repeat_wkd" id="id_repeat_wkd" multiple="">
+    <option value="2">Sunday</option>
+
+    <option value="3">Monday</option>
+  
+    <option value="4">Tuesday</option>
+  
+    <option value="5">Wednesday</option>
+  
+    <option value="6">Thursday</option>
+  
+    <option value="7">Friday</option>
+  
+    <option value="8">Saturday</option>
+
+</select>
+{{event.errors.repeat_wkd}}
+</p>
+
+<p id="R" style="display:none"> 
+  <label for="id_repeatd">How many times ?</label><br>
+  <select name="repeatd" id="id_repeatd" onchange="hm()" >
+    
+<option id='fr' value="frv" selected="" >Forever</option>
+
+<option id = "spc" value="spc" >Specific number of times</option>
+
+<option value="utl">Util</option>
+
+</select>
+{{event.errors.repeatd}}
+<span id='explanation' style="color:red; display:none ">The forever option should not be used with daily, weekly or specific weekdays. It would needlessly use more memory.<br> Make use Daily tasks instead. </span>
+</p>
+
+<p id ="U"style="display:none">
+  <label for="id_repeatutil">Repeat util:</label>
+  <input type="date" name="repeatutil" id="id_repeatutil">
+  {{event.errors.repeatutil}}
+</p>
+
+
+<p id ="num" style="display:none">
+  <label for="id_repeatnumber">Number of repetitions:</label>
+  <input type="number" name="repeatnumber" id="id_repeatnumber" value="0">
+  {{event.errors.repeatnumber}}
+</p>
+
+
+<p>
+  <label for="id_color">Select this task's color:</label>
+  <input type="color" name="color" id="id_color" value="#ff0000">
+  {{event.errors.color}}
+</p>
+
+  <input type="submit" value="Sumbit">
+      </form>
+
+        {% endif %}
+{% endblock %}

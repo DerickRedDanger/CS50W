@@ -644,28 +644,119 @@ def event(request,id):
     # variable to decide to where the submit button will post.
     # if Id = 0, it will lead back to a empty form so another event can be crate
     # if id != 0, will lead back to the page of the edited event.
-    if error != None:
-        tipe='error'
-    else:
-        tipe = id
-
     if id == 0:
-        event = forms.eventForm(request.POST or None)
+        event=[]
+        # the below is used when an event is not validated, so they are set to null for now
+        thisweekday =""
+        start_time=""
+        end_time=""
+        dateu=""
+        date=""
         if request.method == "POST":
+            event = forms.eventForm(request.POST or None)
             if event.is_valid():
                 event.save()
-                event = forms.eventForm
+                event = []
 
             # if event wasn't valid
             else:
+                event=models.Event()
+                event.title = request.POST['title']
+                event.day = request.POST['day']
+                event.start_time = request.POST['start_time']
+                event.end_time = request.POST['end_time']
+                event.description = request.POST['description']
+                event.notes = request.POST['notes']
+                event.repeat = request.POST['repeat']
+                print("wkd")
+                print((request.POST.getlist('repeat_wkd')))
+                wkdlist=(request.POST.getlist('repeat_wkd'))
+                event.repeatd = request.POST['repeatd']
+                event.repeatutil = request.POST['repeatutil']
+                event.repeatnumber = request.POST['repeatnumber']
+                event.color=request.POST['color']
+
+
+                thisweekday=[]
+
+                    #creates a variable to check if the loop appended the day to the list
+                k = 1
+
+                    # for day and id in weekday
+                for d,n in weekday:
+
+                    # for weekdays selected in the events
+                    for x in wkdlist:
+                        print(f" n = {n} and x = {x}")
+                        # if the weekday Id is equal to one selected
+                        if int(n) == int(x):
+                            # append it to the list with a 1 (selected) at the end and set K = 0
+                            thisweekday.append((d,n,1))
+                            k = 0
+                            print("added")
+                    # if none of the weekdays selected is equal to the weekday in question
+                    if k == 1 :
+                        # append it to the list, with a 0 (not seletected) at the end
+                        thisweekday.append((d,n,0))
+                        print("not added")
+                    # resets K to 1 at the end of the loop.
+                    k = 1
+
+                # converts the list to a proper tuple to be used in the html
+                thisweekday = tuple (thisweekday)
+                print(f"thisweekday = {thisweekday}")
+
+                print(f"event.day = {event.day}")
+                y = event.day
+                year = f"{y[0]}{y[1]}{y[2]}{y[3]}"
+                month = f"{y[5]}{y[6]}"
+                day= f"{y[8]}{y[9]}"
+                #date = datetime.datetime(year,month,day)
+                #day=event.day.strftime("%d")
+                #month=event.day.strftime("%m")
+                #year=event.day.strftime("%Y")
+                #print(f"{year}-{month}-{day}")
+                print(event.day)
+                print(f"date {year} - {month} - {day}")
+                date=f"{year}-{month}-{day}"
+                print(f"date = {date}")
+                if event.repeatutil:
+                    y = event.repeatutil
+                    year = f"{y[0]}{y[1]}{y[2]}{y[3]}"
+                    month = f"{y[5]}{y[6]}"
+                    day= f"{y[8]}{y[9]}"
+                    dateu =f"{year}-{month}-{day}"
+                else:
+                    dateu=""
+                print(f"start_time = {event.start_time}")
+                print(f"lengt of start_time = {len(event.start_time)}")
+                if len(event.start_time) == 4:
+                    y = event.start_time
+                    start_time= f'{y[0]}:{y[2]}{y[3]}'
+                else:
+                    y = event.start_time
+                    start_time= f'{y[0]}{y[1]}:{y[3]}{y[4]}'
+
+                if len(event.end_time) == 4:
+                    y = event.end_time
+                    end_time= f'{y[0]}:{y[2]}{y[3]}'
+                else:
+                    y = event.end_time
+                    end_time= f'{y[0]}{y[1]}:{y[3]}{y[4]}'
+
+                
+                nevent = forms.eventForm(request.POST or None)
+                #print (f"nevent1 = {nevent}")
+
+
+
                 print("something went wrong")
                 error = "something went wrong"
-        
+
         # returns the html with the empty form is through GET or a correct POST
         # returns with the filled post if event wasn't valid to make it easier to fix.
         return render(request, "event.html",{"event":event,"start":start,"end":end,"error":error,
-                    "weekday":weekday,"repeat_choices":repeat_choices,"priority_choices":priority_choices,
-                    "tipe":tipe,})
+                    "thisweekday":thisweekday,"start_time":start_time,"end_time":end_time, "dateu":dateu, "date":date,})
     else:
         event=models.Event.objects.get(id=id)
         day=event.day.strftime("%d")
@@ -768,7 +859,7 @@ def event(request,id):
 
         return render(request,"event.html",{"start":start,"end":end,"start_time":start_time,
                     "end_time":end_time,"event":event,"date":date,"error":error,"thisweekday":thisweekday,
-                     "dateu":dateu, "tipe":tipe, })
+                     "dateu":dateu,})
 
 def daily(request,id):
     error=""
