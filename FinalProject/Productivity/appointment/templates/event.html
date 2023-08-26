@@ -5,6 +5,11 @@
   document.addEventListener("DOMContentLoaded",rp());
   document.addEventListener("DOMContentLoaded",hm());
 
+  document.getElementById("id_repeat").addEventListener("change",rp);
+
+  document.getElementById("id_repeatd").addEventListener("change", hm);
+
+
   function rp() {
     // Get the repeat element
     var repeat = document.getElementById("id_repeat");
@@ -16,42 +21,50 @@
     var util = document.getElementById("U");
     // Get the num element
     var num = document.getElementById("num");
-    // Get the forever option
-    var fr = document.getElementsByClassName("frv");
+    // Get the submit buttom
+    var submit = document.getElementById("submit");
     // Get the specific number of times option
     var spc = document.getElementById("spc");
     // Get the forever explanation element
-     var expl = document.getElementById("explanation");
-  
-    // If the checkbox is checked, display the output text
-    if (repeat.value == "nvr"){
-      specific.style.display = "none";
-      howmany.style.display="none";
-      util.style.display = "none";
-      num.style.display="none";
-      fr.disabled = false;
-      expl.style.display = 'none';
+    var expl = document.getElementById("explanation");
+    // Get the howmany element's choice value
+    var howmany_choice = document.getElementById("id_repeatd");
 
-    } else if(repeat.value == "wkd") {
-      specific.style.display = "block";
-      howmany.style.display="block";
-      fr.disabled = true;
-      expl.style.display = 'block';
+    switch (repeat.value) {
 
-    } else if (repeat.value == "day" || repeat.value == "wek"){
-      specific.style.display = "none";
-      howmany.style.display="block";
-      fr.disabled = true;
-      expl.style.display = 'block';
- 
-    } else{
-      specific.style.display = "none";
-      howmany.style.display="block";
-      fr.disabled = false;
-      expl.style.display = 'none';
- 
+      case "day":
+      case "wek":
+          submit.disabled = false;
+          specific.style.display = "none";
+          howmany.style.display="block";
+          expl.style.display = 'block';
+          if (howmany_choice.value == "frv"){
+            submit.disabled = true;}
+        break;
+          
+      case "nvr":
+          specific.style.display = "none";
+          howmany.style.display="none";
+          util.style.display = "none";
+          num.style.display="none";
+          submit.disabled = false;
+          expl.style.display = 'none';
+          break; 
 
+      case "wkd":
+          specific.style.display = "block";
+          howmany.style.display="block";
+          submit.disabled = false;
+          expl.style.display = 'block';
+          break;
+     
+         default:
+          specific.style.display = "none";
+          howmany.style.display="block";
+          submit.disabled = false;
+          expl.style.display = 'none';
     }
+
   }
 
 
@@ -64,17 +77,31 @@
     var util = document.getElementById("U");
     // Get the num element
     var num = document.getElementById("num");
+    // Get the repeat element
+    var repeat = document.getElementById("id_repeat");
   
-    // 
-    if (howmany.value == "frv"){
+  switch (howmany.value) {
+
+    
+      
+    case "frv":
       util.style.display = "none";
       num.style.display="none";
-    } else if(howmany.value == "spc") {
+      submit.disabled = false;
+      if (repeat.value == "frv"|| repeat.value =="wek"){
+        submit.disabled = true;}
+      break
+
+    case "spc": 
       util.style.display = "none";
       num.style.display="block";
-    } else{
+      submit.disabled = false;
+      break
+      
+    default:
       util.style.display = "block";
       num.style.display="none";
+      submit.disabled = false;
     }
   }
 
@@ -86,217 +113,139 @@
 
 {% block content %}
 <!-- if this is the page of a existing event -->
-{% if event.id %}
+{% if id != 0 %}
     <form id="event" style="margin-top: 30px;" action="/event/{{event.id}}" method="post" >
-    {% else %}
+      <h4> Editing/Viewing a event: </h4>
+      {% else %}
     <form id="event" style="margin-top: 30px;" action="/event/0" method="post" >
+    <h4> Creating a new event: </h4>
     {% endif %}
     
-      <h4> Creating a new event: </h4>
 
   {% csrf_token %}
       <p>
-  <label for="id_title">Event's name:</label>
-  <input type="text" name="title" maxlength="200" value="{{event.title}}" required="" id="id_title">
-        {{event.errors.title}}
+  {% if event.title.errors %}
+    {{event.title.errors}}<br>
+  {% endif %}
+
+  {{event.title.label_tag}}
+  {{event.title}}
+  
   
 </p>
 
 
 <p>
+  {% if event.day.errors %}
+    {{event.day.errors}}<br>
+  {% endif %}
 
-  <label for="id_day">Day of the event:</label>
+  {{event.day.label_tag}}
   <input type="date" name="day" value="{{date}}"  required="" id="id_day">
-  {{date}}
-  {{event.errors.date}}
+
 </p>
 
 <p>
-  <label for="id_start_time">Starting time:</label>
-  <select name="start_time"  required="" id="id_start_time">
-    {% if start_time %}
-    <option value="{{start_time}}" selected="">Original value: {{start_time}}</option>
-    {% else %}
-    <option value="" selected="">---------</option>
-    {% endif %}
-
-{% for time in start %}
-
-<option value="{{time}}">{{time}}</option>
-
-{% endfor %}
-
-</select>
-{{event.errors.start_time}}
+  {% if event.start_time.errors %}
+    {{event.start_time.errors}}<br>
+  {% endif %}
+    {{event.start_time.label_tag}}
+    {{event.start_time}}
 </p>
 
 
 <p>
 
-    <label for="id_end_time">Ending time:</label>
-    <select name="end_time"  required="" id="id_end_time">
-      {% if end_time %}
-      <option value="{{end_time}}" selected="">Original Value: {{end_time}}</option>
-      {% else %}
-      <option value="" selected="">---------</option>
-      {% endif %}
-  
-  {% for time in end %}
-  
-  <option value="{{time}}">{{time}}</option>
-  
-  {% endfor %}
-</select>
-   {{event.errors.end_time}}  
+  {% if event.end_time.errors %}
+    {{event.end_time.errors}}<br>
+  {% endif %}
+  {{event.end_time.label_tag}}
+  {{event.end_time}}
 </p>
 
 <p>
-  <label for="id_description">Event's description:</label><br>
-  <textarea name="description" cols="90" rows="5" id="id_description">{{event.description}}</textarea>
-  {{event.errors.description}}
+  {% if event.description.errors %}
+    {{event.description.errors}}<br>
+  {% endif %}
+  {{event.description.label_tag}}<br>
+  {{event.description}}
 </p>
 
 
 <p>
-  <label for="id_notes">Notes about the event:</label><br>
-  <textarea name="notes" cols="90" rows="3" id="id_notes">{{event.notes}}</textarea>
-  {{event.errors.notes}}
+  {% if event.notes.errors %}
+    {{event.notes.errors}}<br>
+  {% endif %}
+  {{event.notes.label_tag}}<br>
+  {{event.notes}}
 </p>
 
 <p>
-  <label for="id_importance">How vital is this task ? will It bring great benefits if done? Great demerits if not done?</label>
-  <select name="importance" id="id_importance">
-    {% if event.importance %}
-    <option value="{{event.importance}}" selected="">Original value: {{event.importance}}</option>
-    
-    <option value="m">desirable</option>
-    {% else %}
-    <option value="m" selected="">desirable</option>
-    {% endif %}
 
-    <option value="vh">Essential</option>
+{% if event.importance.errors %}
+  {{event.importance.errors}}<br>
+{% endif %}
+{{event.importance.label_tag}}<br>
+{{event.importance}}
 
-    <option value="h">important</option>
-  
-    <option value="l">Curiosity/interest</option>
-  
-    <option value="vl">trivial</option>
-
-    <option value="cr">Circumstantial</option>
-
-</select>
-{{event.errors.importance}}
 </p>
 <p>
-  <label for="id_repeat">Do you want this event to repeat ?</label><br>
-  <select name="repeat" id="id_repeat" onchange="rp()">
-    {% if event.repeat %}
-    <option value="{{event.repeat}}" selected="">Original value: {{event.repeat}}</option>
-
-    <option value="nvr" >Never</option>
-    {% else %}
-    <option value="nvr" selected="">Never</option>
-    {% endif %}
-
-<option value="day">Daily</option>
-
-<option value="wek">Weekly</option>
-
-<option value="mth">Monthly</option>
-
-<option value="yea">Yearly</option>
-
-<option value="wkd">Specific weekdays</option>
-
-</select>
-{{event.errors.repeat}}
+  {% if event.repeat.errors %}
+  {{event.repeat.errors}}<br>
+{% endif %}
+{{event.repeat.label_tag}}<br>
+{{event.repeat}}
 </p>
 
 <p id ="SW" style="display:none" >
-  <label for="id_repeat_wkd">Repeat on which weekdays ?</label><br>
-  <span class="helptext">Hold Shift or Control to select more than one option</span><br>
+{% if event.repeat_wkd.errors %}
+  {{event.repeat_wkd.errors}}<br>
+{% endif %}
+<label for="id_repeat_wkd">Repeat on which weekdays ?</label><br>
+<span class="helptext">Hold Shift or Control to select more than one option</span><br>
+{{event.repeat_wkd}}
 
-  <select name="repeat_wkd" id="id_repeat_wkd" multiple="">
-
-    {% if thisweekday %}
-    {% for day,n,s in thisweekday %}
-
-        {% if s == 1%}
-
-        <option value="{{n}}" selected="">{{day}}</option>
-      
-        {% else %}
-
-        <option value="{{n}}" >{{day}}</option>
-      
-        {% endif %}
-
-  {% endfor %}
-
-  {% else %}
-  <option value="2">Sunday</option>
-
-  <option value="3">Monday</option>
-
-  <option value="4">Tuesday</option>
-
-  <option value="5">Wednesday</option>
-
-  <option value="6">Thursday</option>
-
-  <option value="7">Friday</option>
-
-  <option value="8">Saturday</option>
-  {% endif %}
-
-</select>
-
-{{event.errors.repeat_wkd}}
 </p>
 
 <p id="R" style="display:none" >
-  <label for="id_repeatd">How many times ?</label><br>
-  <select name="repeatd" id="id_repeatd" onchange="hm()">
-    {% if event.repeatd %}
-<option class = "{{event.repeatd}}" =  value="{{event.repeatd}}" selected="" >Original value:{{event.repeatd}}</option>
 
-<option class = "frv "value="frv">Forever</option>
-
-{% else %}
-<option id='fr' value="frv" selected="" >Forever</option>
+{% if event.repeatd.errors %}
+  {{event.repeatd.errors}}<br>
 {% endif %}
+{{event.repeatd.label_tag}}<br>
+{{event.repeatd}}
 
-<option value="spc">Specific number of times</option>
-
-<option value="utl">Util</option>
-
-</select>
-{{event.errors.repeatd}}
 <span id='explanation' style="color:red; display:none ">The forever option should not be used with daily, 
   weekly or specific weekdays. It would needlessly use more memory.<br>
   Make use Daily tasks instead. </span>  
 </p>
 
 <p id ="U"style="display:none">
+{% if event.repeatutil.errors %}
+  {{event.repeatutil.errors}}<br>
+{% endif %}
   <label for="id_repeatutil">Repeat util:</label>
   <input type="date" value="{{dateu}}" name="repeatutil" id="id_repeatutil">
-  {{event.errors.repeatutil}}
 </p>
 
 
 <p id ="num" style="display:none">
-  <label for="id_repeatnumber">Number of repetitions:</label>
-  <input type="number" name="repeatnumber" id="id_repeatnumber" value="{{event.repeatnumber}}">
-  {{event.errors.repeatnumber}}
+{% if event.repeatnumber.errors %}
+  {{event.repeatnumber.errors}}<br>
+{% endif %}
+{{event.repeatnumber.label_tag}}<br>
+{{event.repeatnumber}}
 </p>
 
 
 <p>
-  <label for="id_color">Select this task's color:</label>
-  <input type="color" name="color" id="id_color" value="{{event.color}}">
-  {{event.errors.color}}
+{% if event.color.errors %}
+  {{event.color.errors}}<br>
+{% endif %}
+{{event.color.label_tag}}<br>
+  <input type="color" name="color" id="id_color" value="{{event.color.value}}">
 </p>
 
-  <input type="submit" value="Sumbit">
+  <input id="submit" type="submit" value="Sumbit">
       </form>
       {% endblock %}

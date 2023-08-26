@@ -9,6 +9,7 @@ from django.http import HttpResponse, HttpResponseRedirect,JsonResponse
 from . import models
 from .utils.calendarutils import Calendar
 from . import forms
+from django.forms.models import model_to_dict
 
 
 # Checking the date to decide if it's time to do all the auto functions.
@@ -371,9 +372,18 @@ def calendar(request,year=None, month=None):
     else:
         return HttpResponseRedirect(reverse("index"))
 
-def new_event(request):
+def event(request,id):
     error=""
-    event = forms.eventForm(request.POST or None)
+    date = None
+    start_time = None
+    end_time = None
+    dateu=None
+    if id != 0:
+        obj = models.Event.objects.get(id = id)
+        event = forms.eventForm(instance = obj)
+    else:
+        obj = models.Event(None)
+        event = forms.eventForm(None)
     if request.method == "POST":
         if event.is_valid():
             event.save()
@@ -383,21 +393,41 @@ def new_event(request):
         else:
             print("something went wrong")
             error = "something went wrong"
-
+    print(obj.day)
+    if obj.day:
+        print(f"obj.day = {obj.day}")
+        date=obj.day.strftime("%Y-%m-%d")
+        start_time = obj.start_time.strftime("%H:%M")
+        end_time = obj.end_time.strftime("%H:%M")
+    if obj.repeatutil:
+        dateu=obj.repeatutil.strftime("%Y-%m-%d")
+    
     # returns the html with the empty form is through GET or a correct POST
     # returns with the filled post if event wasn't valid to make it easier to fix.
-    return render(request, "New_event.html",{"event":event,"start":start,"end":end,"error":error,"weekday":weekday,"repeat_choices":repeat_choices,"priority_choices":priority_choices,})
+    # return render(request, "forms.html",{"event":event,"start":start,"end":end,"error":error,"weekday":weekday,"repeat_choices":repeat_choices,"priority_choices":priority_choices,})
+    return render(request, "event.html",{"event":event,"id":id,"start_time":start_time,"end_time":end_time,"date":date,"dateu":dateu,"start":start,"end":end,"error":error,"weekday":weekday,"repeat_choices":repeat_choices,"priority_choices":priority_choices,})
 
     #if request.method == "GET":
      #   context={}
      #   form = forms.eventForm
       #  context['form']=form
 
-def dailytask(request):
+def dailytask(request,id):
+    snack=""
+    error = False
+    if id == 0:
+        task = models.DailyTask()
+        task = forms.DailyTaskForm(request.POST or None)
 
-    error = ""
-    task = forms.DailyTaskForm(request.POST or None)
+        
+    else:
+        task = models.DailyTask.objects.get(id=id)
+        
     if request.method == "POST":
+        task = forms.DailyTaskForm(request.POST or None)
+        if task.is_valid:
+            task.save()
+            task=models.DailyTask()
         title = request.POST['title']
         weekday = request.POST['weekday']
         start_time = request.POST['start_time']
@@ -417,27 +447,34 @@ def dailytask(request):
             # cheking if this task is being edited, not created.
             # if it is, ignore self in the filter.
             try:
-                tasks = models.DailyTask.objects.filter(weekday=day).exclude(id=self.id)
+                tasks = models.DailyTask.objects.filter(weekday=day).exclude(id=task.id)
             except:
                 tasks = models.DailyTask.objects.filter(weekday=day)
             if tasks.exists():
                 for test in tasks:
                     if check_overlap(test.start_time, test.end_time, start_time ,end_time):
                         # raise snackbar/toast
-                        error = f' There is an overlap with another task: {test.title}, {test.start_time} - {test.end_time}) on the weekday {day}'
+                        error=True
+                        snack = f' There is an overlap with another task: {test.title}, {test.start_time} - {test.end_time}) on the weekday {day}'
                         break
-            if error=="":
+        if error==False:
                 # models.DailyTask.objects.create(
                     # saving the new task
-                new = models.DailyTask(title=title,start_time=start_time,
+            new = models.DailyTask(title=title,start_time=start_time,
                     end_time=end_time,quick_description=quick_description,
                     description=description,notes=notes,urgency=urgency,
                     importance=importance,color=color)
-                new.save()
+            new.save()
                 # adding the weekdays, since it raises a error if added without first saving
-                new.weekday.add(weekday)
-                
-    return render(request,"dailytask.html",{"task":task,"start":start,"end":end,"error":error,"repeat_choices":repeat_choices,"priority_choices":priority_choices,})
+            new.weekday.add(weekday)
+            if id == 0 :
+                snack =f"The task {task.title} has been created"
+            else : 
+                snack =f"The task {task.title} has been saved"
+            
+    return render(request,"dailytask.html",{"task":task,"start":start,"end":end,"error":error,
+                                            "repeat_choices":repeat_choices,"priority_choices":priority_choices,
+                                            "snack":snack,"daily":task})
 
 def listtodo(request):
     error = ""
@@ -639,7 +676,7 @@ def test(request):
         'test3':test3,'test4':test4,'test5':test5, 'ftest':ftest,
         'testtimetest':testtimetest,'testtimey':testtimey,'allf':allf})
 
-def event(request,id):
+def event_outdated(request,id):
     error=request.POST or None
     # variable to decide to where the submit button will post.
     # if Id = 0, it will lead back to a empty form so another event can be crate
@@ -654,12 +691,15 @@ def event(request,id):
         date=""
         if request.method == "POST":
             event = forms.eventForm(request.POST or None)
+            print(f"form = {event}")
+
             if event.is_valid():
                 event.save()
                 event = []
 
             # if event wasn't valid
             else:
+
                 event=models.Event()
                 event.title = request.POST['title']
                 event.day = request.POST['day']
@@ -755,7 +795,7 @@ def event(request,id):
 
         # returns the html with the empty form is through GET or a correct POST
         # returns with the filled post if event wasn't valid to make it easier to fix.
-        return render(request, "event.html",{"event":event,"start":start,"end":end,"error":error,
+        return render(request, "event_outdated2.html",{"event":event,"start":start,"end":end,"error":error,
                     "thisweekday":thisweekday,"start_time":start_time,"end_time":end_time, "dateu":dateu, "date":date,})
     else:
         event=models.Event.objects.get(id=id)
@@ -857,7 +897,7 @@ def event(request,id):
 
         print(f"This is weekday = {thisweekday}")
 
-        return render(request,"event.html",{"start":start,"end":end,"start_time":start_time,
+        return render(request,"event_outdated2.html",{"start":start,"end":end,"start_time":start_time,
                     "end_time":end_time,"event":event,"date":date,"error":error,"thisweekday":thisweekday,
                      "dateu":dateu,})
 

@@ -1,4 +1,7 @@
-Change the new_event,dailytask and listtodo page to be able to both create a new and edit a old
+event rework complete, need to create validations to ensure the specific repetitions and util
+are after the day of the even and not null.
+
+Change the dailytask and listtodo page to be able to both create a new and edit a old
 
 
 finish the snack bar at the end of the index.html

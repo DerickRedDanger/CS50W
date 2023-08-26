@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from datetime import datetime,timedelta
+from datetime import datetime,timedelta,time
 from django.core.exceptions import ValidationError
 from django.urls import reverse
 from django.db.models.signals import pre_save, post_save
@@ -9,6 +9,35 @@ from . import models_util
 
 # for calendar and daily/weekly activities
     # Events and appoitments for the callendar
+
+
+#test
+print(time(5, 00))
+
+# Time choices
+hours = {5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23}
+minutes = (00,15,30,45,)
+start_choices=[]
+end_choices=[]
+for hour in hours:
+    for minute in minutes:
+        if hour == 5 and minute == 00:
+                pass
+        # dt.time(00, 00)
+        else:
+            x = time(hour,minute)
+            end_choices.append((x,x))
+            
+        if hour == 23 and minute == 45:
+                pass
+        else:
+            y = time(hour,minute)
+            start_choices.append((y,y))
+        
+start_choices=tuple(start_choices)
+end_choices=tuple(end_choices)
+print(f"start_choices = {start_choices}")
+print(f"end_choices = {end_choices}")
 
 # Choices for Urgency/Importance
 veryhight="vh"
@@ -75,9 +104,9 @@ class EventTool(models.Model):
 class Event(models.Model):
 
     title = models.CharField(u"Event's name",max_length=200, unique=True)
-    day = models.DateField(u'Day of the event',default=f"{Year}-{Month}-{Day}", help_text=u"Format: year-month-day",)
-    start_time = models.TimeField(u'Starting time',default=f"{start}", help_text=u"Format: hour:minute")
-    end_time = models.TimeField(u'Ending time',default=f"{end}", help_text=u"Format: hour:minute")
+    day = models.DateField(u'Day of the event', help_text=u"Format: year-month-day",)
+    start_time = models.TimeField(u'Starting time',choices= start_choices)
+    end_time = models.TimeField(u'Ending time', choices = end_choices)
     description = models.TextField(u"Event's description",blank=True, null=True)
     notes = models.TextField(u'Textual Notes', help_text=u'Textual Notes', blank=True, null=True)
     
@@ -111,12 +140,15 @@ class Event(models.Model):
         choices= repeat_choices,
         default=nvr,
     )
-    
+    # here to fix a error in the data base
+    today_weekday = (int(x.strftime('%w')) + int(2))
+    # today_weekday = str()
+
     repeat_wkd = models.ManyToManyField(
         WeekDay,
         related_name="Todayevent",
-        blank=True,
-        default=str(x.strftime('%w'))
+        blank=False,
+        default=today_weekday
         )
     
     #repeat duration choices:
@@ -134,8 +166,8 @@ class Event(models.Model):
         choices= repeatd_choices,
         default=frv,
     )  
-    repeatutil = models.DateField(u'Repeat util',default=f"{Year}-{Month}-{Day}", help_text=u"Format: year-month-day",null=True, blank=True)
-    repeatnumber = models.IntegerField(u'number of repetitions',default=1,null=True, blank=True)
+    repeatutil = models.DateField(u'Repeat util', help_text=u"Format: year-month-day",null=True, blank=True)
+    repeatnumber = models.IntegerField(u'number of repetitions',default=1)
     color = models.CharField(u"Color in the planner/calendar",max_length= 9,blank=True,null=True)
  #--------------------!!------------------
     

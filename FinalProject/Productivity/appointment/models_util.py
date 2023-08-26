@@ -93,13 +93,15 @@ def event_post_save(sender,instance,created, *args, **kwargs):
 
                                     # check if the weekday in question was one of the selected.
                                     if dayi.strftime("%A") in week:
+                                        print(f"dayi = {dayi.strftime} in")
 
                                         # if it's create a new repetition and save.
                                         new = models.EventRepetiton(original=instance, day=dayi,
                                         start_time=instance.start_time, end_time=instance.end_time)
                                         print(f'new = {new}')
                                         new.save()
-                                
+                                    else:
+                                        print(f"dayi = {dayi.strftime} in")
                                 # if it's not the initial day and it's not set to repeat on specific weekdays
                                 # than this is a day that event is meant to be created.
                                 else:
@@ -142,7 +144,7 @@ def event_post_save(sender,instance,created, *args, **kwargs):
                             # so increase day by 1
                             else:
                                 dayi=dayi+timedelta(days=1)
-                                print(f'day - dayi = {dayi}')
+                                print(f'day - dayi = {dayi} yea')
 
                 # else, if the event is set to be repeted a certain number of times
                 elif instance.repeatd == "spc":
@@ -165,7 +167,7 @@ def event_post_save(sender,instance,created, *args, **kwargs):
 
                                 # if specific week days was selected
                                 if instance.repeat=='wkd':
-                                    print(f'dayi = {dayi.strftime("%A")}')
+                                    print(f'dayi = {dayi.strftime("%A")} wkd')
 
                                     # check if the weekday in question was one of the selected.
                                     if dayi.strftime("%A") in week:
@@ -176,6 +178,9 @@ def event_post_save(sender,instance,created, *args, **kwargs):
                                         print(f'new = {new}')
                                         new.save()
                                         n=n+1 
+                                    else:
+                                        print(f'dayi = {dayi.strftime("%A")} else wkd')
+                                        print (f"week = {week}")
                                        
                                 # if it's not the initial day and it's not set to repeat on specific weekdays
                                 # than this is a day that event is meant to be created.
@@ -235,6 +240,6 @@ def event_post_save(sender,instance,created, *args, **kwargs):
                             # so increase day by 1
                             else:
                                 dayi=dayi+timedelta(days=1)
-                                print(f'day - dayi = {dayi}')
+                                print(f'day - dayi = {dayi} day')
                 
  

@@ -5,7 +5,18 @@
 
 <form id="todo" style="margin-top: 30px;" action="/listtodo/" method="post">
     {% csrf_token %}
-    {{ todo.as_p }}
+    {{ event.as_p }}
     <input type="submit" value="Sumbit">
 </form>
+
+# In your template:
+{{ event }}
+<br><br><br>
+# In form_snippet.html:
+{% for field in event %}
+    <div class="fieldWrapper">
+        {{ field.errors }}
+        {{ field.label_tag }} {{ field }} {{field.value}}
+    </div>
+{% endfor %}
 {% endblock %}

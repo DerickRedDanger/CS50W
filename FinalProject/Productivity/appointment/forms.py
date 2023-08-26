@@ -1,14 +1,37 @@
 from django import forms
 from . import models
+import datetime as datetime
+HOUR_CHOICES = [(datetime.time(hour=x), '{:02d}:00'.format(x)) for x in range(0, 24)]
 
+hours = {5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23}
+minutes = (00,15,30,45,)
+start_choices=[]
+end_choices=[]
+for hour in hours:
+    for minute in minutes:
+        if hour == 5 and minute == 00:
+            pass
+        else:
+            x = f"{hour}:{minute}"
+            y = datetime.time(hour,minute)
+            end_choices.append((y,x))
+            
+        if hour == 23 and minute == 45:
+            pass
+        else:
+            j = f"{hour}:{minute}"
+            k = datetime.time(hour,minute)
+            start_choices.append((j,k))
 class eventForm(forms.ModelForm):
     class Meta:
         model = models.Event
-        fields = ['title','day','start_time','end_time','description','notes','repeat','repeat_wkd','repeatd','repeatutil','repeatnumber','color',]
+        fields = ['title','day','start_time','end_time','description','notes','importance','repeat','repeat_wkd','repeatd','repeatutil','repeatnumber','color',]
         widgets = {
             'day' : forms.DateInput(attrs = {'placeholder': 'Year-Month-Day'}),
-            'start_time' : forms.TimeInput(attrs = {'placeholder': 'Hour:Minute'}),
-            'end_time' : forms.TimeInput(attrs = {'placeholder': 'Hour:Minute'}),
+            #'start_time' : forms.TimeInput(attrs = {'placeholder': 'Hour:Minute'}),
+            #'end_time' : forms.TimeInput(attrs = {'placeholder': 'Hour:Minute'}),
+            'start_time': forms.Select(choices=start_choices),
+            'end_time': forms.Select(choices=end_choices),
             'description': forms.Textarea(attrs={'cols': 90, 'rows': 5}),
             'notes':forms.Textarea(attrs={'cols': 90, 'rows': 3}),
         }

@@ -8,34 +8,58 @@
     {% csrf_token %}
         <p>
     <label for="id_title">Event's name:</label>
-    <input type="text" name="title" maxlength="200" required="" id="id_task">
+    <input type="text" name="title" maxlength="200" value="{{daily.title.value}}" required="" id="id_task">
+    {{daily.title.value}}
+    {{daily.errors.title}}
   </p>
 
   <p>
     <label for="id_weekday">Weekday:</label>
     <select name="weekday" id="id_weekday" multiple="">
       
-  <option value="2">Sunday</option>
-
-  <option value="3">Monday</option>
-
-  <option value="4">Tuesday</option>
-
-  <option value="5">Wednesday</option>
-
-  <option value="6">Thursday</option>
-
-  <option value="7">Friday</option>
-
-  <option value="8">Saturday</option>
+      {% if thisweekday %}
+      {% for day,n,s in thisweekday %}
+  
+          {% if s == 1%}
+  
+          <option value="{{n}}" selected="">{{day}}</option>
+        
+          {% else %}
+  
+          <option value="{{n}}" >{{day}}</option>
+        
+          {% endif %}
+  
+    {% endfor %}
+  
+    {% else %}
+    <option value="2">Sunday</option>
+  
+    <option value="3">Monday</option>
+  
+    <option value="4">Tuesday</option>
+  
+    <option value="5">Wednesday</option>
+  
+    <option value="6">Thursday</option>
+  
+    <option value="7">Friday</option>
+  
+    <option value="8">Saturday</option>
+    {% endif %}
 
 </select>
+{{daily.errors.weekday}}
   </p>
   
   <p>
     <label for="id_start_time">Starting time:</label>
     <select name="start_time"  required="" id="id_start_time">
-  <option value="" selected="">---------</option>
+      {% if start_time %}
+      <option value="{{start_time}}" selected="">Original value: {{start_time}}</option>
+      {% else %}
+      <option value="" selected="">---------</option>
+      {% endif %}
   
   {% for time in start %}
   
@@ -46,6 +70,7 @@
   
   
   </select>
+  {{daily.errors.start_time}}
   </p>
     
   
@@ -53,7 +78,11 @@
   
       <label for="id_end_time">Ending time:</label>
       <select name="end_time"  required="" id="id_end_time">
-    <option value="" selected="">---------</option>
+        {% if end_time %}
+        <option value="{{end_time}}" selected="">Original Value: {{end_time}}</option>
+        {% else %}
+        <option value="" selected="">---------</option>
+        {% endif %}
   
     {% for time in end %}
     
@@ -61,51 +90,69 @@
     
     {% endfor %}
   </select>
-       
+  {{daily.errors.end_time}}
   </p>
   
   <p>
     <label for="id_quick_description">Quick description:</label>
-    <textarea name="quick_description" cols="60" rows="3" id="id_quick_description"></textarea>
+    <textarea name="quick_description" cols="60" rows="3" id="id_quick_description">{{daily.quick_description}}</textarea>
+    {{daily.errors.quick_description}}
   </p>
 
   
   <p>
     <label for="id_description">Detailed description:</label>
-    <textarea name="description" cols="90" rows="5" id="id_description"></textarea>
+    <textarea name="description" cols="90" rows="5" id="id_description">{{daily.description}}</textarea>
+    {{daily.errors.description}}
   </p>
 
   
   <p>
     <label for="id_notes">Task's Notes:</label>
-    <textarea name="notes" cols="60" rows="3" id="id_notes"></textarea>
+    <textarea name="notes" cols="60" rows="3" id="id_notes">{{daily.notes}}</textarea>
       <span class="helptext">Textual Notes</span>
+      {{daily.errors.notes}}
   </p>
 
   
   <p>
     <label for="id_urgency">How urgent is this task? Can it wait/be postponed?</label>
     <select name="urgency" id="id_urgency">
+
+      {% if daily.importance %}
+      <option value="{{daily.importance}}" selected="">Original value: {{daily.importance}}</option>
+      
+      <option value="m">medium</option>
+      {% else %}
+      <option value="m" selected="">medium</option>
+      {% endif %}
+
   <option value="vh">very hight</option>
 
   <option value="h">hight</option>
 
-  <option value="m" selected="">medium</option>
-
   <option value="l">low</option>
 
 </select>
+{{daily.errors.urgency}}
   </p>
 
   
   <p>
     <label for="id_importance">How vital is this task ? Will It bring great benefits if done? Great demerits if not done?</label>
     <select name="importance" id="id_importance">
+
+      {% if daily.importance %}
+      <option value="{{daily.importance}}" selected="">Original value: {{daily.importance}}</option>
+      
+      <option value="m">desirable</option>
+      {% else %}
+      <option value="m" selected="">desirable</option>
+      {% endif %}
+
       <option value="vh">Essential</option>
 
       <option value="h">Important</option>
-    
-      <option value="m" selected="">Desirable</option>
     
       <option value="l">Curiosity/interest</option>
     
@@ -114,11 +161,13 @@
       <option value="cr">Circumstantial</option>
 
 </select>
+{{daily.errors.importance}}
   </p>
 
   <p>
     <label for="id_color">Select this task's color:</label>
-    <input type="color" name="color" id="id_color" value="#ff0000">
+    <input type="color" name="color" id="id_color" value="{{daily.color}}" value="#ff0000">
+    {{daily.errors.color}}
   </p>
 
 
