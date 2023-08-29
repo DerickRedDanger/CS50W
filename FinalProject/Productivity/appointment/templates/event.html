@@ -4,11 +4,17 @@
 <script>
   document.addEventListener("DOMContentLoaded",rp());
   document.addEventListener("DOMContentLoaded",hm());
+  document.addEventListener("DOMContentLoaded",spc());
 
   document.getElementById("id_repeat").addEventListener("change",rp);
 
   document.getElementById("id_repeatd").addEventListener("change", hm);
 
+  let weekdays = document.querySelectorAll("#id_repeat,#id_monday,#id_tuesday,#id_wednesday,#id_thursday,#id_friday,#id_saturday,#id_sunday")
+
+  for (const day of weekdays) {
+        day.addEventListener('change', spc)
+    }
 
   function rp() {
     // Get the repeat element
@@ -106,7 +112,42 @@
   }
 
 
+function spc(){
+  // Get the howmany element
+  var repeat = document.getElementById("id_repeat");
+  // Get the howmany element
+  var sunday = document.getElementById("id_sunday");
+  // Get the howmany element
+  var monday = document.getElementById("id_monday");
+  // Get the howmany element
+  var tuesday = document.getElementById("id_tuesday");
+  // Get the howmany element
+  var wednesday = document.getElementById("id_wednesday");
+  // Get the howmany element
+  var thursday = document.getElementById("id_thursday");
+  // Get the howmany element
+  var friday = document.getElementById("id_friday");
+  // Get the howmany element
+  var saturday = document.getElementById("id_saturday");
+  //console.log(repeat);
+  //console.log(sunday);
+  //console.log(monday);
+  //console.log(tuesday);
+  //console.log(wednesday);
+  //console.log(thursday);
+  //console.log(friday);
+  //console.log(saturday);
 
+  
+  if (repeat.value == "wkd" && sunday.checked == false && monday.checked == false && tuesday.checked== false && wednesday.checked == false && thursday.checked == false && friday.checked== false && saturday.checked== false ){
+    submit.disabled = true;
+
+  } else {
+  submit.disabled = false;
+  //console.log ('else')
+  }
+
+}
   
 </script>
 {% endblock %}
@@ -202,6 +243,22 @@
   {{event.repeat_wkd.errors}}<br>
 {% endif %}
 <label for="id_repeat_wkd">Repeat on which weekdays ?</label><br>
+{{event.sunday.label_tag}}
+{{event.sunday}} &nbsp; &nbsp;
+{{event.monday.label_tag}}
+{{event.monday}} &nbsp; &nbsp;
+{{event.tuesday.label_tag}}
+{{event.tuesday}} &nbsp; &nbsp;
+{{event.wednesday.label_tag}}
+{{event.wednesday}}<br>
+{{event.thursday.label_tag}}
+{{event.thursday}} &nbsp; &nbsp;
+{{event.friday.label_tag}}
+{{event.friday}} &nbsp; &nbsp;
+{{event.saturday.label_tag}}
+{{event.saturday}} &nbsp; &nbsp;
+
+<br>
 <span class="helptext">Hold Shift or Control to select more than one option</span><br>
 {{event.repeat_wkd}}
 

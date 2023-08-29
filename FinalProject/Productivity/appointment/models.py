@@ -151,6 +151,13 @@ class Event(models.Model):
         default=today_weekday
         )
     
+    monday=models.BooleanField()
+    tuesday=models.BooleanField()
+    wednesday=models.BooleanField()
+    thursday=models.BooleanField()
+    friday=models.BooleanField()
+    saturday=models.BooleanField()
+    sunday=models.BooleanField()
     #repeat duration choices:
     frv="frv"
     spc="spc"
@@ -198,6 +205,14 @@ class Event(models.Model):
     #    return u'<a href="%s">%s</a>' % (url, str(self.start_time))
  
     def clean(self):
+        data=self
+        end_time=data.end_time
+        start_time=data.start_time
+        Day=data.day
+        repeatd=data.repeatd
+        repeatutil = data.repeatutil
+        repeatnumber = data.repeatnumber
+        repeat = data.repeat
         #print(self.end_time)
         #print(type(self.end_time))
         #print(self.start_time)
@@ -207,9 +222,20 @@ class Event(models.Model):
         #print(type(self.end_time))
         #print(self.start_time)
         #print(type(self.start_time))
+        print (f"repeat = {repeat}")
         if self.end_time <= self.start_time:
-            raise ValidationError('Ending times must be after starting times')
+            raise ValidationError ('2 Ending times must be after starting times')
  
+        if (repeat == "dly" or repeat == "wek") and repeatd == "frv":
+            raise ValidationError ("Don't use repeat forever with daily/weekly. In that case, use daily task instead")
+
+        if repeat != "nvr" and repeatd == "spc" and (type(repeatnumber) is not str or repeatnumber <= 0):
+            raise ValidationError ( "If set to repeat a specific amount of time, the number of repetitions must be higher than 0")
+
+        if repeat != "nvr" and repeatd == "utl" and repeatutil <= Day:
+            raise ValidationError ("If set to repeat util a date, the date must be after the day of the event")
+
+
         events = Event.objects.filter(day=self.day).exclude(id=self.id)
         if events.exists():
             for event in events:

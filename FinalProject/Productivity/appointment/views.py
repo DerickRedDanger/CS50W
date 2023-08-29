@@ -25,17 +25,29 @@ except ValueError:
     except ValueError:
         y = datetime (x.year+1, 1, 1).date()
 print("auto test")
+print("all good till here 1")
 if (x - last_checkup) >= (y-x):
-
+    print("all good till here 2")
     # All Auto functions:
     #-------------------
 
     #------------------------ testing the auto functions
     All_Forever_Event = models.Event.objects.filter(repeatd = "frv").exclude(repeat="nvr")
+
+    print("all good till here 3")
+
     print(len(All_Forever_Event))
+
+    print("all good till here 4")
+
     if len(All_Forever_Event) != 0 :
+
+        print("all good till here 4")
+
         for y in range(len(All_Forever_Event)):
-            
+
+            print("all good till here 5")
+
             x = All_Forever_Event[y]
             print (f"event = {x}")
             All_Forever_Repetition = x.Repetitions.all()
@@ -153,7 +165,7 @@ if (x - last_checkup) >= (y-x):
                                 #    print(f'day - dayi = {dayi}')
 
     #AllForeverEvent = models.Event.objects.filter(repeatd = "frv")
-    
+    print("all good till here")
     # Get all events that aren't set to repeat forever.
     All_Non_Forever_Events = models.Event.objects.all().exclude(repeatd = "frv")| models.Event.objects.all().filter(repeat='nvr').filter(repeatd = "frv")
     print(len(All_Non_Forever_Events))
@@ -252,7 +264,7 @@ if (x - last_checkup) >= (y-x):
                 #print(Last_repetition)
     
     pass
-
+print("all good till here ")
 weekday=[]
 weekdays = models.WeekDay.objects.all()
 for x in weekdays:
@@ -393,12 +405,13 @@ def event(request,id):
         else:
             print("something went wrong")
             error = "something went wrong"
-    print(obj.day)
+
     if obj.day:
         print(f"obj.day = {obj.day}")
         date=obj.day.strftime("%Y-%m-%d")
         start_time = obj.start_time.strftime("%H:%M")
         end_time = obj.end_time.strftime("%H:%M")
+
     if obj.repeatutil:
         dateu=obj.repeatutil.strftime("%Y-%m-%d")
     

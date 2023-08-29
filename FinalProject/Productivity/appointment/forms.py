@@ -25,7 +25,8 @@ for hour in hours:
 class eventForm(forms.ModelForm):
     class Meta:
         model = models.Event
-        fields = ['title','day','start_time','end_time','description','notes','importance','repeat','repeat_wkd','repeatd','repeatutil','repeatnumber','color',]
+        fields = ['title','day','start_time','end_time','description','notes','importance','repeat','repeat_wkd','repeatd','repeatutil','repeatnumber','color',
+                'monday','tuesday','wednesday','thursday','friday','saturday','sunday',]
         widgets = {
             'day' : forms.DateInput(attrs = {'placeholder': 'Year-Month-Day'}),
             #'start_time' : forms.TimeInput(attrs = {'placeholder': 'Hour:Minute'}),
@@ -57,6 +58,10 @@ class eventForm(forms.ModelForm):
         end_time=data.get("end_time")
         start_time=data.get("start_time")
         Day=data.get("day")
+        repeatd=data.get("repeatd")
+        repeatutil = data.get("repeatutil")
+        repeatnumber = data.get("repeatnumber")
+        repeat = data.get("repeat")
         #print(f"start_time = {start_time}")
         #print(f"end_time = {end_time}")
         #print(f"day = {Day}")
@@ -64,7 +69,18 @@ class eventForm(forms.ModelForm):
         #print(type(end_time))
         #print(type(start_time))
         if end_time <= start_time:
+            #raise forms.ValidationError("Ending time must be after starting time")
             self.add_error("end_time", "Ending time must be after starting time")
+        
+        if (repeat == "dly" or repeat == "wek") and repeatd == "frv":
+            self.add_error("repeatd", "Don't use repeat forever with daily/weekly. In that case, use daily task instead")
+
+        if repeat != "nvr" and repeatd == "spc" and (type(repeatnumber) is not str or repeatnumber <= 0):
+            self.add_error("repeatnumber", "If set to repeat a specific amount of time, the number of repetitions must be higher than 0")
+
+        if repeat != "nvr" and repeatd == "utl" and repeatutil <= Day:
+            self.add_error("repeatutil", "If set to repeat util a date, the date must be after the day of the event")
+
         try:
             events = models.Event.objects.filter(day=Day).exclude(id=self.id)
         except:

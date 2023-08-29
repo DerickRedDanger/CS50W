@@ -38,12 +38,23 @@ def event_post_save(sender,instance,created, *args, **kwargs):
       
                 # If weekdays was selected, get the selected weekdays from the original event.
                 if instance.repeat =="wkd":
-                        weekdays=instance.repeat_wkd.all()
-                        print(f"weekdays = {weekdays}")
+                        
                         week=[]
-                        for x in range(len(weekdays)):
-                            week.append(weekdays[x].day)
-                        print(f"week = {week}")
+                        if instance.sunday == True:
+                            week.append(0)
+                        if instance.monday == True:
+                            week.append(0)
+                        if instance.tuesday == True:
+                            week.append(0)
+                        if instance.wednesday == True:
+                            week.append(0)
+                        if instance.thursday == True:
+                            week.append(0)
+                        if instance.friday == True:
+                            week.append(0)
+                        if instance.saturday == True:
+                            week.append(0)
+
 
 
                 # if the event is set to repeat till a certain data or forever
@@ -89,10 +100,10 @@ def event_post_save(sender,instance,created, *args, **kwargs):
 
                                 # if specific week days was selected
                                 if instance.repeat=='wkd':
-                                    print(f'dayi = {dayi.strftime("%A")}')
+                                    print(f'dayi = {dayi.strftime("%w")}')
 
                                     # check if the weekday in question was one of the selected.
-                                    if dayi.strftime("%A") in week:
+                                    if dayi.strftime("%w") in week:
                                         print(f"dayi = {dayi.strftime} in")
 
                                         # if it's create a new repetition and save.
@@ -167,10 +178,10 @@ def event_post_save(sender,instance,created, *args, **kwargs):
 
                                 # if specific week days was selected
                                 if instance.repeat=='wkd':
-                                    print(f'dayi = {dayi.strftime("%A")} wkd')
+                                    print(f'dayi = {dayi.strftime("%w")} wkd')
 
                                     # check if the weekday in question was one of the selected.
-                                    if dayi.strftime("%A") in week:
+                                    if dayi.strftime("%w") in week:
                                         
                                         # if it's create a new repetition and save.
                                         new = models.EventRepetiton(original= instance, day=dayi,
@@ -179,7 +190,7 @@ def event_post_save(sender,instance,created, *args, **kwargs):
                                         new.save()
                                         n=n+1 
                                     else:
-                                        print(f'dayi = {dayi.strftime("%A")} else wkd')
+                                        print(f'dayi = {dayi.strftime("%w")} else wkd')
                                         print (f"week = {week}")
                                        
                                 # if it's not the initial day and it's not set to repeat on specific weekdays

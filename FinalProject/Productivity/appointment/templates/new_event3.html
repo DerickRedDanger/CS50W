@@ -3,7 +3,7 @@
 
 {% block content %}
 
-<form id="event" style="margin-top: 30px;" action="/new/" method="post">
+<form id="event" style="margin-top: 30px;" action="/event/0" method="post">
     <h4> Creating a new event: </h4>
         {% csrf_token %}
         {{ event.as_p }}
