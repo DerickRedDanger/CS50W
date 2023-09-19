@@ -1,5 +1,5 @@
 from . import models
-from datetime import datetime,timedelta
+from datetime import datetime,timedelta,date
 
 
 
@@ -41,20 +41,21 @@ def event_post_save(sender,instance,created, *args, **kwargs):
                         
                         week=[]
                         if instance.sunday == True:
-                            week.append(0)
+                            week.append('0')
                         if instance.monday == True:
-                            week.append(0)
+                            week.append('1')
                         if instance.tuesday == True:
-                            week.append(0)
+                            week.append('2')
                         if instance.wednesday == True:
-                            week.append(0)
+                            week.append('3')
                         if instance.thursday == True:
-                            week.append(0)
+                            week.append('4')
                         if instance.friday == True:
-                            week.append(0)
+                            week.append('5')
                         if instance.saturday == True:
-                            week.append(0)
+                            week.append('6')
 
+                        print (f"week = {week}")
 
 
                 # if the event is set to repeat till a certain data or forever
@@ -85,11 +86,13 @@ def event_post_save(sender,instance,created, *args, **kwargs):
                             # Since simply creating an repetition event endlessly wouldn't be doable
                             # and would take a lot of space, instead, it will be set to repeat for three years
                             # than increase by an year when it has 2 years remaining.
-                            dayf=datetime(dayi.year+3, dayi.month, dayi.day)
+                            dayf=date(dayi.year+3, dayi.month, dayi.day)
 
                     
 
                         # while the day in question isn't higher than the until date:
+                        print(f"dayi type = {type(dayi)}")
+                        print(f"dayf type = {type(dayf)}")
                         while(dayi<= dayf):
                             print(f'dayi = {dayi}')
                             print(f'dayf = {dayf}')
@@ -100,11 +103,11 @@ def event_post_save(sender,instance,created, *args, **kwargs):
 
                                 # if specific week days was selected
                                 if instance.repeat=='wkd':
-                                    print(f'dayi = {dayi.strftime("%w")}')
-
+                                    print(f'dayi type = {type(dayi.strftime("%w"))}')
+                                    print(f'week[o] type = {type(week[0])}')
                                     # check if the weekday in question was one of the selected.
                                     if dayi.strftime("%w") in week:
-                                        print(f"dayi = {dayi.strftime} in")
+                                        print(f"week - dayi = {dayi.strftime} in")
 
                                         # if it's create a new repetition and save.
                                         new = models.EventRepetiton(original=instance, day=dayi,

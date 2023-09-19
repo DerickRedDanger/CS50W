@@ -1,4 +1,6 @@
-switch the weekdays from ManyToMany to checkbox
+change the validation error on forms.dailytask.clean to raise error, and fix the dailytask.clean on models
+
+Change models.DailyTask to work with checkbox instead of manytomany
 
 event rework complete, need to create validations to ensure the specific repetitions and util
 are after the day of the even and not null.

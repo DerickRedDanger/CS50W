@@ -1,0 +1,120 @@
+{% extends 'base_calendar.html' %}
+
+
+{% block content %}
+
+{% if id != 0 %}
+    <form id="dailytask" style="margin-top: 30px;" action="/dailytask/{{form.id}}" method="post" >
+      <h4> Editing/Viewing a daily task: </h4>
+      {% else %}
+    <form id="dailytask" style="margin-top: 30px;" action="/dailytask/0" method="post" >
+    <h4> Creating a new daily task: </h4>
+    {% endif %}
+    {% csrf_token %}
+
+    <p>
+    {% if form.non_field_errors %}
+        {{ form.non_field_errors }}
+    {% endif %}
+    </p>
+    <p>
+        {% if form.errors.title %}
+          {{form.errors.title}}<br>
+        {% endif %}
+        {{form.title.label_tag}}
+        {{form.title}}
+      </p>
+    
+    
+    <p>
+    
+    {% if form.errors.sunday %}
+      {{form.errors.sunday}}<br>
+    {% endif %}
+    <label for="id_repeat_wkd">Repeat on which weekdays ?</label><br>
+    {{form.sunday.label_tag}}
+    {{form.sunday}} &nbsp; &nbsp;
+    {{form.monday.label_tag}}
+    {{form.monday}} &nbsp; &nbsp;
+    {{form.tuesday.label_tag}}
+    {{form.tuesday}} &nbsp; &nbsp;
+    {{form.wednesday.label_tag}}
+    {{form.wednesday}}<br>
+    {{form.thursday.label_tag}}
+    {{form.thursday}} &nbsp; &nbsp;
+    {{form.friday.label_tag}}
+    {{form.friday}} &nbsp; &nbsp;
+    {{form.saturday.label_tag}}
+    {{form.saturday}} &nbsp; &nbsp;
+    
+    <br>
+    </p>
+    
+        <p>
+            {% if form.errors.start_time %}
+              {{form.errors.start_time}}<br>
+            {% endif %}
+            {{form.start_time.label_tag}}
+            {{form.start_time}}
+          </p>
+    
+        <p>
+            {% if form.errors.end_time %}
+              {{form.errors.end_time}}<br>
+            {% endif %}
+            {{form.end_time.label_tag}}
+            {{form.end_time}}
+          </p>
+    
+          <p>
+            {% if form.errors.quick_description %}
+              {{form.errors.quick_description}}<br>
+            {% endif %}
+            {{form.quick_description.label_tag}}<br>
+            {{form.quick_description}}
+          </p>
+    
+          <p>
+            {% if form.errors.description %}
+              {{form.errors.description}}<br>
+            {% endif %}
+            {{form.description.label_tag}}<br>
+            {{form.description}}
+          </p>
+    
+          <p>
+            {% if form.errors.notes %}
+              {{form.errors.notes}}<br>
+            {% endif %}
+            {{form.notes.label_tag}}<br>
+            {{form.notes}}
+          </p>
+    
+          <p>
+            {% if form.errors.urgency %}
+              {{form.errors.urgency}}<br>
+            {% endif %}
+            {{form.urgency.label_tag}}
+            {{form.urgency}}
+          </p>
+    
+          <p>
+            {% if form.errors.importance %}
+              {{form.errors.importance}}<br>
+            {% endif %}
+            {{form.importance.label_tag}}
+            {{form.importance}}
+          </p>
+    
+          <p>
+            {% if form.errors.color %}
+              {{form.errors.color}}<br>
+            {% endif %}
+            {{form.color.label_tag}}<br>
+              <input type="color" name="color" id="id_color" value="{{form.color.value}}">
+            </p>
+    
+        <input type="submit" value="Sumbit">
+    </form>
+
+{% endblock %}

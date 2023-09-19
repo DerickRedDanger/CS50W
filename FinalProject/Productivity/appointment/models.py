@@ -147,8 +147,7 @@ class Event(models.Model):
     repeat_wkd = models.ManyToManyField(
         WeekDay,
         related_name="Todayevent",
-        blank=False,
-        default=today_weekday
+        blank=True,
         )
     
     monday=models.BooleanField()
@@ -204,15 +203,21 @@ class Event(models.Model):
     #    url = reverse('admin:%s_%s_change' % (self._meta.app_label, self._meta.model_name), args=[self.id])
     #    return u'<a href="%s">%s</a>' % (url, str(self.start_time))
  
+    # clean was here.   ------
     def clean(self):
         data=self
-        end_time=data.end_time
-        start_time=data.start_time
         Day=data.day
         repeatd=data.repeatd
         repeatutil = data.repeatutil
         repeatnumber = data.repeatnumber
         repeat = data.repeat
+        monday=data.monday
+        tuesday=data.tuesday
+        wednesday=data.wednesday
+        thursday=data.thursday
+        friday=data.friday
+        saturday=data.saturday
+        sunday=data.sunday
         #print(self.end_time)
         #print(type(self.end_time))
         #print(self.start_time)
@@ -223,11 +228,15 @@ class Event(models.Model):
         #print(self.start_time)
         #print(type(self.start_time))
         print (f"repeat = {repeat}")
-        if self.end_time <= self.start_time:
-            raise ValidationError ('2 Ending times must be after starting times')
- 
-        if (repeat == "dly" or repeat == "wek") and repeatd == "frv":
-            raise ValidationError ("Don't use repeat forever with daily/weekly. In that case, use daily task instead")
+        try:
+
+            if self.end_time <= self.start_time:
+                print("raise validation error in models")
+                raise ValidationError ('From Models: Ending times must be after starting times')
+        except TypeError:
+                raise ValidationError('From Models: There is an error in start/end time')
+        if (repeat == "day" or repeat == "wek" or repeatd == "frv") and repeatd == "frv":
+            raise ValidationError ("Don't use repeat forever with daily/weekly/specific weekdays. In that case, use daily task instead")
 
         if repeat != "nvr" and repeatd == "spc" and (type(repeatnumber) is not str or repeatnumber <= 0):
             raise ValidationError ( "If set to repeat a specific amount of time, the number of repetitions must be higher than 0")
@@ -235,6 +244,11 @@ class Event(models.Model):
         if repeat != "nvr" and repeatd == "utl" and repeatutil <= Day:
             raise ValidationError ("If set to repeat util a date, the date must be after the day of the event")
 
+        if repeat == "wkd" and sunday == False and monday == False and tuesday == False and wednesday == False and thursday == False and friday == False and saturday == False:
+            raise ValidationError("If set to on specific weekdays, at least one weekday needs to be selected")
+
+        if repeat == "wkd" and sunday == True and monday == True and tuesday == True and wednesday == True and thursday == True and friday == True and saturday == True:
+            raise ValidationError("If set to on specific weekdays, don't select all weekdays, use daily task intead")
 
         events = Event.objects.filter(day=self.day).exclude(id=self.id)
         if events.exists():
@@ -258,7 +272,8 @@ class Event(models.Model):
                 if self.check_overlap(repevent.original.start_time,repevent.original.end_time, self.start_time, self.end_time):
                     raise ValidationError(
                         f'There is an overlap with a repeating event: {repevent.original.title} on {repevent.original.day}, {repevent.original.start_time} - {repevent.original.end_time})')
-    
+ 
+
     def __str__(self):
         return f"{self.title}"
     
@@ -351,6 +366,14 @@ class DailyTask(models.Model):
         blank=True,
         )
 
+    monday=models.BooleanField(default=False)
+    tuesday=models.BooleanField(default=False)
+    wednesday=models.BooleanField(default=False)
+    thursday=models.BooleanField(default=False)
+    friday=models.BooleanField(default=False)
+    saturday=models.BooleanField(default=False)
+    sunday=models.BooleanField(default=False)
+
     start_time = models.TimeField(u'Starting time',default=f"{start}", help_text=u"Format: hour:minute")
     end_time = models.TimeField(u'Ending time',default=f"{end}", help_text=u"Format: hour:minute")
     quick_description = models.TextField(u"quick description",blank=True, null=True)
@@ -423,17 +446,64 @@ class DailyTask(models.Model):
         if self.end_time <= self.start_time:
             raise ValidationError('Ending times must after starting times')
             #zones__in=[<id1>]
-        tasks = DailyTask.objects.filter(weekday__in=[self.weekday.all().get().id]).exclude(id=self.id)
+        if self.sunday == False and self.monday == False and self.tuesday == False and self.wednesday == False and self.thursday == False and self.friday == False and self.saturday == False:
+            raise ValidationError("At least a weekday needs to be selected")
+
+        tasks=[]
+        tasks = DailyTask.objects.filter(id=0)
+        if self.sunday == True:
+            day = DailyTask.objects.filter(sunday = True)
+            tasks.union(day)
+
+        if self.monday == True:
+            day = DailyTask.objects.filter(monday = True)
+            tasks.union(day)
+
+        if self.tuesday == True:
+            day = DailyTask.objects.filter(tuesday = True)
+            tasks.union(day)
+
+        if self.wednesday == True:
+            day = DailyTask.objects.filter(wednesday = True)
+            tasks.union(day)
+
+        if self.thursday == True:
+            day = DailyTask.objects.filter(thursday = True)
+            tasks.union(day)
+
+        if self.friday == True:
+            day = DailyTask.objects.filter(friday = True)
+            tasks.union(day)
+
+        if self.saturday == True:
+            day = DailyTask.objects.filter(saturday = True)
+            tasks.union(day)
+
+        tasks.exclude(id=self.id)
         if tasks.exists():
             for task in tasks:
                 if self.check_overlap(task.start_time, task.end_time, self.start_time, self.end_time):
                     raise ValidationError(
                         f'There is an overlap with another task: {task.title}, {task.start_time} - {task.end_time}) on {task.weekday.all()}')
 
+        
+        
+        
+        
+        
+        
+  
+
+
+
+
+
 
 
     def __str__(self):
         return f"{self.title}"
+
+
 class ListToDo(models.Model):
     title = models.CharField(u"Event's name",max_length=200,)
     quick_description = models.TextField(u"quick description",blank=True, null=True)

@@ -2,21 +2,52 @@
 
 {% block script%}
 <script>
-  document.addEventListener("DOMContentLoaded",rp());
-  document.addEventListener("DOMContentLoaded",hm());
-  document.addEventListener("DOMContentLoaded",spc());
 
-  document.getElementById("id_repeat").addEventListener("change",rp);
+  // Variables to cheking whether the form is incomplete
+  // thus if submit should be disabled or not
+  var numb = false;
+  var rp = false;
+  var hm = false;
+  var spc = false;
+  var util = false;
+  var time = false;
 
-  document.getElementById("id_repeatd").addEventListener("change", hm);
+  function check(){
+    if (numb == false && rp == false && hm == false && spc == false && util == false){
+    submit.disabled = false;
+    console.log("enabled")
+  } else {
+    submit.disabled = true;
+    console.log("disabled")
+  }
+};
+
+  document.addEventListener("DOMContentLoaded",Rp());
+  document.addEventListener("DOMContentLoaded",Hm());
+  document.addEventListener("DOMContentLoaded",Spc());
+
+  document.getElementById("id_repeat").addEventListener("change",Rp);
+
+  document.getElementById("id_repeatd").addEventListener("change",Hm);
+
+  document.getElementById("id_repeatnumber").addEventListener("change", Numb);
+
+  document.getElementById("id_repeatutil").addEventListener("change", Util);
+  document.getElementById("id_day").addEventListener("change", Util);
+
+  //-------------- check this if not using the forms
+  document.getElementById("id_start_time").addEventListener("change", Time);
+  document.getElementById("id_end_time").addEventListener("change", Time);
+ 
+  
 
   let weekdays = document.querySelectorAll("#id_repeat,#id_monday,#id_tuesday,#id_wednesday,#id_thursday,#id_friday,#id_saturday,#id_sunday")
 
   for (const day of weekdays) {
-        day.addEventListener('change', spc)
+        day.addEventListener('change', Spc)
     }
 
-  function rp() {
+  function Rp() {
     // Get the repeat element
     var repeat = document.getElementById("id_repeat");
     // Get the specific element
@@ -40,12 +71,13 @@
 
       case "day":
       case "wek":
-          submit.disabled = false;
+          rp = false;
           specific.style.display = "none";
           howmany.style.display="block";
-          expl.style.display = 'block';
+          expl.style.display = "none";
           if (howmany_choice.value == "frv"){
-            submit.disabled = true;}
+            rp = true;
+            expl.style.display = 'block';}
         break;
           
       case "nvr":
@@ -53,32 +85,37 @@
           howmany.style.display="none";
           util.style.display = "none";
           num.style.display="none";
-          submit.disabled = false;
+          rp = false;
           expl.style.display = 'none';
           break; 
 
       case "wkd":
           specific.style.display = "block";
           howmany.style.display="block";
-          submit.disabled = false;
+          rp = false;
           expl.style.display = 'block';
+          if (howmany_choice.value == "frv"){
+            rp = true;
+            expl.style.display = 'block';}
           break;
      
-         default:
+        default:
           specific.style.display = "none";
           howmany.style.display="block";
-          submit.disabled = false;
+          rp = false;
           expl.style.display = 'none';
     }
+    console.log('rp')
+    console.log(rp)
+    check()
+  };
 
-  }
 
 
-
-  function hm() {
+  function Hm() {
 
     // Get the howmany element
-    var howmany = document.getElementById("id_repeatd");
+    var howmany_choice = document.getElementById("id_repeatd");
     // Get the util element
     var util = document.getElementById("U");
     // Get the num element
@@ -86,33 +123,58 @@
     // Get the repeat element
     var repeat = document.getElementById("id_repeat");
   
-  switch (howmany.value) {
+  switch (howmany_choice.value) {
 
     
       
     case "frv":
       util.style.display = "none";
       num.style.display="none";
-      submit.disabled = false;
+      hm = false;
       if (repeat.value == "frv"|| repeat.value =="wek"){
-        submit.disabled = true;}
+        hm = true;}
       break
 
     case "spc": 
       util.style.display = "none";
       num.style.display="block";
-      submit.disabled = false;
+      hm = false;
       break
       
     default:
       util.style.display = "block";
       num.style.display="none";
-      submit.disabled = false;
+      hm = false;
     }
+    console.log("hm")
+    console.log(hm)
+    check()
+    Rp()
+    Util()
+  };
+
+function Numb(){
+  // get the repeatnumber element
+  var number = document.getElementById("id_repeatnumber")
+  // Get the howmany element
+  var howmany_choice = document.getElementById("id_repeatd");
+  // Get the forever explanation element
+  var expl = document.getElementById("explanation2");
+
+  if ( howmany_choice.value == "spc" && number.value <= 0){
+    numb = true
+    expl.style.display = 'block';
+    //-----------
+  } else {
+    numb = false
+    expl.style.display = 'none';
   }
+  console.log("numb")
+  console.log(numb)
+  check()
+};
 
-
-function spc(){
+function Spc(){
   // Get the howmany element
   var repeat = document.getElementById("id_repeat");
   // Get the howmany element
@@ -140,15 +202,85 @@ function spc(){
 
   
   if (repeat.value == "wkd" && sunday.checked == false && monday.checked == false && tuesday.checked== false && wednesday.checked == false && thursday.checked == false && friday.checked== false && saturday.checked== false ){
-    submit.disabled = true;
+    spc = true;
 
   } else {
-  submit.disabled = false;
+  spc = false;
   //console.log ('else')
   }
-
+  console.log("spc")
+  console.log(spc)
+  check()
 }
   
+function Util(){
+  // Get the repeat element
+  var repeat = document.getElementById("id_repeat");
+  // Get the howmany element
+  var howmany_choice = document.getElementById("id_repeatd");
+  // Get the day element
+  var day = document.getElementById("id_day")
+  // Get the repeatutil element
+  var til = document.getElementById("id_repeatutil");
+  // Get the forever explanation element
+  var expl = document.getElementById("explanation3");
+  if ( howmany_choice.value == "utl" && repeat.value != 'nvr'){
+  if (til.value <= day.value){
+    util = true
+    expl.style.display = 'block';
+    console.log('til <= day')
+    console.log(til.value)
+    console.log(day.value)
+    console.log("util")
+    console.log(util)
+  } else if (til.value > day.value) {
+    util = false
+    console.log('til >= day')
+    console.log(til.value)
+    console.log(day.value)
+    console.log("util")
+    console.log(util)
+    expl.style.display = 'none';
+  } else {
+    util = false
+    console.log('not til <= day nor til >= day')
+    console.log(til.value)
+    console.log(day.value)
+    console.log("util")
+    console.log(util)
+  }
+  } check()
+  }
+
+function Time() {
+  // Get the start_time element
+  var start = document.getElementById("id_start_time");
+  // Get the end_time element
+  var end = document.getElementById("id_end_time");
+  if (start.value >= end.value){
+    time = true
+    console.log('start >= end')
+    console.log(start.value)
+    console.log(end.value)
+    console.log("time")
+    console.log(time)
+  } else if ( start < end){
+    time = false
+    console.log('start <= end')
+    console.log(start.value)
+    console.log(end.value)
+    console.log("time")
+    console.log(time)
+  } else {
+    time = true
+    console.log('not start >= end nor start <= end')
+    console.log(start.value)
+    console.log(end.value)
+    console.log("time")
+    console.log(time)
+  }
+  check()
+}
 </script>
 {% endblock %}
 
@@ -164,9 +296,16 @@ function spc(){
     
 
   {% csrf_token %}
+
+  <p>
+    {% if event.non_field_errors %}
+    {{ event.non_field_errors }}<br>
+  {% endif %}
+    
+  </p>
       <p>
-  {% if event.title.errors %}
-    {{event.title.errors}}<br>
+  {% if event.errors.title %}
+    {{event.errors.title}}<br>
   {% endif %}
 
   {{event.title.label_tag}}
@@ -177,8 +316,8 @@ function spc(){
 
 
 <p>
-  {% if event.day.errors %}
-    {{event.day.errors}}<br>
+  {% if event.errors.day %}
+    {{event.errors.day}}<br>
   {% endif %}
 
   {{event.day.label_tag}}
@@ -187,8 +326,8 @@ function spc(){
 </p>
 
 <p>
-  {% if event.start_time.errors %}
-    {{event.start_time.errors}}<br>
+  {% if event.errors.start_time %}
+    {{event.errors.start_time}}<br>
   {% endif %}
     {{event.start_time.label_tag}}
     {{event.start_time}}
@@ -196,17 +335,16 @@ function spc(){
 
 
 <p>
-
-  {% if event.end_time.errors %}
-    {{event.end_time.errors}}<br>
+  {% if event.errors.end_time %}
+    {{event.errors.end_time}}<br>
   {% endif %}
   {{event.end_time.label_tag}}
   {{event.end_time}}
 </p>
 
 <p>
-  {% if event.description.errors %}
-    {{event.description.errors}}<br>
+  {% if event.errors.description %}
+    {{event.errors.description}}<br>
   {% endif %}
   {{event.description.label_tag}}<br>
   {{event.description}}
@@ -214,8 +352,8 @@ function spc(){
 
 
 <p>
-  {% if event.notes.errors %}
-    {{event.notes.errors}}<br>
+  {% if event.errors.notes %}
+    {{event.errors.notes}}<br>
   {% endif %}
   {{event.notes.label_tag}}<br>
   {{event.notes}}
@@ -223,24 +361,28 @@ function spc(){
 
 <p>
 
-{% if event.importance.errors %}
-  {{event.importance.errors}}<br>
+{% if event.errors.importance %}
+  {{event.errors.importance}}<br>
 {% endif %}
 {{event.importance.label_tag}}<br>
 {{event.importance}}
 
 </p>
 <p>
-  {% if event.repeat.errors %}
-  {{event.repeat.errors}}<br>
+{% if event.errors.repeat %}
+  {{event.errors.repeat}}<br>
 {% endif %}
 {{event.repeat.label_tag}}<br>
 {{event.repeat}}
 </p>
 
 <p id ="SW" style="display:none" >
-{% if event.repeat_wkd.errors %}
-  {{event.repeat_wkd.errors}}<br>
+{% if event.errors.repeat_wkd %}
+  {{event.errors.repeat_wkd}}<br>
+{% endif %}
+
+{% if event.errors.sunday %}
+  {{event.errors.sunday}}<br>
 {% endif %}
 <label for="id_repeat_wkd">Repeat on which weekdays ?</label><br>
 {{event.sunday.label_tag}}
@@ -257,17 +399,12 @@ function spc(){
 {{event.friday}} &nbsp; &nbsp;
 {{event.saturday.label_tag}}
 {{event.saturday}} &nbsp; &nbsp;
-
-<br>
-<span class="helptext">Hold Shift or Control to select more than one option</span><br>
-{{event.repeat_wkd}}
-
 </p>
 
 <p id="R" style="display:none" >
 
-{% if event.repeatd.errors %}
-  {{event.repeatd.errors}}<br>
+{% if event.errors.repeatd %}
+  {{event.errors.repeatd}}<br>
 {% endif %}
 {{event.repeatd.label_tag}}<br>
 {{event.repeatd}}
@@ -278,26 +415,29 @@ function spc(){
 </p>
 
 <p id ="U"style="display:none">
-{% if event.repeatutil.errors %}
-  {{event.repeatutil.errors}}<br>
+{% if event.errors.repeatutil %}
+  {{event.errors.repeatutil}}<br>
 {% endif %}
   <label for="id_repeatutil">Repeat util:</label>
   <input type="date" value="{{dateu}}" name="repeatutil" id="id_repeatutil">
+  <span id='explanation3' style="color:red; display:none ">Until must be a date after the original event's date.</span>  
 </p>
 
 
 <p id ="num" style="display:none">
-{% if event.repeatnumber.errors %}
-  {{event.repeatnumber.errors}}<br>
+{% if event.errors.repeatnumber %}
+  {{event.errors.repeatnumber}}<br>
 {% endif %}
 {{event.repeatnumber.label_tag}}<br>
 {{event.repeatnumber}}
+<span id='explanation2' style="color:red; display:none ">If set to 0, it wouldn't create any repetition, 
+  only the original event.</span>  
 </p>
 
 
 <p>
-{% if event.color.errors %}
-  {{event.color.errors}}<br>
+{% if event.errors.color %}
+  {{event.errors.color}}<br>
 {% endif %}
 {{event.color.label_tag}}<br>
   <input type="color" name="color" id="id_color" value="{{event.color.value}}">

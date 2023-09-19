@@ -102,3 +102,64 @@ def event(request,id):
     return render(request,"event.html",{"start":start,"end":end,"start_time":start_time,"end_time":end_time,"event":event,"date":date,"error":error,"thisweekday":thisweekday, "dateu":dateu})
 
  
+
+
+
+
+
+# Dailytask form ---------------
+
+if id == 0:
+        task = models.DailyTask()
+        task = forms.DailyTaskForm(request.POST or None)
+
+        
+    else:
+        task = models.DailyTask.objects.get(id=id)
+        
+    if request.method == "POST":
+        task = forms.DailyTaskForm(request.POST or None)
+        if task.is_valid:
+            task.save()
+            task=models.DailyTask()
+        title = request.POST['title']
+        weekday = request.POST['weekday']
+        start_time = request.POST['start_time']
+        end_time = request.POST['end_time']
+        quick_description = request.POST['quick_description']
+        description = request.POST['description']
+        notes = request.POST['notes']
+        urgency = request.POST['urgency']
+        importance = request.POST['importance']
+        color=request.POST['color']
+
+
+
+
+
+        # checking if there is there is a overlap with another task, but ignoring if overlaps with itself:
+        for day in weekday:
+
+            # cheking if this task is being edited, not created.
+            # if it is, ignore self in the filter.
+            try:
+                tasks = models.DailyTask.objects.filter(weekday=day).exclude(id=task.id)
+            except:
+                tasks = models.DailyTask.objects.filter(weekday=day)
+            if tasks.exists():
+                for test in tasks:
+                    if check_overlap(test.start_time, test.end_time, start_time ,end_time):
+                        # raise snackbar/toast
+                        error=True
+                        snack = f' There is an overlap with another task: {test.title}, {test.start_time} - {test.end_time}) on the weekday {day}'
+                        break
+        if error==False:
+                # models.DailyTask.objects.create(
+                    # saving the new task
+            new = models.DailyTask(title=title,start_time=start_time,
+                    end_time=end_time,quick_description=quick_description,
+                    description=description,notes=notes,urgency=urgency,
+                    importance=importance,color=color)
+            new.save()
+                # adding the weekdays, since it raises a error if added without first saving
+            new.weekday.add(weekday)

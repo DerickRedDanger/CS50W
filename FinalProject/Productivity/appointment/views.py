@@ -324,23 +324,6 @@ def index(request):
     alltodo = models.ListToDo.objects.all()
     today = models.WhatToDoToday.objects.filter(day=x).order_by('start_time')
     print(today)
-    hours = {5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23}
-    minutes = ('00','15','30','45',)
-    start=[]
-    end=[]
-    for hour in hours:
-        for minute in minutes:
-            if hour == 5 and minute == "00":
-                pass
-            else:
-                end.append(f"{hour}:{minute}")
-            if hour == 23 and minute == "45":
-                pass
-            else:
-                start.append(f"{hour}:{minute}")
-    leng=len(start)
-    print(start)
-    print(end)
     
 
     return render(request,"index.html",{"alltodo":alltodo,'today':today,"error":error,"start":start, "end":end,"leng":leng,"repeat_choices":repeat_choices,"priority_choices":priority_choices,})
@@ -390,30 +373,53 @@ def event(request,id):
     start_time = None
     end_time = None
     dateu=None
-    if id != 0:
-        obj = models.Event.objects.get(id = id)
-        event = forms.eventForm(instance = obj)
-    else:
-        obj = models.Event(None)
-        event = forms.eventForm(None)
+    if request.method == "GET":
+        if id != 0:
+            obj = models.Event.objects.get(id = id)
+            event = forms.eventForm(instance = obj)
+        else:
+            obj = models.Event(None)
+            event = forms.eventForm(None)
+
     if request.method == "POST":
+        event=forms.eventForm(request.POST)
         if event.is_valid():
+            print("event is valid")
             event.save()
             event = forms.eventForm
+
+            if id != 0:
+                obj = models.Event.objects.get(id = id)
+                event = forms.eventForm(instance = obj)
+            else:
+                obj = models.Event(None)
+                event = forms.eventForm(None)  
 
         # if event wasn't valid
         else:
             print("something went wrong")
             error = "something went wrong"
 
-    if obj.day:
-        print(f"obj.day = {obj.day}")
-        date=obj.day.strftime("%Y-%m-%d")
-        start_time = obj.start_time.strftime("%H:%M")
-        end_time = obj.end_time.strftime("%H:%M")
+            date = request.POST['day']
+            dateu = request.POST['repeatutil']
 
-    if obj.repeatutil:
-        dateu=obj.repeatutil.strftime("%Y-%m-%d")
+    try: 
+        if obj.day:
+            print(f"obj.day = {obj.day}")
+            date=obj.day.strftime("%Y-%m-%d")
+            start_time = obj.start_time.strftime("%H:%M")
+            end_time = obj.end_time.strftime("%H:%M")
+    
+    except:
+        print("no obj.day")
+        
+
+    try:
+
+        if obj.repeatutil:
+            dateu=obj.repeatutil.strftime("%Y-%m-%d")
+    except:
+        print("no obj.repeatutil")
     
     # returns the html with the empty form is through GET or a correct POST
     # returns with the filled post if event wasn't valid to make it easier to fix.
@@ -426,68 +432,37 @@ def event(request,id):
       #  context['form']=form
 
 def dailytask(request,id):
-    snack=""
-    error = False
-    if id == 0:
-        task = models.DailyTask()
-        task = forms.DailyTaskForm(request.POST or None)
 
-        
-    else:
-        task = models.DailyTask.objects.get(id=id)
-        
+
+    if request.method == "GET":
+        if id != 0:
+            obj = models.DailyTask.objects.get(id = id)
+            form = forms.DailyTaskForm(instance = obj)
+        else:
+            obj = models.DailyTask(None)
+            form = forms.DailyTaskForm(None)
+
     if request.method == "POST":
-        task = forms.DailyTaskForm(request.POST or None)
-        if task.is_valid:
-            task.save()
-            task=models.DailyTask()
-        title = request.POST['title']
-        weekday = request.POST['weekday']
-        start_time = request.POST['start_time']
-        end_time = request.POST['end_time']
-        quick_description = request.POST['quick_description']
-        description = request.POST['description']
-        notes = request.POST['notes']
-        urgency = request.POST['urgency']
-        importance = request.POST['importance']
-        color=request.POST['color']
+        form=forms.DailyTaskForm(request.POST)
+        if form.is_valid():
+            print("Dailytask is valid")
+            form.save()
+            form = forms.DailyTaskForm
 
-        print(f"title = {title}, weekday = {weekday}, Start = {start_time}, end = {end_time}, quick ={quick_description}, description = {description}, notes = {notes}, urgency = {urgency}, importance = {importance}")
 
-    # checking if there is there is a overlap with another task, but ignoring if overlaps with itself:
-        for day in weekday:
 
-            # cheking if this task is being edited, not created.
-            # if it is, ignore self in the filter.
-            try:
-                tasks = models.DailyTask.objects.filter(weekday=day).exclude(id=task.id)
-            except:
-                tasks = models.DailyTask.objects.filter(weekday=day)
-            if tasks.exists():
-                for test in tasks:
-                    if check_overlap(test.start_time, test.end_time, start_time ,end_time):
-                        # raise snackbar/toast
-                        error=True
-                        snack = f' There is an overlap with another task: {test.title}, {test.start_time} - {test.end_time}) on the weekday {day}'
-                        break
-        if error==False:
-                # models.DailyTask.objects.create(
-                    # saving the new task
-            new = models.DailyTask(title=title,start_time=start_time,
-                    end_time=end_time,quick_description=quick_description,
-                    description=description,notes=notes,urgency=urgency,
-                    importance=importance,color=color)
-            new.save()
-                # adding the weekdays, since it raises a error if added without first saving
-            new.weekday.add(weekday)
-            if id == 0 :
-                snack =f"The task {task.title} has been created"
-            else : 
-                snack =f"The task {task.title} has been saved"
+    snack=""
+    
+
+    
+            #if id == 0 :
+            #    snack =f"The task {task.title} has been created"
+            #else : 
+            #    snack =f"The task {task.title} has been saved"
             
-    return render(request,"dailytask.html",{"task":task,"start":start,"end":end,"error":error,
+    return render(request,"daily.html",{"form":form,"start":start,"end":end,
                                             "repeat_choices":repeat_choices,"priority_choices":priority_choices,
-                                            "snack":snack,"daily":task})
+                                            "snack":snack,"id":id,})
 
 def listtodo(request):
     error = ""
@@ -533,6 +508,7 @@ def listtodo(request):
 def planner(request):
     x = datetime.now()
     data={}
+    # Getting the ListToDo itens.
     alltodo = models.ListToDo.objects.all()
     alllist= []
     N=0
@@ -541,8 +517,11 @@ def planner(request):
         alllist.append(f"all{N}")
         N=N+1
     data['alllist']= alllist
+
     # Querysets can't be JSON serialized
     # so it had to be done manually
+
+    # Getting WhatToDoToday itens.
     today = models.WhatToDoToday.objects.filter(day=x).order_by('start_time')
     todaylist= []
     N=0
@@ -552,7 +531,23 @@ def planner(request):
         N=N+1
     data['todaylist']= todaylist
 
-    daily = models.DailyTask.objects.filter(weekday=(x+timedelta(days=2)).strftime("%w")).order_by('start_time')
+    # Getting DailyTask itens.
+    weekday = x.strftime("%w")
+    if weekday == "0":
+        daily = models.DailyTask.objects.filter(sunday=True).order_by('start_time')
+    elif weekday == "1":
+        daily = models.DailyTask.objects.filter(monday=True).order_by('start_time')
+    elif weekday == "2":
+        daily = models.DailyTask.objects.filter(tuesday=True).order_by('start_time')
+    elif weekday == "3":
+        daily = models.DailyTask.objects.filter(wednesday=True).order_by('start_time')
+    elif weekday == "4":
+        daily = models.DailyTask.objects.filter(thursday=True).order_by('start_time')
+    elif weekday == "5":
+        daily = models.DailyTask.objects.filter(friday=True).order_by('start_time')
+    elif weekday == "6":
+        daily = models.DailyTask.objects.filter(saturday=True).order_by('start_time')
+        
     dailylist= []
     N=0
     for n in daily:
@@ -561,6 +556,7 @@ def planner(request):
         N=N+1
     data['dailylist']= dailylist
 
+    # Getting Event itens.
     event = models.Event.objects.filter(day=x).order_by('start_time')
     eventlist= []
     N=0
@@ -570,6 +566,7 @@ def planner(request):
         N=N+1
     data['eventlist']= eventlist
 
+    # Getting EventRepetition itens.
     revent = models.EventRepetiton.objects.filter(day=x).order_by('start_time')
     reventlist= []
     N=0
