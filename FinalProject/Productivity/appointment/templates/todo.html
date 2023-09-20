@@ -1,0 +1,160 @@
+{% extends 'base_calendar.html' %}
+
+
+{% block content %}
+
+{% if id != 0 %}
+    <form id="dailytask" style="margin-top: 30px;" action="/Todo/{{form.id}}" method="post" >
+      <h4> Editing/Viewing a Todo task: </h4>
+      {% else %}
+    <form id="dailytask" style="margin-top: 30px;" action="/Todo/0" method="post" >
+    <h4> Creating a new Todo task: </h4>
+    {% endif %}
+    {% csrf_token %}
+
+    <p>
+    {% if form.non_field_errors %}
+        {{ form.non_field_errors }}
+    {% endif %}
+    </p>
+    <p>
+        {% if form.errors.title %}
+          {{form.errors.title}}<br>
+        {% endif %}
+        {{form.title.label_tag}}
+        {{form.title}}
+      </p>
+    
+          <p>
+            {% if form.errors.quick_description %}
+              {{form.errors.quick_description}}<br>
+            {% endif %}
+            {{form.quick_description.label_tag}}<br>
+            {{form.quick_description}}
+          </p>
+    
+          <p>
+            {% if form.errors.description %}
+              {{form.errors.description}}<br>
+            {% endif %}
+            {{form.description.label_tag}}<br>
+            {{form.description}}
+          </p>
+    
+          <p>
+            {% if form.errors.step %}
+              {{form.errors.step}}<br>
+            {% endif %}
+            {{form.step.label_tag}}&nbsp; 
+            {{form.step}}
+          </p>
+    
+          <p>
+            {% if form.errors.steps %}
+              {{form.errors.steps}}<br>
+            {% endif %}
+            <label for="id_steps">This task is a step to which task?:</label><br>
+            {{form.steps}}
+          </p>
+          
+          <p>
+            {% if form.errors.deadline %}
+              {{form.errors.deadline}}<br>
+            {% endif %}
+            {{form.deadline.label_tag}}&nbsp;
+            {{form.deadline}}
+          </p>
+
+          <p>
+            {% if form.errors.deadline_date %}
+              {{form.errors.deadline_date}}<br>
+            {% endif %}
+            {{form.deadline_date.label_tag}}
+            <input type="date" name="deadline_date" value="{{date}}"  required="" id="id_deadline_date">
+          </p>
+
+          <p>
+            {% if form.errors.urgency %}
+              {{form.errors.urgency}}<br>
+            {% endif %}
+            {{form.urgency.label_tag}}
+            {{form.urgency}}
+          </p>
+
+          <p>
+            {% if form.errors.urgency_update %}
+              {{form.errors.urgency_update}}<br>
+            {% endif %}
+            {{form.urgency_update.label_tag}}&nbsp;
+            {{form.urgency_update}}
+          </p>
+
+          <p>
+            {% if form.errors.urgency_veryclose_number %}
+              {{form.errors.urgency_veryclose_number}}<br>
+            {% endif %}
+            {{form.urgency_veryclose_number.label_tag}}
+            {{form.urgency_veryclose_number}}{{form.urgency_veryclose_type}}
+          </p>
+
+          <p>
+            {% if form.errors.urgency_close_number %}
+              {{form.errors.urgency_close_number}}<br>
+            {% endif %}
+            {{form.urgency_close_number.label_tag}}
+            {{form.urgency_close_number}}{{form.urgency_close_type}}
+          </p>
+
+          <p>
+            {% if form.errors.urgency_medium_number %}
+              {{form.errors.urgency_medium_number}}<br>
+            {% endif %}
+            {{form.urgency_medium_number.label_tag}}
+            {{form.urgency_medium_number}}{{form.urgency_medium_type}}
+          </p>
+
+          <p>
+            {% if form.errors.urgency_far_number %}
+              {{form.errors.urgency_far_number}}<br>
+            {% endif %}
+            {{form.urgency_far_number.label_tag}}
+            {{form.urgency_far_number}}{{form.urgency_far_type}}
+          </p>
+
+
+          <p>
+            {% if form.errors.importance %}
+              {{form.errors.importance}}<br>
+            {% endif %}
+            {{form.importance.label_tag}}
+            {{form.importance}}
+          </p>
+
+          <p>
+            {% if form.errors.progress %}
+              {{form.errors.progress}}<br>
+            {% endif %}
+            {{form.progress.label_tag}}
+            {{form.progress}}
+          </p>
+
+          <p>
+            {% if form.errors.notes %}
+              {{form.errors.notes}}<br>
+            {% endif %}
+            {{form.notes.label_tag}}<br>
+            {{form.notes}}
+          </p>
+
+          <p>
+            {% if form.errors.color %}
+              {{form.errors.color}}<br>
+            {% endif %}
+            {{form.color.label_tag}}<br>
+              <input type="color" name="color" id="id_color" value="{{form.color.value}}">
+            </p>
+    
+        <input type="submit" value="Sumbit">
+    </form>
+
+{% endblock %}

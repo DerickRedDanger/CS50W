@@ -466,7 +466,7 @@ def dailytask(request,id):
 
 def listtodo(request):
     error = ""
-    todo = forms.ListToDoForm(request.POST or None)
+    form = forms.ListToDoForm(request.POST or None)
     alltodo = models.ListToDo.objects.all()
     if request.method == "POST":
         title = request.POST['title']
@@ -503,7 +503,7 @@ def listtodo(request):
             #else:
                 #print("invalid")
 
-    return render(request,"listtodo.html",{"alltodo":alltodo,"todo":todo,"error":error,"repeat_choices":repeat_choices,"priority_choices":priority_choices,})
+    return render(request,"todo.html",{"alltodo":alltodo,"form":form,"error":error,"repeat_choices":repeat_choices,"priority_choices":priority_choices,})
 
 def planner(request):
     x = datetime.now()

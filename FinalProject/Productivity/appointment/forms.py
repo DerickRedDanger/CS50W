@@ -146,7 +146,7 @@ class DailyTaskForm(forms.ModelForm):
         data=self.cleaned_data
         end_time=data.get("end_time")
         start_time=data.get("start_time")
-        weekday=data.get("weekday")
+
         id = data.get("id")
         monday=data.get("monday")
         tuesday=data.get("tuesday")
@@ -172,7 +172,6 @@ class DailyTaskForm(forms.ModelForm):
         if sunday == False and monday == False and tuesday == False and wednesday == False and thursday == False and friday == False and saturday == False:
             self.add_error("sunday", "At least a weekday needs to be selected")
 
-        tasks=[]
         tasks = models.DailyTask.objects.none()
         sun = models.DailyTask.objects.none()
         mon = models.DailyTask.objects.none()
@@ -189,7 +188,6 @@ class DailyTaskForm(forms.ModelForm):
         if monday == True:
             mon = models.DailyTask.objects.filter(monday = True)
             print(f"day on monday = {mon}")
-
 
         if tuesday == True:
             tue = models.DailyTask.objects.filter(tuesday = True)
@@ -213,18 +211,46 @@ class DailyTaskForm(forms.ModelForm):
         tasks = (sun | mon | tue | wed | thu | fri | sat).distinct()
         tasks.exclude(id=id)
         print(f"tasks at end = {tasks}")
+
         if tasks.exists():
             for task in tasks:
                 if self.check_overlap(task.start_time, task.end_time, start_time, end_time):
-                    raise ValidationError(
-                        f'There is an overlap with another task: {task.title}, {task.start_time} - {task.end_time}) on {task.weekday.all()}')
+                    weekdays=[]
+                    if sunday == True and task.sunday== True: # could be short handed to "if sunday and task.sunday:" As False fails in "if x:"
+                        weekdays.append("Sunday")
+
+                    if monday == True and task.monday==True:
+                        weekdays.append("Monday")
+
+                    if tuesday == True and task.tuesday==True:
+                        weekdays.append("Tuesday")
+                        
+                    if wednesday == True and task.wednesday==True:
+                        weekdays.append("Wednesday")
+
+                    if thursday == True and task.thursday==True:
+                        weekdays.append("Thursday")
+
+                    if friday == True and task.friday==True:
+                        weekdays.append("Friday")
+
+                    if saturday == True and task.saturday==True:
+                        weekdays.append("Saturday")
+                    self.add_error("sunday", f"There is an overlap with another task: {task.title}, {task.start_time} - {task.end_time}) on {weekdays}")
 
 class ListToDoForm(forms.ModelForm):
     class Meta:
         model = models.ListToDo
-        fields = ['title','quick_description','description','steps','duration','urgency','importance','progress','notes','color',]
+        fields = ['title','quick_description','description','step','steps','duration','deadline',
+                  'deadline_date','urgency','urgency_update',
+                  'urgency_veryclose_number','urgency_veryclose_type',
+                  'urgency_close_number','urgency_close_type',
+                  'urgency_medium_number','urgency_medium_type',
+                  'urgency_far_number','urgency_far_type',
+                  'importance','progress','notes','color',]
 
         widgets={
+            'deadline_date' : forms.DateInput(attrs = {'placeholder': 'Year-Month-Day'}),
             'quick_description': forms.Textarea(attrs={'cols': 60, 'rows': 3}),
             'description': forms.Textarea(attrs={'cols': 90, 'rows': 5}),
             'notes':forms.Textarea(attrs={'cols': 60, 'rows': 3}),

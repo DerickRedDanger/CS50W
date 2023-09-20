@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from django.urls import reverse
 from django.db.models.signals import pre_save, post_save
 from . import models_util
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 # for calendar and daily/weekly activities
     # Events and appoitments for the callendar
@@ -150,13 +151,13 @@ class Event(models.Model):
         blank=True,
         )
     
-    monday=models.BooleanField()
-    tuesday=models.BooleanField()
-    wednesday=models.BooleanField()
-    thursday=models.BooleanField()
-    friday=models.BooleanField()
-    saturday=models.BooleanField()
-    sunday=models.BooleanField()
+    monday=models.BooleanField(default=False)
+    tuesday=models.BooleanField(default=False)
+    wednesday=models.BooleanField(default=False)
+    thursday=models.BooleanField(default=False)
+    friday=models.BooleanField(default=False)
+    saturday=models.BooleanField(default=False)
+    sunday=models.BooleanField(default=False)
     #repeat duration choices:
     frv="frv"
     spc="spc"
@@ -340,7 +341,7 @@ class EventRepetiton(models.Model):
         return f"{self.original.title} - R - {self.day}"
 class DailyTask(models.Model):
 
-    title = models.CharField(u"Event's name",max_length=200,)
+    title = models.CharField(u"Event's name",max_length=200,unique=True)
 
     #weekday choices:
     mon="1"
@@ -443,71 +444,89 @@ class DailyTask(models.Model):
     #    return u'<a href="%s">%s</a>' % (url, str(self.start_time))
  
     def clean(self):
+
         if self.end_time <= self.start_time:
             raise ValidationError('Ending times must after starting times')
             #zones__in=[<id1>]
         if self.sunday == False and self.monday == False and self.tuesday == False and self.wednesday == False and self.thursday == False and self.friday == False and self.saturday == False:
             raise ValidationError("At least a weekday needs to be selected")
 
-        tasks=[]
-        tasks = DailyTask.objects.filter(id=0)
+        tasks = DailyTask.objects.none()
+        sun = DailyTask.objects.none()
+        mon = DailyTask.objects.none()
+        tue = DailyTask.objects.none()
+        wed = DailyTask.objects.none()
+        thu = DailyTask.objects.none()
+        fri = DailyTask.objects.none()
+        sat = DailyTask.objects.none()
+        print(f"tasks at start = {tasks}")
         if self.sunday == True:
-            day = DailyTask.objects.filter(sunday = True)
-            tasks.union(day)
+            sun = DailyTask.objects.filter(sunday = True)
+            print(f"day on sunday = {sun}")
 
         if self.monday == True:
-            day = DailyTask.objects.filter(monday = True)
-            tasks.union(day)
+            mon = DailyTask.objects.filter(monday = True)
+            print(f"day on monday = {mon}")
 
         if self.tuesday == True:
-            day = DailyTask.objects.filter(tuesday = True)
-            tasks.union(day)
+            tue = DailyTask.objects.filter(tuesday = True)
+            print(f"day on tuesday = {tue}")
 
         if self.wednesday == True:
-            day = DailyTask.objects.filter(wednesday = True)
-            tasks.union(day)
+            wed = DailyTask.objects.filter(wednesday = True)
+            print(f"day on wednesday = {wed}")
 
         if self.thursday == True:
-            day = DailyTask.objects.filter(thursday = True)
-            tasks.union(day)
+            thu = DailyTask.objects.filter(thursday = True)
+            print(f"day on thursday = {thu}")
 
         if self.friday == True:
-            day = DailyTask.objects.filter(friday = True)
-            tasks.union(day)
+            fri = DailyTask.objects.filter(friday = True)
+            print(f"day on friday = {fri}")
 
         if self.saturday == True:
-            day = DailyTask.objects.filter(saturday = True)
-            tasks.union(day)
-
+            sat = DailyTask.objects.filter(saturday = True)
+            print(f"day on saturday = {sat}")
+        tasks = (sun | mon | tue | wed | thu | fri | sat).distinct()
         tasks.exclude(id=self.id)
+        print(f"tasks at end = {tasks}")
+
         if tasks.exists():
             for task in tasks:
                 if self.check_overlap(task.start_time, task.end_time, self.start_time, self.end_time):
-                    raise ValidationError(
-                        f'There is an overlap with another task: {task.title}, {task.start_time} - {task.end_time}) on {task.weekday.all()}')
+                    weekdays=[]
+                    if self.sunday == True and task.sunday== True: # could be short handed to "if sunday and task.sunday:" As False fails in "if x:"
+                        weekdays.append("Sunday")
 
-        
-        
-        
-        
-        
-        
-  
+                    if self.monday == True and task.monday==True:
+                        weekdays.append("Monday")
 
+                    if self.tuesday == True and task.tuesday==True:
+                        weekdays.append("Tuesday")
+                        
+                    if self.wednesday == True and task.wednesday==True:
+                        weekdays.append("Wednesday")
 
+                    if self.thursday == True and task.thursday==True:
+                        weekdays.append("Thursday")
 
+                    if self.friday == True and task.friday==True:
+                        weekdays.append("Friday")
 
-
-
+                    if self.saturday == True and task.saturday==True:
+                        weekdays.append("Saturday")
+                    raise ValidationError(f"There is an overlap with another task: {task.title}, {task.start_time} - {task.end_time}) on {weekdays}")
 
     def __str__(self):
         return f"{self.title}"
 
-
 class ListToDo(models.Model):
-    title = models.CharField(u"Event's name",max_length=200,)
+    title = models.CharField(u"Event's name",max_length=200,unique=True)
     quick_description = models.TextField(u"quick description",blank=True, null=True)
     description = models.TextField(u"detailed description",blank=True, null=True)
+    
+    step = models.BooleanField(u"This task is one of the steps to another one?",default=False)
+
     steps = models.ManyToManyField(
         "self", symmetrical=False,
         related_name="bigtask",
@@ -531,20 +550,93 @@ class ListToDo(models.Model):
         (years, "Years"),
         (perpetual, "Perpetual"),
     ]
+
     duration = models.CharField(u"How long do you expect this to take ?",
         max_length=2,
         choices= duration_choices,
         default=hours,
     )
+
+
+    deadline = models.BooleanField(u"This task has a deadline?",default=False)
+
+    deadline_date= models.DateField(u'When is the deadline?',default=f"{Year}-{Month}-{Day}", help_text=u"Format: year-month-day")
+
+    importance = models.CharField(u"How vital is this task ? will It bring great benefits if done? Great demerits if not done?",
+        max_length=2,
+        choices= priority_choices,
+        default=medium,
+    )
+    
     urgency = models.CharField(u"How urgent is this task ? can it wait/be delayed?",
         max_length=2,
         choices= urgency_choices,
         default=medium,
     ) # Very hight, hight, medium, low
-    importance = models.CharField(u"How vital is this task ? will It bring great benefits if done? Great demerits if not done?",
+
+    urgency_update = models.BooleanField(u"Want this urgency to auto update as the deadline gets closer ?",default=False)
+
+    day="dy"
+    week="wk"
+    month="mh"
+    year="yr"
+    type_choices = [
+        (day, "Day(s)"),
+        (week, "Week(s)"),
+        (month, "Month(s)"),
+        (year, "Year(s)"),
+    ]
+
+    urgency_veryclose_number= models.IntegerField(
+        u'Update to Very close when deadline is within:',
+        default=1,
+        validators=[
+            MaxValueValidator(30),
+            MinValueValidator(1)
+        ])
+    urgency_veryclose_type=models.CharField(
         max_length=2,
-        choices= priority_choices,
-        default=medium,
+        choices=type_choices,
+        default=day
+    )
+    
+    urgency_close_number= models.IntegerField(
+        u'Update to close when deadline is within:',
+        default=1,
+        validators=[
+            MaxValueValidator(30),
+            MinValueValidator(1)
+        ])
+    urgency_close_type=models.CharField(
+        max_length=2,
+        choices=type_choices,
+        default=week
+    )
+
+    urgency_medium_number= models.IntegerField(
+        u'Update to medium when deadline is within:',
+        default=1,
+        validators=[
+            MaxValueValidator(30),
+            MinValueValidator(1)
+        ])
+    urgency_medium_type=models.CharField(
+        max_length=2,
+        choices=type_choices,
+        default=month
+    )
+
+    urgency_far_number= models.IntegerField(
+        u'Update to far when deadline is within:',
+        default=1,
+        validators=[
+            MaxValueValidator(30),
+            MinValueValidator(1)
+        ])
+    urgency_far_type=models.CharField(
+        max_length=2,
+        choices=type_choices,
+        default=year
     )
 
     #progress choices:

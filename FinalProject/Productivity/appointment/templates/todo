@@ -1,4 +1,4 @@
-change the validation error on forms.dailytask.clean to raise error, and fix the dailytask.clean on models
+finish setting the todo.html, view, model and forms. remember to make a function to auto update the urgency.
 
 Change models.DailyTask to work with checkbox instead of manytomany
 
