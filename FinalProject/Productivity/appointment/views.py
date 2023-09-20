@@ -449,12 +449,7 @@ def dailytask(request,id):
             form.save()
             form = forms.DailyTaskForm
 
-
-
     snack=""
-    
-
-    
             #if id == 0 :
             #    snack =f"The task {task.title} has been created"
             #else : 
@@ -464,46 +459,29 @@ def dailytask(request,id):
                                             "repeat_choices":repeat_choices,"priority_choices":priority_choices,
                                             "snack":snack,"id":id,})
 
-def listtodo(request):
-    error = ""
-    form = forms.ListToDoForm(request.POST or None)
-    alltodo = models.ListToDo.objects.all()
-    if request.method == "POST":
-        title = request.POST['title']
-        quick_description = request.POST['quick_description']
-        description = request.POST['description']
-        # steps = request.POST['Steps'] Steps = {steps},
-        notes = request.POST['notes']
-        duration = request.POST['duration']
-        urgency = request.POST['urgency']
-        importance = request.POST['importance']
-        progress = request.POST['progress']
-        color = request.POST['color']
-        print(f"color = {color}")
-        print(f"todo['color'].value={todo['color'][0]}")
-        #todo['color'][0]=str(todo['color'][0])
-        #print(f"title = {title}, progress = {progress},  duration = {duration}, quick ={quick_description}, description = {description}, notes = {notes}, urgency = {urgency}, importance = {importance},color={color}")
-        #print("todo")
-        #print(todo)
-        new = models.ListToDo(title=title,quick_description=quick_description,
-                    description=description,notes=notes,
-                    duration=duration, urgency=urgency,
-                    progress=progress, color=color,
-                    importance=importance)
-        new.save()
-        print(f"new = {new}")
-        #listtd = models.ListToDo.objects.filter(title=title)
-        #print(listtd.count())
-        #if not listtd.exists():
-            #print("listtd = 0")
-            #if todo.is_valid():
-            #print("valid")
-            #todo.save()
-            #todo = forms.ListToDoForm(None) 
-            #else:
-                #print("invalid")
+def listtodo(request,id):
 
-    return render(request,"todo.html",{"alltodo":alltodo,"form":form,"error":error,"repeat_choices":repeat_choices,"priority_choices":priority_choices,})
+
+
+    if request.method == "GET":
+        if id != 0:
+            obj = models.ListToDo.objects.get(id = id)
+            form = forms.ListToDoForm(instance = obj)
+        else:
+            obj = models.ListToDo(None)
+            form = forms.ListToDoForm(None)
+
+    if request.method == "POST":
+        form=forms.ListToDoForm(request.POST)
+        if form.is_valid():
+            print("ListToDo is valid")
+            form.save()
+            form = forms.ListToDoForm
+
+    snack=""
+
+
+    return render(request,"todo.html",{"snack":snack,"form":form,"repeat_choices":repeat_choices,"priority_choices":priority_choices,})
 
 def planner(request):
     x = datetime.now()

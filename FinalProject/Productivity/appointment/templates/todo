@@ -1,4 +1,4 @@
-finish setting the todo.html, view, model and forms. remember to make a function to auto update the urgency.
+finish setting the todo.model and forms. remember to make a function to auto update the urgency.
 
 Change models.DailyTask to work with checkbox instead of manytomany
 

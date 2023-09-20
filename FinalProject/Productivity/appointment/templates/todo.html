@@ -1,13 +1,121 @@
 {% extends 'base_calendar.html' %}
 
+{% block script%}
+<script>
 
+  document.addEventListener("DOMContentLoaded",Urgency_Check());
+  document.addEventListener("DOMContentLoaded",Step_Check());
+
+  document.getElementById("id_step").addEventListener("change",Step_Check);
+
+  function Step_Check(){
+
+    // Get the step checkbox element
+    var step = document.getElementById("id_step");
+    // Get the step checkbox element
+    var steps = document.getElementById("steps");
+
+    if (step.checked == true){
+      steps.style.display = 'block'
+  } else {
+    steps.style.display = 'none'
+  }}
+
+
+  let urgency_update_check = document.querySelectorAll("#id_deadline,#id_deadline_date,#id_urgency,#id_urgency_update")
+
+  for (const element of urgency_update_check) {
+        element.addEventListener('change', Urgency_Check)
+    }
+
+
+  function Urgency_Check(){
+
+    // Get the deadline checkbox element
+    var deadline = document.getElementById("id_deadline");
+    // Get the deadline date element
+    var deadline_date = document.getElementById("deadline_date");
+    // Get the urgency_update p
+    var urgency_update = document.getElementById("urgency_update");
+    // Get the urgency_update p
+    var id_urgency_update = document.getElementById("id_urgency_update")
+    // Get the urgency element
+    var urgency = document.getElementById("id_urgency");
+    // Get the update to veryclose element
+    var veryclose = document.getElementById("veryclose");
+    // Get the update to close element
+    var close = document.getElementById("close");
+    // Get the update to medium element
+    var medium = document.getElementById("medium");
+    // Get the update to far element
+    var far = document.getElementById("far");
+         
+    if (deadline.checked == true){
+      deadline_date.style.display = 'block'
+      urgency_update.style.display = 'block'
+      
+      switch (urgency.value) {
+          case "vl":
+            if (id_urgency_update.checked == true){
+              veryclose.style.display = 'block'
+              close.style.display = 'block'
+              medium.style.display = 'block'
+              far.style.display = 'block'}
+            break;
+
+          case "l":
+            if (id_urgency_update.checked == true){
+              veryclose.style.display = 'block'
+              close.style.display = 'block'
+              medium.style.display = 'block'
+              far.style.display = 'none'}
+            break;
+
+          case "m":
+            if (id_urgency_update.checked == true){
+              veryclose.style.display = 'block'
+              close.style.display = 'block'
+              medium.style.display = 'none'
+              far.style.display = 'none'}
+            break;
+
+          case "h":
+            if (id_urgency_update.checked == true){
+              veryclose.style.display = 'block'
+              close.style.display = 'none'
+              medium.style.display = 'none'
+              far.style.display = 'none'}
+            break;
+
+          case "vh":
+            urgency_update.style.display = 'none'
+            veryclose.style.display = 'none'
+            close.style.display = 'none'
+            medium.style.display = 'none'
+            far.style.display = 'none'
+            break;
+      }
+    
+  } else{
+    deadline_date.style.display = 'none'
+    veryclose.style.display = 'none'
+    close.style.display = 'none'
+    medium.style.display = 'none'
+    far.style.display = 'none'
+    urgency_update.style.display = 'none'
+  }
+  }
+
+
+</script>
+{% endblock %}
 {% block content %}
 
 {% if id != 0 %}
-    <form id="dailytask" style="margin-top: 30px;" action="/Todo/{{form.id}}" method="post" >
+    <form id="dailytask" style="margin-top: 30px;" action="/listtodo/{{form.id}}" method="post" >
       <h4> Editing/Viewing a Todo task: </h4>
       {% else %}
-    <form id="dailytask" style="margin-top: 30px;" action="/Todo/0" method="post" >
+    <form id="dailytask" style="margin-top: 30px;" action="/listtodo/0" method="post" >
     <h4> Creating a new Todo task: </h4>
     {% endif %}
     {% csrf_token %}
@@ -49,7 +157,7 @@
             {{form.step}}
           </p>
     
-          <p>
+          <p id = "steps" style="display:none">
             {% if form.errors.steps %}
               {{form.errors.steps}}<br>
             {% endif %}
@@ -65,7 +173,7 @@
             {{form.deadline}}
           </p>
 
-          <p>
+          <p id = "deadline_date" style="display:none">
             {% if form.errors.deadline_date %}
               {{form.errors.deadline_date}}<br>
             {% endif %}
@@ -81,7 +189,7 @@
             {{form.urgency}}
           </p>
 
-          <p>
+          <p id = "urgency_update" style="display:none">
             {% if form.errors.urgency_update %}
               {{form.errors.urgency_update}}<br>
             {% endif %}
@@ -89,7 +197,7 @@
             {{form.urgency_update}}
           </p>
 
-          <p>
+          <p id = "veryclose" style="display:none">
             {% if form.errors.urgency_veryclose_number %}
               {{form.errors.urgency_veryclose_number}}<br>
             {% endif %}
@@ -97,7 +205,7 @@
             {{form.urgency_veryclose_number}}{{form.urgency_veryclose_type}}
           </p>
 
-          <p>
+          <p id = "close" style="display:none">
             {% if form.errors.urgency_close_number %}
               {{form.errors.urgency_close_number}}<br>
             {% endif %}
@@ -105,7 +213,7 @@
             {{form.urgency_close_number}}{{form.urgency_close_type}}
           </p>
 
-          <p>
+          <p id = "medium" style="display:none">
             {% if form.errors.urgency_medium_number %}
               {{form.errors.urgency_medium_number}}<br>
             {% endif %}
@@ -113,7 +221,7 @@
             {{form.urgency_medium_number}}{{form.urgency_medium_type}}
           </p>
 
-          <p>
+          <p id = "far" style="display:none">
             {% if form.errors.urgency_far_number %}
               {{form.errors.urgency_far_number}}<br>
             {% endif %}

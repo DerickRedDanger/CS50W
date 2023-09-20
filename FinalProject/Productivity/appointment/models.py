@@ -574,7 +574,7 @@ class ListToDo(models.Model):
         default=medium,
     ) # Very hight, hight, medium, low
 
-    urgency_update = models.BooleanField(u"Want this urgency to auto update as the deadline gets closer ?",default=False)
+    urgency_update = models.BooleanField(u"Want this urgency to auto update as the deadline gets closer?",default=False)
 
     day="dy"
     week="wk"
@@ -588,7 +588,7 @@ class ListToDo(models.Model):
     ]
 
     urgency_veryclose_number= models.IntegerField(
-        u'Update to Very close when deadline is within:',
+        u'Update to "very close" when deadline is within:',
         default=1,
         validators=[
             MaxValueValidator(30),
@@ -601,7 +601,7 @@ class ListToDo(models.Model):
     )
     
     urgency_close_number= models.IntegerField(
-        u'Update to close when deadline is within:',
+        u'Update to "close" when deadline is within:',
         default=1,
         validators=[
             MaxValueValidator(30),
@@ -614,7 +614,7 @@ class ListToDo(models.Model):
     )
 
     urgency_medium_number= models.IntegerField(
-        u'Update to medium when deadline is within:',
+        u'Update to "medium" when deadline is within:',
         default=1,
         validators=[
             MaxValueValidator(30),
@@ -627,7 +627,7 @@ class ListToDo(models.Model):
     )
 
     urgency_far_number= models.IntegerField(
-        u'Update to far when deadline is within:',
+        u'Update to "far" when deadline is within:',
         default=1,
         validators=[
             MaxValueValidator(30),
@@ -651,7 +651,7 @@ class ListToDo(models.Model):
         (inp, "In Progress"),
         (done, "Done"),
         (fo, "forgotten"),
-        (fn, "forgottten and not started"),
+        (fn, "forgotten and not started"),
         (har,"Hardship"),
     ]
     progress= models.CharField(u"What's the progress on this task? ",
