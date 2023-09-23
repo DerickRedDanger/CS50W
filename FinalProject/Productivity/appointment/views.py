@@ -460,9 +460,7 @@ def dailytask(request,id):
                                             "snack":snack,"id":id,})
 
 def listtodo(request,id):
-
-
-
+    print(f"todo id = {id}")
     if request.method == "GET":
         if id != 0:
             obj = models.ListToDo.objects.get(id = id)
@@ -477,11 +475,13 @@ def listtodo(request,id):
             print("ListToDo is valid")
             form.save()
             form = forms.ListToDoForm
+        else:
+            print("'list to do' form is not valid")
 
     snack=""
 
 
-    return render(request,"todo.html",{"snack":snack,"form":form,"repeat_choices":repeat_choices,"priority_choices":priority_choices,})
+    return render(request,"todo.html",{"id":id,"snack":snack,"form":form,"repeat_choices":repeat_choices,"priority_choices":priority_choices,})
 
 def planner(request):
     x = datetime.now()

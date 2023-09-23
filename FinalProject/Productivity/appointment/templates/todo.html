@@ -12,13 +12,13 @@
 
     // Get the step checkbox element
     var step = document.getElementById("id_step");
-    // Get the step checkbox element
-    var steps = document.getElementById("steps");
+    // Get the step_to checkbox element
+    var step_to = document.getElementById("step_to");
 
     if (step.checked == true){
-      steps.style.display = 'block'
+      step_to.style.display = 'block'
   } else {
-    steps.style.display = 'none'
+    step_to.style.display = 'none'
   }}
 
 
@@ -112,7 +112,7 @@
 {% block content %}
 
 {% if id != 0 %}
-    <form id="dailytask" style="margin-top: 30px;" action="/listtodo/{{form.id}}" method="post" >
+    <form id="dailytask" style="margin-top: 30px;" action="/listtodo/{{id}}" method="post" >
       <h4> Editing/Viewing a Todo task: </h4>
       {% else %}
     <form id="dailytask" style="margin-top: 30px;" action="/listtodo/0" method="post" >
@@ -125,6 +125,13 @@
         {{ form.non_field_errors }}
     {% endif %}
     </p>
+
+    <p>
+      {% if form.errors %}
+          {{ form.errors }}
+      {% endif %}
+      </p>
+
     <p>
         {% if form.errors.title %}
           {{form.errors.title}}<br>
@@ -157,12 +164,12 @@
             {{form.step}}
           </p>
     
-          <p id = "steps" style="display:none">
-            {% if form.errors.steps %}
-              {{form.errors.steps}}<br>
+          <p id = "step_to" style="display:none">
+            {% if form.errors.step_to %}
+              {{form.errors.step_to}}<br>
             {% endif %}
-            <label for="id_steps">This task is a step to which task?:</label><br>
-            {{form.steps}}
+            <label for="id_step_to">This task is a step to What other task?:</label><br>
+            {{form.step_to}}
           </p>
           
           <p>
@@ -178,7 +185,7 @@
               {{form.errors.deadline_date}}<br>
             {% endif %}
             {{form.deadline_date.label_tag}}
-            <input type="date" name="deadline_date" value="{{date}}"  required="" id="id_deadline_date">
+            <input type="date" name="deadline_date" value="{{date}}" id="id_deadline_date">
           </p>
 
           <p>
@@ -201,6 +208,9 @@
             {% if form.errors.urgency_veryclose_number %}
               {{form.errors.urgency_veryclose_number}}<br>
             {% endif %}
+            {% if form.errors.urgency_veryclose_type %}
+              {{form.errors.urgency_veryclose_type}}<br>
+            {% endif %}
             {{form.urgency_veryclose_number.label_tag}}
             {{form.urgency_veryclose_number}}{{form.urgency_veryclose_type}}
           </p>
@@ -209,6 +219,9 @@
             {% if form.errors.urgency_close_number %}
               {{form.errors.urgency_close_number}}<br>
             {% endif %}
+            {% if form.errors.urgency_close_type %}
+            {{form.errors.urgency_close_type}}<br>
+          {% endif %}
             {{form.urgency_close_number.label_tag}}
             {{form.urgency_close_number}}{{form.urgency_close_type}}
           </p>
@@ -217,6 +230,9 @@
             {% if form.errors.urgency_medium_number %}
               {{form.errors.urgency_medium_number}}<br>
             {% endif %}
+            {% if form.errors.urgency_medium_type %}
+              {{form.errors.urgency_medium_type}}<br>
+            {% endif %}
             {{form.urgency_medium_number.label_tag}}
             {{form.urgency_medium_number}}{{form.urgency_medium_type}}
           </p>
@@ -224,6 +240,9 @@
           <p id = "far" style="display:none">
             {% if form.errors.urgency_far_number %}
               {{form.errors.urgency_far_number}}<br>
+            {% endif %}
+            {% if form.errors.urgency_far_type %}
+              {{form.errors.urgency_far_type}}<br>
             {% endif %}
             {{form.urgency_far_number.label_tag}}
             {{form.urgency_far_number}}{{form.urgency_far_type}}
@@ -238,6 +257,14 @@
             {{form.importance}}
           </p>
 
+          <p>
+            {% if form.errors.duration %}
+              {{form.errors.duration}}<br>
+            {% endif %}
+            {{form.duration.label_tag}}
+            {{form.duration}}
+          </p>
+          
           <p>
             {% if form.errors.progress %}
               {{form.errors.progress}}<br>

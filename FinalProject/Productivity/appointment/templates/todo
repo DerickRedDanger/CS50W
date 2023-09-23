@@ -1,4 +1,4 @@
-finish setting the todo.model and forms. remember to make a function to auto update the urgency.
+fix minor errors on Todo.html and fix Todo.View so it can edit a Listtodo
 
 Change models.DailyTask to work with checkbox instead of manytomany
 

@@ -7,6 +7,7 @@ from django.urls import reverse
 from django.db.models.signals import pre_save, post_save
 from . import models_util
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db.models.signals import m2m_changed
 
 # for calendar and daily/weekly activities
     # Events and appoitments for the callendar
@@ -14,6 +15,8 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 
 #test
 print(time(5, 00))
+
+now = datetime.now().date()
 
 # Time choices
 hours = {5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23}
@@ -229,14 +232,22 @@ class Event(models.Model):
         #print(self.start_time)
         #print(type(self.start_time))
         print (f"repeat = {repeat}")
-        try:
 
+        try:
+            non_unique_name = Event.objects.filter(title=self.title).exclude(id=self.id)
+        except:
+            non_unique_name = Event.objects.filter(title=self.title)
+        if non_unique_name:
+            raise ValidationError ('This title is already in use, pick another one')
+
+        try:
             if self.end_time <= self.start_time:
                 print("raise validation error in models")
                 raise ValidationError ('From Models: Ending times must be after starting times')
         except TypeError:
                 raise ValidationError('From Models: There is an error in start/end time')
-        if (repeat == "day" or repeat == "wek" or repeatd == "frv") and repeatd == "frv":
+        
+        if (repeat == "day" or repeat == "wek" or repeatd == "wkd") and repeatd == "frv":
             raise ValidationError ("Don't use repeat forever with daily/weekly/specific weekdays. In that case, use daily task instead")
 
         if repeat != "nvr" and repeatd == "spc" and (type(repeatnumber) is not str or repeatnumber <= 0):
@@ -274,7 +285,6 @@ class Event(models.Model):
                     raise ValidationError(
                         f'There is an overlap with a repeating event: {repevent.original.title} on {repevent.original.day}, {repevent.original.start_time} - {repevent.original.end_time})')
  
-
     def __str__(self):
         return f"{self.title}"
     
@@ -445,11 +455,18 @@ class DailyTask(models.Model):
  
     def clean(self):
 
+        try:
+            non_unique_name = DailyTask.objects.filter(title=self.title).exclude(id=self.id)
+        except:
+            non_unique_name = DailyTask.objects.filter(title=self.title)
+        if non_unique_name:
+            raise ValidationError ('This title is already in use, pick another one')
+
         if self.end_time <= self.start_time:
             raise ValidationError('Ending times must after starting times')
             #zones__in=[<id1>]
         if self.sunday == False and self.monday == False and self.tuesday == False and self.wednesday == False and self.thursday == False and self.friday == False and self.saturday == False:
-            raise ValidationError("At least a weekday needs to be selected")
+            raise ValidationError("At least one weekday needs to be selected")
 
         tasks = DailyTask.objects.none()
         sun = DailyTask.objects.none()
@@ -527,10 +544,10 @@ class ListToDo(models.Model):
     
     step = models.BooleanField(u"This task is one of the steps to another one?",default=False)
 
-    steps = models.ManyToManyField(
+    step_to = models.ManyToManyField(
         "self", symmetrical=False,
         related_name="bigtask",
-        blank=True,
+        blank=True, null=True,
         )
     
     #Duration choices
@@ -551,7 +568,7 @@ class ListToDo(models.Model):
         (perpetual, "Perpetual"),
     ]
 
-    duration = models.CharField(u"How long do you expect this to take ?",
+    duration = models.CharField(u"How long do you expect this to take?",
         max_length=2,
         choices= duration_choices,
         default=hours,
@@ -559,28 +576,29 @@ class ListToDo(models.Model):
 
 
     deadline = models.BooleanField(u"This task has a deadline?",default=False)
+    #repeatutil = models.DateField(u'Repeat util', help_text=u"Format: year-month-day",null=True, blank=True)
+    deadline_date= models.DateField(u'When is the deadline?', help_text=u"Format: year-month-day", null=True, blank=True)
 
-    deadline_date= models.DateField(u'When is the deadline?',default=f"{Year}-{Month}-{Day}", help_text=u"Format: year-month-day")
-
-    importance = models.CharField(u"How vital is this task ? will It bring great benefits if done? Great demerits if not done?",
+    importance = models.CharField(u"How vital is this task? Will It bring great benefits if done? Great demerits if not done?",
         max_length=2,
         choices= priority_choices,
         default=medium,
     )
     
-    urgency = models.CharField(u"How urgent is this task ? can it wait/be delayed?",
+    urgency = models.CharField(u"How urgent is this task? can it wait/be delayed?",
         max_length=2,
         choices= urgency_choices,
         default=medium,
     ) # Very hight, hight, medium, low
 
     urgency_update = models.BooleanField(u"Want this urgency to auto update as the deadline gets closer?",default=False)
-
+    none="nn"
     day="dy"
     week="wk"
     month="mh"
     year="yr"
     type_choices = [
+        (none,"---------"),
         (day, "Day(s)"),
         (week, "Week(s)"),
         (month, "Month(s)"),
@@ -654,7 +672,7 @@ class ListToDo(models.Model):
         (fn, "forgotten and not started"),
         (har,"Hardship"),
     ]
-    progress= models.CharField(u"What's the progress on this task? ",
+    progress= models.CharField(u"What's the progress on this task?",
         max_length=2,
         choices=progress_choices,
         default=nts
@@ -675,9 +693,143 @@ class ListToDo(models.Model):
             "notes": self.notes,
             "color": self.color,
         }
+    
+    def urgency_time_calculation(self,number,time):
+        if time == "nn":
+            return 0
+        elif time == "dy":
+            total_time = now + timedelta(days=number)
+        elif time == "wk":
+            total_time = now + timedelta(days=7*number)
+        elif time == "mh":
+            total_time = now + timedelta(days=30*number)
+        elif time == "yr":
+            total_time = now + timedelta(days=365*number)
+        return total_time
+
+    
+    def clean(self):
+
+        if self.deadline == True:
+            try:
+                if now > self.deadline_date:
+                    raise ValidationError("The deadline can't be set to before today")
+            except:
+                raise ValidationError("The deadline can't be set to before today")
+
+        if self.urgency_update == True:
+            veryclose = self.urgency_time_calculation(self.urgency_veryclose_number,self.urgency_veryclose_type)
+            print (f"veryclose = {veryclose}")
+            close = self.urgency_time_calculation(self.urgency_close_number,self.urgency_close_type)
+            print (f"close = {close}")
+            medium = self.urgency_time_calculation(self.urgency_medium_number,self.urgency_medium_type)
+            print (f"medium = {medium}")
+            far = self.urgency_time_calculation(self.urgency_far_number,self.urgency_far_type)
+            print (f"far = {far}")
+
+            if far != 0 and self.urgency == "vl":
+                lower=[]
+                if medium != 0 and far < medium:
+                    lower.append("medium")
+                if close != 0 and far < close:
+                    lower.append("close")
+                if veryclose != 0 and far < veryclose:
+                    lower.append("very close")
+                if lower != []:
+                    raise ValidationError(f"Far must be higher then {lower}")
+
+            if medium != 0 and (self.urgency == "vl" or self.urgency == "l"):
+                lower=[]
+                if close != 0 and medium < close:
+                    lower.append("close")
+                if veryclose != 0 and medium < veryclose:
+                    lower.append("very close")
+                if lower != []:
+                    raise ValidationError(f"Medium must be higher then {lower}")
+
+            if close != 0 and (self.urgency != "h" or self.urgency != "vh"):
+                if veryclose != 0 and close < veryclose:
+                    raise ValidationError(f"Close must be higher then 'Very close'")
+
+        try:
+            non_unique_name = ListToDo.objects.filter(title=self.title).exclude(id=self.id)
+        except:
+            non_unique_name = ListToDo.objects.filter(title=self.title)
+        if non_unique_name:
+            raise ValidationError('This title is already in use, pick another one')
+        
+
+    def save(self, *args, **kwargs):
+        
+        # if deadline is set to false, set deadline_date to null
+        if self.deadline == False:
+            self.deadline_date= None
+
+        # If deadline set to true, urgency isn't set to Very Close and auto update is set to true
+        if self.deadline == True and self.urgency != "vh" and self.urgency_update == True:
+            
+            # If urgency is set to far, zero the auto update of far
+            if self.urgency == "l":
+                self.urgency_far_value=1
+                self.urgency_far_type="nn"
+            
+            # If urgency is set to medium, zero the auto update of far and medium
+            if self.urgency == "m":
+                self.urgency_medium_value=1
+                self.urgency_medium_type="nn"
+                self.urgency_far_value=1
+                self.urgency_far_type="nn"
+            
+            # If urgency is set to close, zero the auto update of far, medium and close
+            if self.urgency == "h":
+                self.urgency_close_value=1
+                self.urgency_close_type="nn"
+                self.urgency_medium_value=1
+                self.urgency_medium_type="nn"
+                self.urgency_far_value=1
+                self.urgency_far_type="nn"
+
+
+        # else, if there isn't a deadline, auto update set to False or Urgency set to Very Close
+        # set all auto updates to zero
+        else:
+            self.urgency_veryclose_value=1
+            self.urgency_veryclose_type="nn"
+            self.urgency_close_value=1
+            self.urgency_close_type="nn"
+            self.urgency_medium_value=1
+            self.urgency_medium_type="nn"
+            self.urgency_far_value=1
+            self.urgency_far_type="nn"
+            
+        super().save(*args, **kwargs)
+
+        # Under th ListToDo model is a function that is connected to this one
+        # when ManytoMany relationship is edited from this model a signal will be sent
+        # to the function ListToDo_Steps_clear
 
     def __str__(self):
+
         return f"{self.title}"
+    
+# Function created to remove the Steps_to ManytoMany relationship on ListTodo Object if thir Step is set to false
+def ListToDo_step_to_clearer(sender,instance, **kwargs):
+
+    # after reaching this function, it disconects so that it's not signalled again while is edit the M2M
+    # as, othewise, it would cause an endless recursion, activating itself over and over again.
+    m2m_changed.disconnect(ListToDo_step_to_clearer, sender=ListToDo.step_to.through)
+
+    # If step set to false
+    if instance.step == False:
+        # delete all M2M relationships on step_to
+        instance.step_to.clear()
+    # once done, reconnect.
+    m2m_changed.connect(ListToDo_step_to_clearer, sender=ListToDo.step_to.through)
+
+#  -- Command to connect ListTodo to it's Step_to_clearer --
+m2m_changed.connect(ListToDo_step_to_clearer, sender=ListToDo.step_to.through)
+    
+
 
 class WhatToDoToday(models.Model):
 
