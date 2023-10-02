@@ -15,9 +15,11 @@
   function check(){
     if (numb == false && rp == false && hm == false && spc == false && util == false){
     submit.disabled = false;
+    console.log(`numb = ${numb}, rp = ${rp}, hm = ${hm}, spc = ${spc}, util = ${util}`)
     console.log("enabled")
   } else {
     submit.disabled = true;
+    console.log(`numb = ${numb}, rp = ${rp}, hm = ${hm}, spc = ${spc}, util = ${util}`)
     console.log("disabled")
   }
 };
@@ -27,6 +29,7 @@
   document.addEventListener("DOMContentLoaded",Spc());
 
   document.getElementById("id_repeat").addEventListener("change",Rp);
+  document.getElementById("id_repeat").addEventListener("change",Hm);
 
   document.getElementById("id_repeatd").addEventListener("change",Hm);
 
@@ -93,7 +96,7 @@
           specific.style.display = "block";
           howmany.style.display="block";
           rp = false;
-          expl.style.display = 'block';
+          expl.style.display = 'none';
           if (howmany_choice.value == "frv"){
             rp = true;
             expl.style.display = 'block';}
@@ -249,6 +252,8 @@ function Util(){
     console.log("util")
     console.log(util)
   }
+  } else{
+    util = false
   } check()
   }
 
@@ -287,7 +292,7 @@ function Time() {
 {% block content %}
 <!-- if this is the page of a existing event -->
 {% if id != 0 %}
-    <form id="event" style="margin-top: 30px;" action="/event/{{event.id}}" method="post" >
+    <form id="event" style="margin-top: 30px;" action="/event/{{id}}" method="post" >
       <h4> Editing/Viewing a event: </h4>
       {% else %}
     <form id="event" style="margin-top: 30px;" action="/event/0" method="post" >

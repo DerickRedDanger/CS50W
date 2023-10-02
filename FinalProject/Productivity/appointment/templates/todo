@@ -1,22 +1,16 @@
-fix minor errors on Todo.html and fix Todo.View so it can edit a Listtodo
-
-Change models.DailyTask to work with checkbox instead of manytomany
+create a filter and short button for the all list to do in the index
 
 event rework complete, need to create validations to ensure the specific repetitions and util
 are after the day of the even and not null.
 
-
-
 add a reset buttom when editing a created event/task
-
-Change the dailytask and listtodo page to be able to both create a new and edit a old
 
 
 finish the snack bar at the end of the index.html
 
 Create   the add to today's task so that it also updates the added tasks last update date
 
-Create the filter and sort function for all list to do{
+Create the filter and sort function for all list to do in the index{
     sort_order=[]
     onchange: check if this button is in the sort_order:
         if it's: remove

@@ -49,18 +49,28 @@
     var medium = document.getElementById("medium");
     // Get the update to far element
     var far = document.getElementById("far");
+    // Get the warning element
+    var warning = document.getElementById("warning")
          
     if (deadline.checked == true){
       deadline_date.style.display = 'block'
       urgency_update.style.display = 'block'
-      
+          
       switch (urgency.value) {
           case "vl":
             if (id_urgency_update.checked == true){
               veryclose.style.display = 'block'
               close.style.display = 'block'
               medium.style.display = 'block'
-              far.style.display = 'block'}
+              far.style.display = 'block'
+              warning.style.display = 'none'}
+              else{
+                veryclose.style.display = 'none'
+                close.style.display = 'none'
+                medium.style.display = 'none'
+                far.style.display = 'none'
+                warning.style.display = 'none'
+              }
             break;
 
           case "l":
@@ -68,7 +78,15 @@
               veryclose.style.display = 'block'
               close.style.display = 'block'
               medium.style.display = 'block'
-              far.style.display = 'none'}
+              far.style.display = 'none'
+              warning.style.display = 'none'}
+              else{
+                veryclose.style.display = 'none'
+                close.style.display = 'none'
+                medium.style.display = 'none'
+                far.style.display = 'none'
+                warning.style.display = 'none'
+              }
             break;
 
           case "m":
@@ -76,7 +94,15 @@
               veryclose.style.display = 'block'
               close.style.display = 'block'
               medium.style.display = 'none'
-              far.style.display = 'none'}
+              far.style.display = 'none'
+              warning.style.display = 'none'}
+              else{
+                veryclose.style.display = 'none'
+                close.style.display = 'none'
+                medium.style.display = 'none'
+                far.style.display = 'none'
+                warning.style.display = 'none'
+              }
             break;
 
           case "h":
@@ -84,7 +110,15 @@
               veryclose.style.display = 'block'
               close.style.display = 'none'
               medium.style.display = 'none'
-              far.style.display = 'none'}
+              far.style.display = 'none'
+              warning.style.display = 'none'}
+              else{
+                veryclose.style.display = 'none'
+                close.style.display = 'none'
+                medium.style.display = 'none'
+                far.style.display = 'none'
+                warning.style.display = 'none'
+              }
             break;
 
           case "vh":
@@ -93,8 +127,10 @@
             close.style.display = 'none'
             medium.style.display = 'none'
             far.style.display = 'none'
+            warning.style.display = 'block'
             break;
       }
+
     
   } else{
     deadline_date.style.display = 'none'
@@ -103,6 +139,7 @@
     medium.style.display = 'none'
     far.style.display = 'none'
     urgency_update.style.display = 'none'
+    warning.style.display = 'none'
   }
   }
 
@@ -185,7 +222,7 @@
               {{form.errors.deadline_date}}<br>
             {% endif %}
             {{form.deadline_date.label_tag}}
-            <input type="date" name="deadline_date" value="{{date}}" id="id_deadline_date">
+            <input type="date" name="deadline_date" value="{{deadline_date}}" id="id_deadline_date">
           </p>
 
           <p>
@@ -194,6 +231,9 @@
             {% endif %}
             {{form.urgency.label_tag}}
             {{form.urgency}}
+            <span id = "warning" style="display:none; color:red" > 
+              Auto update isn't avaliable when Urgency is set to Very cloe
+              <span/>
           </p>
 
           <p id = "urgency_update" style="display:none">

@@ -79,12 +79,16 @@ class eventForm(forms.ModelForm):
         print(type(end_time))
         print(type(start_time))
 
-        try:
-            unique_name = models.Event.objects.filter(title=title).exclude(id=self.id)
-        except:
-            unique_name = models.Event.objects.filter(title=title)
-        if unique_name:
-            self.add_error ("title",'This title is already in use, pick another one')
+        #try:
+        #    non_unique_name = models.Event.objects.filter(title=title).exclude(id=self.id)
+        #    print(f"self.pk = {self.id}")
+        #    print(f"non_unique_name with id = {non_unique_name}")
+        #except:
+        #    non_unique_name = models.Event.objects.filter(title=title)
+        #    print(f"self.pk = {self.id}")
+        #    print(f"non_unique_name with id = {non_unique_name}")
+        #if non_unique_name:
+        #    self.add_error ("title",'This title is already in use, pick another one')
         
         if end_time <= start_time:
             #raise forms.ValidationError("Ending time must be after starting time")
@@ -115,10 +119,10 @@ class eventForm(forms.ModelForm):
 
     
         
-        if events.exists():
-            for event in events:
-                if self.check_overlap(event.start_time, event.end_time, start_time, end_time):
-                    self.add_error("title", f"This event overlaps with the event: ''{event.title}'' that starts at {event.start_time} and ends at {event.end_time}")
+        #if events.exists():
+        #    for event in events:
+        #        if self.check_overlap(event.start_time, event.end_time, start_time, end_time):
+        #            self.add_error("title", f"This event overlaps with the event: ''{event.title}'' that starts at {event.start_time} and ends at {event.end_time}")
 
 
 class DailyTaskForm(forms.ModelForm):
@@ -175,12 +179,12 @@ class DailyTaskForm(forms.ModelForm):
         #saturday=data.get("saturday")
         #sunday=data.get("sunday")
 
-        try:
-            unique_name = models.DailyTask.objects.filter(title=title).exclude(id=self.id)
-        except:
-            unique_name = models.DailyTask.objects.filter(title=title)
-        if unique_name:
-            self.add_error ("title",'This title is already in use, pick another one')
+        #try:
+        #    non_unique_name = models.DailyTask.objects.filter(title=title).exclude(id=self.id)
+        #except:
+        #    non_unique_name = models.DailyTask.objects.filter(title=title)
+        #if non_unique_name:
+        #    self.add_error ("title",'This title is already in use, pick another one')
 
         if end_time <= start_time:
             self.add_error('sunday','Ending times must after starting times')
@@ -338,12 +342,12 @@ class ListToDoForm(forms.ModelForm):
                 if veryclose != 0 and close < veryclose:
                     self.add_error("urgency_close_number",f"Close must be higher then 'Very close'")
 
-        try:
-            unique_name = models.ListToDo.objects.filter(title=title).exclude(id=self.id)
-        except:
-            unique_name = models.ListToDo.objects.filter(title=title)
-        if unique_name:
-            self.add_error ("title",'This title is already in use, pick another one')
+        #try:
+        #    non_unique_name = models.ListToDo.objects.filter(title=title).exclude(id=self.id)
+        #except:
+        #    non_unique_name = models.ListToDo.objects.filter(title=title)
+        #if non_unique_name:
+        #    self.add_error ("title",'This title is already in use, pick another one')
 
 class WhatToDoTodayForm(forms.ModelForm):
     class Meta:

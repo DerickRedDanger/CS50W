@@ -5,7 +5,7 @@ from datetime import datetime,timedelta,time
 from django.core.exceptions import ValidationError
 from django.urls import reverse
 from django.db.models.signals import pre_save, post_save
-from . import models_util
+from . import models_post_save
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db.models.signals import m2m_changed
 
@@ -234,10 +234,15 @@ class Event(models.Model):
         print (f"repeat = {repeat}")
 
         try:
+
+
             non_unique_name = Event.objects.filter(title=self.title).exclude(id=self.id)
+            print(f"self.pk = {self.pk}")
+            print(f"non_unique_name with id = {non_unique_name}")
         except:
             non_unique_name = Event.objects.filter(title=self.title)
         if non_unique_name:
+            print(non_unique_name)
             raise ValidationError ('This title is already in use, pick another one')
 
         try:
@@ -288,8 +293,8 @@ class Event(models.Model):
     def __str__(self):
         return f"{self.title}"
     
-# Event's Post_save at models_util:
-post_save.connect(models_util.event_post_save,sender=Event)
+# Event's Post_save at models_post_save:
+post_save.connect(models_post_save.event_post_save,sender=Event)
     
     
 
@@ -752,7 +757,9 @@ class ListToDo(models.Model):
                     raise ValidationError(f"Close must be higher then 'Very close'")
 
         try:
-            non_unique_name = ListToDo.objects.filter(title=self.title).exclude(id=self.id)
+            print(f"self.pk = {self.pk}")
+            non_unique_name = ListToDo.objects.filter(title=self.title).exclude(id=self.pk)
+            print(f"non_unique_name with id = {non_unique_name}")
         except:
             non_unique_name = ListToDo.objects.filter(title=self.title)
         if non_unique_name:
@@ -801,6 +808,7 @@ class ListToDo(models.Model):
             self.urgency_medium_type="nn"
             self.urgency_far_value=1
             self.urgency_far_type="nn"
+            self.urgency_update=False
             
         super().save(*args, **kwargs)
 

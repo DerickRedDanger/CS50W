@@ -9,12 +9,18 @@ from django.http import HttpResponse, HttpResponseRedirect,JsonResponse
 from . import models
 from .utils.calendarutils import Calendar
 from . import forms
+from . import models_auto_functions
 from django.forms.models import model_to_dict
+
+x = datetime.now().date()
+
+#-------------------- Models auto urgency update ---------------------
+auto = models_auto_functions.listtodo_urgency_auto_update(x)
 
 
 # Checking the date to decide if it's time to do all the auto functions.
 last_checkup=models.datetracking.objects.get(id=1).day
-x = datetime.now().date()
+
 # --------
 # Remember to switch this back to month + 1
 try:
@@ -376,20 +382,22 @@ def event(request,id):
     if request.method == "GET":
         if id != 0:
             obj = models.Event.objects.get(id = id)
+
             event = forms.eventForm(instance = obj)
+
         else:
             obj = models.Event(None)
             event = forms.eventForm(None)
 
     if request.method == "POST":
-        event=forms.eventForm(request.POST)
+        obj = models.Event.objects.get(id = id)
+        event=forms.eventForm(request.POST,instance = obj)
         if event.is_valid():
             print("event is valid")
             event.save()
             event = forms.eventForm
 
             if id != 0:
-                obj = models.Event.objects.get(id = id)
                 event = forms.eventForm(instance = obj)
             else:
                 obj = models.Event(None)
@@ -470,18 +478,38 @@ def listtodo(request,id):
             form = forms.ListToDoForm(None)
 
     if request.method == "POST":
-        form=forms.ListToDoForm(request.POST)
+        if id != 0:
+            obj = models.ListToDo.objects.get(id = id)
+            form=forms.ListToDoForm(request.POST,instance = obj)
+        else:
+            form=forms.ListToDoForm(request.POST)
         if form.is_valid():
             print("ListToDo is valid")
             form.save()
             form = forms.ListToDoForm
+
+            if id != 0:
+                obj =models.ListToDo.objects.get(id = id)
+                form = forms.ListToDoForm(instance = obj)
+            else:
+                obj = models.ListToDo(None)
+                form = forms.ListToDoForm(None) 
+
         else:
             print("'list to do' form is not valid")
-
+    try: 
+        if obj.deadline_date:
+            print(f"obj.day = {obj.deadline_date}")
+            deadline_date=obj.deadline_date.strftime("%Y-%m-%d")
+        else:
+            deadline_date=None
+    except:
+        deadline_date=None
+        print("no obj.day")
     snack=""
 
 
-    return render(request,"todo.html",{"id":id,"snack":snack,"form":form,"repeat_choices":repeat_choices,"priority_choices":priority_choices,})
+    return render(request,"todo.html",{"id":id,"snack":snack,"form":form,"repeat_choices":repeat_choices,"priority_choices":priority_choices,"deadline_date":deadline_date})
 
 def planner(request):
     x = datetime.now()
@@ -933,3 +961,8 @@ def todo(request,id):
         event=models.Event.objects.get(id=id)
         error = ""
     return render(request,"event.html",{"event":event,"date":date,"error":error})
+
+
+
+
+
