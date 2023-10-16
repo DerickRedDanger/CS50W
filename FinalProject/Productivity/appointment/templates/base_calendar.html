@@ -10,7 +10,9 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.10/css/all.css">
   <link rel="stylesheet" href="{% static 'css/calendar_style.css' %}">
- 
+  <link rel="stylesheet" href="{% static 'css/base_css.css' %}">
+  {% block style %}
+  {% endblock %}
 </head>
 <body>
 
@@ -25,8 +27,42 @@
     crossorigin="anonymous"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
     crossorigin="anonymous"></script>
+    <script src="{% static 'script/base_script.js' %}"></script>
 
   {% block script %}
   {% endblock %}
+
+  <!-- Snackbar - Debug -->
+  <br><span style="color:red" > remove the below at the end of the project<span><br>
+    <button onclick="Snackbar()">Show Snackbar</button><br>
+    snackbar = {{Snackbar}}<br>
+    alert = {{alert}}<br>
+
+    <!-- Snackbar-->
+    {% if Snackbar %}
+      {% if alert == 'success' %}
+      <div id="Snackbar" class="Snackbar alert success">
+        <span onclick="Close()" class="closebtn">&times;</span>  
+        <strong>Success!</strong> {{Snackbar}}
+      </div>
+      {% elif alert == 'info'  %}
+      <div id="Snackbar" class="Snackbar alert info">
+        <span onclick="Close()" class="closebtn">&times;</span>  
+        <strong>Info!</strong> {{Snackbar}}
+      </div>
+      {% elif alert == 'warning'  %}
+      <div id="Snackbar" class="Snackbar alert warning">
+        <span onclick="Close()" class="closebtn">&times;</span>  
+        <strong>Warning!</strong> {{Snackbar}}
+      </div>
+      {% elif alert == 'alert'  %}
+      <div id="Snackbar" class="Snackbar alert">
+        <span onclick="Close()" class="closebtn">&times;</span>  
+        <strong>Danger!</strong> {{Snackbar}}
+      </div>
+    {% endif %}
+    {% endif %}
+
+
 </body>
 </html>

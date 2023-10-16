@@ -78,7 +78,7 @@ def event_post_save(sender,instance,created, *args, **kwargs):
                            # month= int(f"{time[5]}{time[6]}")
                            # dai= int(f"{time[8]}{time[9]}")
                            # dayf=datetime(year,month,dai)
-                            dayf = instance.repeatutil
+                            dayf = instance.repeatutil + timedelta(seconds=1)
 
                         # if set to repeat forever
                         elif instance.repeatd == "frv":
@@ -95,6 +95,7 @@ def event_post_save(sender,instance,created, *args, **kwargs):
                         print(f"dayi type = {type(dayi)}")
                         print(f"dayf type = {type(dayf)}")
                         while(dayi<= dayf):
+
                             print(f'dayi = {dayi}')
                             print(f'dayf = {dayf}')
                             
@@ -131,7 +132,7 @@ def event_post_save(sender,instance,created, *args, **kwargs):
                                 print(f'wek - dayi = {dayi}')
                             elif instance.repeat =="mth":
                                 try :
-                                    dayi=datetime(dayi.year, dayi.month+1, dayi.day)
+                                    dayi=date(dayi.year, dayi.month+1, dayi.day)
                                     print(f'mth - dayi = {dayi}')
                                     
                                     # if this doesn't work
@@ -141,18 +142,18 @@ def event_post_save(sender,instance,created, *args, **kwargs):
                                     if (dayi.month + 1) == 13:
 
                                         # if it's, than month will be 1 and year will be year + 1
-                                        dayi=datetime(dayi.year+1, 1, dayi.day)
+                                        dayi=date(dayi.year+1, 1, dayi.day)
                                         print(f'mth - dayi = {dayi}')
 
                                         # In cases where the day doesn't exist in that month, 
                                         # like 31 in a month with 30 days or 30 in frebuary
                                         # skip to next month, as there are no months in a row that ends in 30 or lower
                                     else:
-                                        dayi=datetime(dayi.year, dayi.month+2, dayi.day)
+                                        dayi=date(dayi.year, dayi.month+2, dayi.day)
                                         print(f'mth - dayi = {dayi}')
 
                             elif instance.repeat =="yea":
-                                dayi=datetime(dayi.year+1, dayi.month, dayi.day)
+                                dayi=date(dayi.year+1, dayi.month, dayi.day)
                                 print(f'yea - dayi = {dayi}')
 
                             # if it's none of the above, it was set to daily,
@@ -160,6 +161,9 @@ def event_post_save(sender,instance,created, *args, **kwargs):
                             else:
                                 dayi=dayi+timedelta(days=1)
                                 print(f'day - dayi = {dayi} yea')
+                            
+                            print(f"dayi type = {type(dayi)}")
+                            print(f"dayf type = {type(dayf)}")
 
                 # else, if the event is set to be repeted a certain number of times
                 elif instance.repeatd == "spc":
@@ -214,7 +218,7 @@ def event_post_save(sender,instance,created, *args, **kwargs):
                             elif instance.repeat =="mth":
     
                                 try :
-                                    dayi=datetime(dayi.year, dayi.month+1, dayi.day)
+                                    dayi=date(dayi.year, dayi.month+1, dayi.day)
                                     print(f'mth - dayi = {dayi}')
                                         
                                     # if this doesn't work
@@ -224,7 +228,7 @@ def event_post_save(sender,instance,created, *args, **kwargs):
                                     if (dayi.month + 1) == 13:
 
                                         # if it's, than month will be 1 and year will be year + 1
-                                        dayi=datetime(dayi.year+1, 1, dayi.day)
+                                        dayi=date(dayi.year+1, 1, dayi.day)
                                         print(f'mth - dayi = {dayi}')
 
                                         # In cases where the day doesn't exist in that month, 
@@ -232,22 +236,22 @@ def event_post_save(sender,instance,created, *args, **kwargs):
                                         # skip to next month, as there are no months in a row that ends in 30 or lower
                                     else:
                                         try:
-                                            dayi=datetime(dayi.year, dayi.month+1, dayi.day)
+                                            dayi=date(dayi.year, dayi.month+1, dayi.day)
                                             print(f'mth - dayi = {dayi}')
                                         except ValueError:
-                                            dayi=datetime(dayi.year, dayi.month+2, dayi.day)
+                                            dayi=date(dayi.year, dayi.month+2, dayi.day)
                                             print(f'mth - dayi = {dayi}')
 
                             #-------
                             elif instance.repeat =="yea":
                                 try:
-                                    dayi=datetime(dayi.year+1, dayi.month, dayi.day)
+                                    dayi=date(dayi.year+1, dayi.month, dayi.day)
                                     print(f'yea - dayi = {dayi}')
 
                                     # if the day in question is 29th february:
                                 except ValueError:
                                     if int (dayi.day) == 29 and int(dayi.month) == 2:
-                                        dayi=datetime(dayi.year+4, dayi.month, dayi.day)
+                                        dayi=date(dayi.year+4, dayi.month, dayi.day)
                                         print('yearly except ok')
                                     print('yearly except')
                                     print (f'dayi.day = {dayi.day} and dayi.month = {dayi.month}')

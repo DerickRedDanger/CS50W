@@ -1,130 +1,60 @@
 {% extends 'base_calendar.html' %}
 {% block script%}
+  <script>
+
+    </script>
 {% endblock %}
+{% block style%}
+  <style>
+    
+    </style> 
+{% endblock%}
 {% block content %}
 
 <body>
+    <h2>Snackbar / Toast</h2>
+  <p>Snackbars are often used as a tooltips/popups to show a message at the bottom of the screen.</p>
+  <p>Click on the button to show the snackbar. It will disappear after 3 seconds.</p>
 
-  <h1>test - {{test}}</h1>
-  <h1>test1 - {{test1}}</h1>
-  <h1>test2 - {{test2}}</h1>
-  <h1>test3 - {{test3}}</h1>
-  <h1>test4 - {{test4}}</h1>
-<br>
-<h1>test5 - {{test5}}</h1>
-<br><br>
-<h1> forever's test </h1>
-<br>
-if {{testtimetest}} >= {{testtimey}} the below will work
-<br>
-<h1>{{ftest}}</h1>
+  <button onclick="Snackbar()">Show Snackbar</button>
 
-<h1>{{allf}}</h1>
+  <div >Some text some message..</div>
+
+<!-- Snackbar -->
+<span style="color:red" > remove the below at the end of the project<span><br>
+<button onclick="Snackbar()">Show Snackbar</button><br>
+snackbar = {{Snackbar}}<br>
+alert = {{alert}}<br>
+{% if Snackbar %}
+  {% if alert == 'success' %}
+  <div id="Snackbar" class="Snackbar alert success">
+    <span onclick="Close()" class="closebtn">&times;</span>  
+    <strong>Success!</strong> {{Snackbar}}
+  </div>
+  {% elif alert == 'info'  %}
+  <div id="Snackbar" class="Snackbar alert info">
+    <span onclick="Close()" class="closebtn">&times;</span>  
+    <strong>Info!</strong> {{Snackbar}}
+  </div>
+  {% elif alert == 'warning'  %}
+  <div id="Snackbar" class="Snackbar alert warning">
+    <span onclick="Close()" class="closebtn">&times;</span>  
+    <strong>Warning!</strong> {{Snackbar}}
+  </div>
+  {% elif alert == 'alert'  %}
+  <div id="Snackbar" class="Snackbar alert">
+    <span onclick="Close()" class="closebtn">&times;</span>  
+    <strong>Danger!</strong> {{Snackbar}}
+  </div>
+{% endif %}
+{% endif %}
 
 
-    <form action="planner" method="post">
-        
-        {% csrf_token %}
 
-    <p>
-        <label for="id_name">Name:</label>
-        <input type="text" name="name" maxlength="50" required="" id="id_name">
-        
-        
-      </p>
-    
-      
-      <p>
-        <label for="id_day">The day i (don't) have to do this:</label>
-        <input type="text" name="day" value="2023-7-5" required="" id="id_day">
-        
-          <span class="helptext">Format: year-month-day</span>
-        
-        
-      </p>
-    
-      
-      <p>
-        <label for="id_todo">Todo:</label>
-        <select name="todo" required="" id="id_todo">
-      <option value="" selected="">---------</option>
-    
-      <option value="1">Final Project</option>
-    
-      <option value="2">test</option>
-    
-      <option value="3">test2</option>
-    
-      <option value="4">test3</option>
-    
-      <option value="5">test</option>
-    
-      <option value="6">test</option>
-    
-      <option value="7">test</option>
-    
-      <option value="8">test</option>
-    
-      <option value="9">another test</option>
-    
-    </select>
-        
-        
-      </p>
-    
-      
-      <p>
-        <label for="id_need">Need:</label>
-        <select name="need" id="id_need">
-      <option value="Hv" selected="">Have to do today</option>
-    
-      <option value="Dn">Don't have to do today</option>
-    
-      <option value="Bw">Big Win</option>
-    
-      <option value="Dl">Can delegate</option>
-    
-      <option value="it">If enough time</option>
-    
-    </select>
-        
-        
-      </p>
-    
-      
-      <p>
-        <label for="id_start_time">Starting time:</label>
-        <input type="text" name="start_time" value="19:17" required="" id="id_start_time">
-        
-          <span class="helptext">Format: hour:minute</span>
-        
-        
-      </p>
-    
-      
-      <p>
-        <label for="id_end_time">Ending time:</label>
-        <input type="text" name="end_time" value="19:18" required="" id="id_end_time">
-        
-          <span class="helptext">Format: hour:minute</span>
-        
-        
-      </p>
-    
-      
-      <p>
-        <label for="id_done">Done:</label>
-        <input type="checkbox" name="done" id="id_done">
-        
-        
-          
-        
-      </p>
-    <p><input type="submit" value="Submit"></p>
-    </form>
 
-    
-    
-    </body>
+
+
+
+</body>
 
 {% endblock %}

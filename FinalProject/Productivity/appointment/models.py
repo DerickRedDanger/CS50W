@@ -290,6 +290,9 @@ class Event(models.Model):
                     raise ValidationError(
                         f'There is an overlap with a repeating event: {repevent.original.title} on {repevent.original.day}, {repevent.original.start_time} - {repevent.original.end_time})')
  
+    def get_absolute_url(self):
+        return f"/event/{self.id}/"
+
     def __str__(self):
         return f"{self.title}"
     
@@ -351,6 +354,9 @@ class EventRepetiton(models.Model):
                 if self.check_overlap(repevent.original.start_time,repevent.original.end_time, self.original.start_time, self.original.end_time):
                     raise ValidationError(
                         f'There is an overlap with a repeating event: {repevent.original.title} on {repevent.day}, {repevent.start_time} - {repevent.end_time})')
+
+    def get_absolute_url(self):
+        return f"{self.original.get_absolute_url}/"
 
     def __str__(self):
         return f"{self.original.title} - R - {self.day}"
@@ -539,6 +545,9 @@ class DailyTask(models.Model):
                         weekdays.append("Saturday")
                     raise ValidationError(f"There is an overlap with another task: {task.title}, {task.start_time} - {task.end_time}) on {weekdays}")
 
+    def get_absolute_url(self):
+        return f"/dailytask/{self.id}/"
+
     def __str__(self):
         return f"{self.title}"
 
@@ -552,7 +561,7 @@ class ListToDo(models.Model):
     step_to = models.ManyToManyField(
         "self", symmetrical=False,
         related_name="bigtask",
-        blank=True, null=True,
+        blank=True,
         )
     
     #Duration choices
@@ -815,6 +824,9 @@ class ListToDo(models.Model):
         # Under th ListToDo model is a function that is connected to this one
         # when ManytoMany relationship is edited from this model a signal will be sent
         # to the function ListToDo_Steps_clear
+
+    def get_absolute_url(self):
+        return f"/listtodo/{self.id}/"
 
     def __str__(self):
 

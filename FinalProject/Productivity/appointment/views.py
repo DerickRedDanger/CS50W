@@ -12,265 +12,45 @@ from . import forms
 from . import models_auto_functions
 from django.forms.models import model_to_dict
 
-x = datetime.now().date()
-
-#-------------------- Models auto urgency update ---------------------
-auto = models_auto_functions.listtodo_urgency_auto_update(x)
-
+now = datetime.now().date()
 
 # Checking the date to decide if it's time to do all the auto functions.
 last_checkup=models.datetracking.objects.get(id=1).day
 
 # --------
-# Remember to switch this back to month + 1
+# Check if it's been a day since last autofunction
 try:
-    y = datetime(x.year, x.month, x.day+1).date()
+    y = datetime(now.year, now.month, now.day+1).date()
 except ValueError:
+    # in case today's the last day of a month
     try:
-        y = datetime (x.year, x.month + 1, 1).date()
+        y = datetime (now.year, now.month + 1, 1).date()
+    # in case today's the last day of the year
     except ValueError:
-        y = datetime (x.year+1, 1, 1).date()
+        y = datetime (now.year+1, 1, 1).date()
 print("auto test")
 print("all good till here 1")
-if (x - last_checkup) >= (y-x):
+
+# if the time difference between now and last check up is more than one day
+if (now - last_checkup) >= (y-now):
     print("all good till here 2")
-    # All Auto functions:
+    # do all Auto functions:
     #-------------------
 
-    #------------------------ testing the auto functions
-    All_Forever_Event = models.Event.objects.filter(repeatd = "frv").exclude(repeat="nvr")
+#-------------------- Models.listtodo - auto urgency update --------------------
+auto = models_auto_functions.listtodo_urgency_auto_update(now)
 
-    print("all good till here 3")
+#-------------------- Models.event-forever - auto repetitions creation --------------------
+auto = models_auto_functions.event_forever_repeat_creation(now)
 
-    print(len(All_Forever_Event))
+#how old (in years) should the repetitions/events be before being deleted
+years = 3
 
-    print("all good till here 4")
+#-------------------- Models.event-Nonforever - auto delete --------------------
+auto = models_auto_functions.event_ForeverRepetitions_auto_delete(years)
+#-------------------- Models.event-forever - repetition auto delete --------------------
+auto = models_auto_functions.event_NonForever_auto_delete(years)
 
-    if len(All_Forever_Event) != 0 :
-
-        print("all good till here 4")
-
-        for y in range(len(All_Forever_Event)):
-
-            print("all good till here 5")
-
-            x = All_Forever_Event[y]
-            print (f"event = {x}")
-            All_Forever_Repetition = x.Repetitions.all()
-            print(f"All repetitions from event x = {All_Forever_Repetition}")
-            if len(All_Forever_Repetition) != 0 :
-                print("from repetition")
-                z = All_Forever_Repetition[len(All_Forever_Repetition)-1].day
-                Last_repetition = datetime(z.year, z.month, z.day)
-            else:
-                print("from event.day")
-                Last_repetition = datetime(x.day.year, x.day.month, x.day.day) 
-                #print(Last_repetition)
-            today = datetime.now()
-            Two_Years_From_Today = datetime(today.year + 2, today.month, today.day)
-            print(f'last_repetition = {Last_repetition}')
-            print(f'today = {today}')
-            print(f'two years from today = {Two_Years_From_Today}')
-            print ( f" ({Last_repetition} - {today}) <= ({Two_Years_From_Today} - {today})")
-            if (Last_repetition - today) <= (Two_Years_From_Today - today):
-                print(f"x = {x}")
-                dayf = datetime(today.year+2, Last_repetition.month, Last_repetition.day)
-                dayi = datetime(Last_repetition.year, Last_repetition.month, Last_repetition.day)
-
-                # If weekdays was selected, get the selected weekdays from the original event.
-                #if x.repeat =="wkd":
-                #            weekdays=x.repeat_wkd.all()
-                #            print(f"weekdays = {weekdays}")
-                #            week=[]
-                #            for x in range(len(weekdays)):
-                #                week.append(weekdays[x].day)
-                #            print(f"week = {week}")
-
-                # while the date in question isn't higher than he final date
-                while(dayi<= dayf):
-                                print(f'dayi = {dayi}')
-                                print(f'dayf = {dayf}')
-
-                                # since it's starting on the same day as the event, 
-                                # i have to skip that initial day.
-                                if dayi!=Last_repetition and dayi>=today:
-
-                                    print(f"dayi != last {dayi} != {Last_repetition}")
-
-                                    # if specific week days was selected
-                                    #if x.repeat=='wkd':
-                                    #    print(f'dayi = {dayi.strftime("%A")}')
-
-                                    #    # check if the weekday in question was one of the selected.
-                                    #    if dayi.strftime("%A") in week:
-
-                                            # if it's create a new repetition and save.
-                                    #        new = models.EventRepetiton(original=x, day=dayi,
-                                    #        start_time=x.start_time, end_time=x.end_time)
-                                    #        print(f'new = {new}')
-                                    #        new.save()
-                                    
-                                    # if it's not the initial day and it's not set to repeat on specific weekdays
-                                    # than this is a day that event is meant to be created.
-                                    #else:
-                                    new = models.EventRepetiton(original=x, day=dayi,
-                                    start_time=x.start_time, end_time=x.end_time)
-                                    new.save()
-
-                                # If set to repeat weekly, montly or yearly
-                                # increase the day by 7 or month/year by 1
-                                #if x.repeat =="wek":
-                                #    dayi=dayi+timedelta(days=7)
-                                #    print(f'wek - dayi = {dayi}')
-                                
-
-                                # If ser to repeat monthly, increase month by 1
-                                if x.repeat =="mth":
-                                    try :
-                                        dayi=datetime(dayi.year, dayi.month+1, dayi.day)
-                                        print(f'mth - dayi = {dayi}')
-                                        
-                                        # if this doesn't work
-                                    except:
-
-                                        # check if it's the end of the year, on which case month would end up being 13
-                                        if (dayi.month + 1) == 13:
-
-                                            # if it's, than month will be 1 and year will be year + 1
-                                            dayi=datetime(dayi.year+1, 1, dayi.day)
-                                            print(f'mth - dayi = {dayi}')
-
-                                            # In cases where the day doesn't exist in that month, 
-                                            # like 31 in a month with 30 days or 30 in frebuary
-                                            # skip to next month, as there are no months in a row that ends in 30 or lower
-                                        else:
-                                            try:
-                                                dayi=datetime(dayi.year, dayi.month+1, dayi.day)
-                                                print(f'mth - dayi = {dayi}')
-                                            except ValueError:
-                                                dayi=datetime(dayi.year, dayi.month+2, dayi.day)
-                                                print(f'mth - dayi = {dayi}')
-                                
-                                # if ser to repeat yearly, increase year by 1
-                                elif x.repeat =="yea":
-                                    try:
-                                        dayi=datetime(dayi.year+1, dayi.month, dayi.day)
-                                        print(f'yea - dayi = {dayi}')
-
-                                        # if the day in question is 29th february:
-                                    except ValueError:
-                                        if dayi.day == '29' and dayi.month == "02":
-                                            dayi=datetime(dayi.year+4, dayi.month, dayi.day)
-
-                                # if it's none of the above, it was set to daily,
-                                # so increase day by 1
-                                
-                                
-                                #else:
-                                #    dayi=dayi+timedelta(days=1)
-                                #    print(f'day - dayi = {dayi}')
-
-    #AllForeverEvent = models.Event.objects.filter(repeatd = "frv")
-    print("all good till here")
-    # Get all events that aren't set to repeat forever.
-    All_Non_Forever_Events = models.Event.objects.all().exclude(repeatd = "frv")| models.Event.objects.all().filter(repeat='nvr').filter(repeatd = "frv")
-    print(len(All_Non_Forever_Events))
-
-    # If there are events of that kind.
-    if len(All_Non_Forever_Events) != 0 :
-
-        # Run through each of them
-        for y in range(len(All_Non_Forever_Events)):
-            x = All_Non_Forever_Events[y]
-            print (f"event = {x}")
-
-            # and check if they have repetitions
-            All_Non_Forever_Events_Repetition = x.Repetitions.all()
-            print(f"All repetitions from event x = {All_Non_Forever_Events_Repetition}")
-            
-            # If they do, get the latest one. (the one more in the "future")
-            if len(All_Non_Forever_Events_Repetition) != 0 :
-                print("from repetition")
-                z = All_Non_Forever_Events_Repetition[len(All_Non_Forever_Events_Repetition)-1].day
-                Last_repetition = datetime(z.year, z.month, z.day)
-            
-            # if they don't, get the event's date.
-            else:
-                print("from event.day")
-                Last_repetition = datetime(x.day.year, x.day.month, x.day.day) 
-                #print(Last_repetition)
-            
-            # Get today's date and the date of 3 years in the future
-            today = datetime.now()
-            Three_Years_From_Today = datetime(today.year + 3, today.month, today.day)
-            print(f'last_repetition = {Last_repetition}')
-            print(f'today = {today}')
-            print(f'two years from today = {Two_Years_From_Today}')
-            print ( f" ({Last_repetition} - {today}) <= ({Two_Years_From_Today} - {today})")
-            print (f"{Last_repetition - today} >= {Three_Years_From_Today - today}")
-            
-            # check if the latest repetitions or the event is older than 3 years.
-            if (today - Last_repetition ) >= (Three_Years_From_Today - today):
-                print(f"this event {x} is outdated")
-                
-                # if it's, delete it.
-                x.delete()
-
-
-
-                #--------------------
-
-    # Get all events set to repeat forever
-    All_Forever_Event = models.Event.objects.filter(repeatd = "frv").exclude(repeat="nvr")
-    
-    # if there are events of that kind
-    if len(All_Forever_Event) != 0 :
-
-        # Run through each of them
-        for y in range(len(All_Forever_Event)):
-            x = All_Forever_Event[y]
-            print (f"event = {x}")
-
-            # And check if they have repetitions
-            All_Forever_Repetition = x.Repetitions.all()
-            print(f"All repetitions from event x = {All_Forever_Repetition}")
-            
-            # If they do, run through each one of them
-            if len(All_Forever_Repetition) != 0 :
-                print("from repetition")
-                for z in range(len(All_Forever_Repetition)):
-
-                    # Saving that repetition and it's date
-                    repetition = All_Forever_Repetition[z]
-                    repetition_date = datetime(repetition.day.year, repetition.day.month, repetition.day.day)
-                    
-                    # Get Today's date and the date of 3 years in the future
-                    today = datetime.now()
-                    Three_Years_From_Today = datetime(today.year + 3, today.month, today.day)
-                    print(f'last_repetition = {Last_repetition}')
-                    print(f'today = {today}')
-                    print(f'two years from today = {Two_Years_From_Today}')
-                    print ( f" ({Last_repetition} - {today}) <= ({Two_Years_From_Today} - {today})")
-                    print (f'event = {x}, repetition = {repetition}')
-                    print (f"repeatedevent {Last_repetition - today} >= {Three_Years_From_Today - today}")
-                    
-                    # Check if this repetitions is 3 years older or more.
-                    if (today - repetition_date) >= (Three_Years_From_Today - today):
-                        
-                        # If it's, delete it.
-                        repetition.delete()
-
-            # If this event doesn't have repetitions, then something is wrong.
-            # as all events set to repeat forever create repetitions by default.
-            else:
-                print (f"Something is wrong. the event {x} doesn't have repetition, despite being a forever event and going through an auto fill function.")
-                break
-                #print("from event.day")
-                #Last_repetition = datetime(x.day.year, x.day.month, x.day.day) 
-                #print(Last_repetition)
-    
-    pass
-print("all good till here ")
 weekday=[]
 weekdays = models.WeekDay.objects.all()
 for x in weekdays:
@@ -317,9 +97,7 @@ for hour in hours:
 leng=len(start)
 #print(start)
 
-# checking for events set to forever.
-fore = models.Event.objects.filter(repeatd = "frv")
-#-----------------------------------
+
 
 
 
@@ -390,8 +168,11 @@ def event(request,id):
             event = forms.eventForm(None)
 
     if request.method == "POST":
-        obj = models.Event.objects.get(id = id)
-        event=forms.eventForm(request.POST,instance = obj)
+        if id != 0:
+            obj = models.Event.objects.get(id = id)
+            event=forms.eventForm(request.POST,instance = obj)
+        else:
+            event=forms.eventForm(request.POST)
         if event.is_valid():
             print("event is valid")
             event.save()
@@ -633,64 +414,10 @@ def check_overlap( fixed_start, fixed_end, new_start, new_end):
         return overlap
 
 def test(request):
-    test = models.DailyTask.objects.get(id=4)
-    test1=test.weekday.all()[:1].get()
-    #something=test1[0]
-    #test2=something
-    test2=test1.day
-    test4=[]
-    test3=test.weekday.all().get()
-    #topping.name for topping in self.toppings.all()
-    #test4 = test3.day
-    #for x in range(len(test4)):
-    #  test4.append(test.weekday.all()[:1].get())
-    test4 = test3.id
-    # getting a queryset with all Dailytask whose's weekday is among test's weekday.
-    tasks = models.DailyTask.objects.filter(weekday__in=[test.weekday.all().get().id])
-    # getting the lenght of that queryset
-    test5 = len(tasks)
-    # getting one object from that query set, allowing me to once again use thm as objects.
-    test5 = tasks[3].weekday.all()
-    x = datetime.now().date()
+    Snackbar = "This is a success"
+    alert = "success"
 
-    # checking for events set to forever.
-    fore = All_Non_Forever_Events = models.Event.objects.all().exclude(repeatd = "frv")| models.Event.objects.all().filter(repeatd = "frv").filter(repeat='nvr')
-    # models.Event.objects.filter(repeatd = "frv").exclude(repeat="nvr")
-    ftest=fore
-
-    allf=0
-    testtimetest =0
-    testtimey=0
-    #f=len(fore)-2
-    #ftest=fore[f].Repetitions.all()
-    #allf = fore
-    #F=len(ftest) - 1
-    #ftest=fore[f].Repetitions.all()[F].day
-    #testtimetest = ftest - x
-    #y = datetime(x.year + 2, x.month, x.day).date()
-    #testtimey = y - x
-    #if (ftest - x) >=(y-x):
-    #    ftest = f"it's working!"
-    #else:
-    #    ftest = f"it's not working..."
-
-    
-            
-    #test2=models.DailyTask.objects.get(id=something)
-    #daily = models.DailyTask.objects.filter(id=5).get()
-    #week = models.WeekDay.objects.filter(Todaytask__in=daily)[:1].get()
-    
-    #test1 = daily
-    #test2 = week
-    
-    #test2=[]
-    #for x in test1:
-    #    test2.append(models.WeekDay.objects.filter(id=x[0])) 
-    #test1 = models.DailyTask.objects.filter(weekday__in=[test.weekday.all()])
-    todo = forms.WhatToDoTodayForm(request.POST or None)
-    return render(request, "test.html",{'todo':todo, 'test':test,'test1':test1,'test2':test2,
-        'test3':test3,'test4':test4,'test5':test5, 'ftest':ftest,
-        'testtimetest':testtimetest,'testtimey':testtimey,'allf':allf})
+    return render(request, "test.html",{"Snackbar":Snackbar, "alert":alert})
 
 def event_outdated(request,id):
     error=request.POST or None
