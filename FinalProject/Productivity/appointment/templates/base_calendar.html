@@ -34,31 +34,35 @@
 
   <!-- Snackbar - Debug -->
   <br><span style="color:red" > remove the below at the end of the project<span><br>
-    <button onclick="Snackbar()">Show Snackbar</button><br>
     snackbar = {{Snackbar}}<br>
     alert = {{alert}}<br>
 
     <!-- Snackbar-->
     {% if Snackbar %}
+    <button onclick="Snackbar()">Show latest warning again </button><br>
       {% if alert == 'success' %}
-      <div id="Snackbar" class="Snackbar alert success">
+      <div id="Snackbar" class="Snackbar alert success show">
         <span onclick="Close()" class="closebtn">&times;</span>  
-        <strong>Success!</strong> {{Snackbar}}
+        <strong>Success!</strong> {{Snackbar}} 
+        {% if link %} - <a href={{link}}> Link to it.  </a> {% endif %}
       </div>
       {% elif alert == 'info'  %}
-      <div id="Snackbar" class="Snackbar alert info">
+      <div id="Snackbar" class="Snackbar alert info show">
         <span onclick="Close()" class="closebtn">&times;</span>  
         <strong>Info!</strong> {{Snackbar}}
+        {% if link %} - <a href={{link}}> Link to it. </a> {% endif %}
       </div>
       {% elif alert == 'warning'  %}
-      <div id="Snackbar" class="Snackbar alert warning">
+      <div id="Snackbar" class="Snackbar alert warning show">
         <span onclick="Close()" class="closebtn">&times;</span>  
         <strong>Warning!</strong> {{Snackbar}}
+        {% if link %} - <a href={{link}}> Link to it. </a> {% endif %}
       </div>
       {% elif alert == 'alert'  %}
-      <div id="Snackbar" class="Snackbar alert">
+      <div id="Snackbar" class="Snackbar alert show">
         <span onclick="Close()" class="closebtn">&times;</span>  
-        <strong>Danger!</strong> {{Snackbar}}
+        <strong>Error!</strong> {{Snackbar}}
+        {% if link %} - <a href={{link}}> Link to it. </a> {% endif %}
       </div>
     {% endif %}
     {% endif %}

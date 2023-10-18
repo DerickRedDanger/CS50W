@@ -1,9 +1,8 @@
-Snackbar created, add it to every function on views.py,informing the user if their action was a success or failure and showing
-them a link to it's page if successfull
 
-def get_absolute_url for all models and add them to each model's page
 
-create a filter and short button for the all list to do in the index
+create a filter and sort button for the all list to do in the index
+
+create a windged to events,dailytask and listtodo that shows all of it's objects.
 
 event rework complete, need to create validations to ensure the specific repetitions and util
 are after the day of the even and not null.

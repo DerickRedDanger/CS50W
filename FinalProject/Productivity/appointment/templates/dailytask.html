@@ -170,6 +170,21 @@
     {{daily.errors.color}}
   </p>
 
+        <!-- Reset Button -->    
+        {% if id != 0 %}
+        <div id ='reset?'>
+          <input type="button" onclick="resett()" value="Reset"> <br>
+        &nbsp; &nbsp;
+        </div>
+
+      <div id = "reset" style="display:none">
+        <span> Are you sure you want to reset this form back to the orignal? </span> <br>
+        <input type="reset" onclick="cancel()" value="Reset"> 
+        &nbsp; &nbsp;
+        <input type="button" onclick="cancel()" value="Cancel"><br>
+      </div>
+    {% endif %} 
+      <!-- Reset Button --> 
 
     <input type="submit" value="Sumbit">
         </form>

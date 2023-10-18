@@ -104,13 +104,15 @@ leng=len(start)
 def index(request):
     x = datetime.now()
     print(x)
-    error = ""
+    snackbar=""
+    alert=""
+    link=""
     alltodo = models.ListToDo.objects.all()
     today = models.WhatToDoToday.objects.filter(day=x).order_by('start_time')
     print(today)
     
 
-    return render(request,"index.html",{"alltodo":alltodo,'today':today,"error":error,"start":start, "end":end,"leng":leng,"repeat_choices":repeat_choices,"priority_choices":priority_choices,})
+    return render(request,"index.html",{"Snackbar":snackbar, "alert":alert, "link":link,"alltodo":alltodo,'today':today,"start":start, "end":end,"leng":leng,"repeat_choices":repeat_choices,"priority_choices":priority_choices,})
 
 def calendar(request,year=None, month=None):
     if request.method == "GET":
@@ -152,7 +154,9 @@ def calendar(request,year=None, month=None):
         return HttpResponseRedirect(reverse("index"))
 
 def event(request,id):
-    error=""
+    snackbar=""
+    alert=""
+    link=""
     date = None
     start_time = None
     end_time = None
@@ -175,8 +179,12 @@ def event(request,id):
             event=forms.eventForm(request.POST)
         if event.is_valid():
             print("event is valid")
-            event.save()
-            event = forms.eventForm
+            form = event.save()
+            snackbar =f"The event '{form.title}' has been saved successfully" 
+            alert="success"
+            link=form.get_absolute_url()
+
+
 
             if id != 0:
                 event = forms.eventForm(instance = obj)
@@ -187,8 +195,10 @@ def event(request,id):
         # if event wasn't valid
         else:
             print("something went wrong")
-            error = "something went wrong"
-
+            title = request.POST['title']
+            snackbar =f"The event '{title}' wasn't valid - Check the errors warning at the beginning of the form for more information and directions" 
+            alert="alert"
+            
             date = request.POST['day']
             dateu = request.POST['repeatutil']
 
@@ -213,7 +223,7 @@ def event(request,id):
     # returns the html with the empty form is through GET or a correct POST
     # returns with the filled post if event wasn't valid to make it easier to fix.
     # return render(request, "forms.html",{"event":event,"start":start,"end":end,"error":error,"weekday":weekday,"repeat_choices":repeat_choices,"priority_choices":priority_choices,})
-    return render(request, "event.html",{"event":event,"id":id,"start_time":start_time,"end_time":end_time,"date":date,"dateu":dateu,"start":start,"end":end,"error":error,"weekday":weekday,"repeat_choices":repeat_choices,"priority_choices":priority_choices,})
+    return render(request, "event.html",{"Snackbar":snackbar, "alert":alert, "link":link, "event":event,"id":id,"start_time":start_time,"end_time":end_time,"date":date,"dateu":dateu,"start":start,"end":end,"weekday":weekday,"repeat_choices":repeat_choices,"priority_choices":priority_choices,})
 
     #if request.method == "GET":
      #   context={}
@@ -221,7 +231,10 @@ def event(request,id):
       #  context['form']=form
 
 def dailytask(request,id):
-
+        
+    snackbar=""
+    alert=""
+    link=""
 
     if request.method == "GET":
         if id != 0:
@@ -235,20 +248,30 @@ def dailytask(request,id):
         form=forms.DailyTaskForm(request.POST)
         if form.is_valid():
             print("Dailytask is valid")
-            form.save()
+            form = form.save()
+            snackbar =f"The daily task '{form.title}' has been saved successfully" 
+            alert="success"
+            link=form.get_absolute_url()
             form = forms.DailyTaskForm
-
-    snack=""
+        else:
+            title = request.POST['title']
+            snackbar =f"The daily task '{title}' wasn't valid - Check the errors warning at the beginning of the form for more information and directions" 
+            alert="alert"
             #if id == 0 :
             #    snack =f"The task {task.title} has been created"
             #else : 
             #    snack =f"The task {task.title} has been saved"
             
-    return render(request,"daily.html",{"form":form,"start":start,"end":end,
-                                            "repeat_choices":repeat_choices,"priority_choices":priority_choices,
-                                            "snack":snack,"id":id,})
+    return render(request,"daily.html",{"Snackbar":snackbar, "alert":alert, "link":link, 
+                                        "form":form,"start":start,"end":end,"repeat_choices":repeat_choices,
+                                        "priority_choices":priority_choices,"id":id,})
 
 def listtodo(request,id):
+
+    snackbar=""
+    alert=""
+    link=""
+
     print(f"todo id = {id}")
     if request.method == "GET":
         if id != 0:
@@ -266,7 +289,10 @@ def listtodo(request,id):
             form=forms.ListToDoForm(request.POST)
         if form.is_valid():
             print("ListToDo is valid")
-            form.save()
+            form = form.save()
+            snackbar =f"The event '{form.title}' has been saved successfully" 
+            alert="success"
+            link=form.get_absolute_url()
             form = forms.ListToDoForm
 
             if id != 0:
@@ -277,6 +303,9 @@ def listtodo(request,id):
                 form = forms.ListToDoForm(None) 
 
         else:
+            title = request.POST['title']
+            snackbar =f"The event '{title}' wasn't valid - Check the errors warning at the beginning of the form for more information and directions" 
+            alert="alert"
             print("'list to do' form is not valid")
     try: 
         if obj.deadline_date:
@@ -290,7 +319,7 @@ def listtodo(request,id):
     snack=""
 
 
-    return render(request,"todo.html",{"id":id,"snack":snack,"form":form,"repeat_choices":repeat_choices,"priority_choices":priority_choices,"deadline_date":deadline_date})
+    return render(request,"todo.html",{"Snackbar":snackbar, "alert":alert, "link":link,"id":id,"form":form,"repeat_choices":repeat_choices,"priority_choices":priority_choices,"deadline_date":deadline_date})
 
 def planner(request):
     x = datetime.now()

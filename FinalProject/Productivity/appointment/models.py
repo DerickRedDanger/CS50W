@@ -189,6 +189,7 @@ class Event(models.Model):
             "end_time": self.end_time,
             "title": self.title,
             "color": self.color,
+            "link":self.get_absolute_url(),
         }
 
 
@@ -291,7 +292,7 @@ class Event(models.Model):
                         f'There is an overlap with a repeating event: {repevent.original.title} on {repevent.original.day}, {repevent.original.start_time} - {repevent.original.end_time})')
  
     def get_absolute_url(self):
-        return f"/event/{self.id}/"
+        return f"/event/{self.id}"
 
     def __str__(self):
         return f"{self.title}"
@@ -337,6 +338,7 @@ class EventRepetiton(models.Model):
             "end_time": self.end_time,
             "title": self.original.title,
             "color": self.original.color,
+            "link":self.get_absolute_url(),
         }
 
     def clean(self):
@@ -356,7 +358,7 @@ class EventRepetiton(models.Model):
                         f'There is an overlap with a repeating event: {repevent.original.title} on {repevent.day}, {repevent.start_time} - {repevent.end_time})')
 
     def get_absolute_url(self):
-        return f"{self.original.get_absolute_url}/"
+        return f"{self.original.get_absolute_url}"
 
     def __str__(self):
         return f"{self.original.title} - R - {self.day}"
@@ -446,6 +448,7 @@ class DailyTask(models.Model):
             "end_time": self.end_time,
             "title": self.title,
             "color": self.color,
+            "link":self.get_absolute_url(),
             
         }
 
@@ -546,7 +549,7 @@ class DailyTask(models.Model):
                     raise ValidationError(f"There is an overlap with another task: {task.title}, {task.start_time} - {task.end_time}) on {weekdays}")
 
     def get_absolute_url(self):
-        return f"/dailytask/{self.id}/"
+        return f"/dailytask/{self.id}"
 
     def __str__(self):
         return f"{self.title}"
@@ -706,6 +709,7 @@ class ListToDo(models.Model):
             "progress": self.progress,
             "notes": self.notes,
             "color": self.color,
+            "link":self.get_absolute_url(),
         }
     
     def urgency_time_calculation(self,number,time):
@@ -826,7 +830,7 @@ class ListToDo(models.Model):
         # to the function ListToDo_Steps_clear
 
     def get_absolute_url(self):
-        return f"/listtodo/{self.id}/"
+        return f"/listtodo/{self.id}"
 
     def __str__(self):
 
@@ -895,9 +899,10 @@ class WhatToDoToday(models.Model):
         return {
             "id": self.id,
             "start_time": self.start_time,
-            "end_time": self.end_time,
+            "end_time": self.end_time,       
             "title": self.title,
             "color": self.color,
+        # "link":self.get_absolute_url(), ------ still have to create this model's page
         }
 
     def __str__(self):
