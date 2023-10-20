@@ -7,6 +7,8 @@
 {% block style%}
   <style>
     
+
+    
     </style> 
 {% endblock%}
 {% block content %}
@@ -21,7 +23,7 @@
   <div >Some text some message..</div>
 
 <!-- Snackbar -->
-<span style="color:red" > remove the below at the end of the project<span><br>
+<span style="color:red" > remove the below at the end of the project</span><br>
 <button onclick="Snackbar()">Show Snackbar</button><br>
 snackbar = {{Snackbar}}<br>
 alert = {{alert}}<br>
@@ -46,12 +48,35 @@ alert = {{alert}}<br>
     <span onclick="Close()" class="closebtn">&times;</span>  
     <strong>Danger!</strong> {{Snackbar}}
   </div>
+
 {% endif %}
 {% endif %}
 
 
 
+ <!-- Sidenav -->
+ <div id="main">
+  <span style="font-size:30px;cursor:pointer" onclick="openLNav()">&#9776; open</span> <br>
+  ------------------------------------------------------------------------------------------------------------------------
+  <span style="font-size:30px;cursor:pointer" onclick="openRNav()">&#9776; open</span> <br>
+  </div>
+  <!-- L Sidenav -->
+  <div id="LSidenav" class="LSidenav">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeLNav()">&times;</a>
+    <a href="#">About</a>
+    <a href="#">Services</a>
+    <a href="#">Clients</a>
+    <a href="#">Contact</a>
+  </div>
 
+  <!-- R Sidenav -->
+  <div id="RSidenav" class="RSidenav">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeRNav()">&times;</a>
+    <a href="#">About</a>
+    <a href="#">Services</a>
+    <a href="#">Clients</a>
+    <a href="#">Contact</a>
+  </div>
 
 
 

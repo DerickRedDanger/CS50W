@@ -1,4 +1,5 @@
-
+Add the sidenav to all views, namely a right one that shows all objects to event/task/listtodo
+and modify the all todo from the index into a left sidenav
 
 create a filter and sort button for the all list to do in the index
 

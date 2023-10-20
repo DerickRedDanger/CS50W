@@ -10,7 +10,7 @@
     z-index: 1;
     left: 25%;
     right: 25%;
-    bottom: 30px;
+    bottom: 5%;
     font-size: 17px;
   }
   
@@ -24,12 +24,12 @@
 
   @-webkit-keyframes fadein {
     from {bottom: 0; opacity: 0;} 
-    to {bottom: 30px; opacity: 1;}
+    to {bottom: 5%; opacity: 1;}
   }
   
   @keyframes fadein {
     from {bottom: 0; opacity: 0;}
-    to {bottom: 30px; opacity: 1;}
+    to {bottom: 5%px; opacity: 1;}
   }
 
   /* --- Snackbar - fadeout animation ---*/
@@ -42,12 +42,12 @@
   
   
   @-webkit-keyframes fadeout {
-    from {bottom: 30px; opacity: 1;} 
+    from {bottom: 5%; opacity: 1;} 
     to {bottom: 0; opacity: 0;}
   }
   
   @keyframes fadeout {
-    from {bottom: 30px; opacity: 1;}
+    from {bottom: 5%; opacity: 1;}
     to {bottom: 0; opacity: 0;}
   }
 
@@ -79,6 +79,95 @@
     color: black;
   }
 
+/* --- SideNav - Left side --- */
 
+.LSidenav {
+  height: 100%;
+  width: 0;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  background-color: #111;
+  overflow-x: hidden;
+  transition: 0.5s;
+  padding-top: 60px;
+}
+
+.LSidenav a {
+  padding: 8px 8px 8px 32px;
+  text-decoration: none;
+  font-size: 25px;
+  color: #818181;
+  display: block;
+  transition: 0.3s;
+}
+
+.LSidenav a:hover {
+  color: #f1f1f1;
+}
+
+.LSidenav .closebtn {
+  position: absolute;
+  top: 0;
+  right: 25px;
+  font-size: 36px;
+  margin-left: 50px;
+}
+
+/* --- SideNav - Left side - button --- */
+.LSOpenBtn {
+  transition: .5s;
+  padding: 16px;
+  position: fixed;
+  z-index: 1;
+  top: 40%;
+  right: 0;
+  line-height: 1; 
+  background-color: #111;
+  color: #818181;
+
+}
+
+/* --- SideNav - right side --- */
+.RSidenav {
+  height: 100%;
+  width: 0;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  right: 0;
+  background-color: #111;
+  overflow-x: hidden;
+  transition: 0.5s;
+  padding-top: 60px;
+}
+
+.RSidenav a {
+  padding: 8px 8px 8px 32px;
+  text-decoration: none;
+  font-size: 25px;
+  color: #818181;
+  display: block;
+  transition: 0.3s;
+}
+
+.RSidenav a:hover {
+  color: #f1f1f1;
+}
+
+.RSidenav .closebtn {
+  position: absolute;
+  top: 0;
+  right: 25px;
+  font-size: 36px;
+  margin-left: 50px;
+}
+
+
+#main {
+  transition: .5s;
+  padding: 16px;
+}
   /* Use Ctr + f5 to refresh the statics files*/
  

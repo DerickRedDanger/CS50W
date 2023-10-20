@@ -1,6 +1,7 @@
 
 document.addEventListener("DOMContentLoaded",Snackbar());
 
+// Snackbar
 function Snackbar() {
   var x = document.getElementById("Snackbar");
   console.log(x)
@@ -17,6 +18,7 @@ function Close(){
   setTimeout(function(){ x.style.display = "none"; }, 500);
 };
 
+// Reset Button
 function resett(){
   var x = document.getElementById("reset")
   var y = document.getElementById("reset?")
@@ -35,6 +37,35 @@ function cancel(){
   console.log(x)
   console.log(y)
 };
+
+// Sidenav - left
+
+function openLNav() {
+  document.getElementById("LSidenav").style.width = "250px";
+  document.getElementById("LSOpenBtn").style.marginLeft = "249px";
+  document.getElementById("main").style.marginLeft = "249px";
+}
+
+function closeLNav() {
+  document.getElementById("LSidenav").style.width = "0";
+  document.getElementById("LSOpenBtn").style.marginLeft= "0";
+  document.getElementById("main").style.marginLeft= "0";
+}
+
+// Sidenav - right
+
+function openRNav() {
+  document.getElementById("RSidenav").style.width = "250px";
+  document.getElementById("LSOpenBtn").style.marginRight = "249px";
+  document.getElementById("main").style.marginRight = "249px";
+}
+
+function closeRNav() {
+  document.getElementById("RSidenav").style.width = "0";
+  document.getElementById("LSOpenBtn").style.marginRight= "0";
+  document.getElementById("main").style.marginRight= "0";
+}
+
 
 /*
 
