@@ -1,6 +1,11 @@
 from . import models
 from datetime import datetime,timedelta
 
+# ---------------------- Warning --------------------------
+# When add/removing "rows" to the model's field, make sure to wipe this file clear before migrating
+# and then using Ctr + Z to restore it, because theses auto function will cause errors on the creation
+# of fields during migrations
+# Also need to delete the auto functions on view before migrating and Ctr + Z after it to restore them
 
 #-------------------- Models.Listtodo auto urgency update ---------------------
 # Function made to update all Listtodo whose Auto urgency update was enabled.
@@ -73,7 +78,7 @@ def event_forever_repeat_creation(now):
 
     print("all good till here 3")
 
-    print(len(All_Forever_Event))
+
 
     print("all good till here 4")
 

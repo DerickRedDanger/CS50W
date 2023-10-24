@@ -27,7 +27,7 @@ for hour in hours:
 class eventForm(forms.ModelForm):
     class Meta:
         model = models.Event
-        fields = ['title','day','start_time','end_time','description','notes','importance','repeat','repeat_wkd','repeatd','repeatutil','repeatnumber','color',
+        fields = ['title','day','start_time','end_time','short_description','description','notes','importance','repeat','repeat_wkd','repeatd','repeatutil','repeatnumber','color',
                 'monday','tuesday','wednesday','thursday','friday','saturday','sunday',]
         widgets = {
             'day' : forms.DateInput(attrs = {'placeholder': 'Year-Month-Day'}),
@@ -35,6 +35,7 @@ class eventForm(forms.ModelForm):
             #'end_time' : forms.TimeInput(attrs = {'placeholder': 'Hour:Minute'}),
             'start_time': forms.Select(choices=start_choices),
             'end_time': forms.Select(choices=end_choices),
+            'short_description':forms.Textarea(attrs={'cols': 90, 'rows': 3}),
             'description': forms.Textarea(attrs={'cols': 90, 'rows': 5}),
             'notes':forms.Textarea(attrs={'cols': 90, 'rows': 3}),
         }
@@ -100,7 +101,7 @@ class eventForm(forms.ModelForm):
         if (repeat == "day" or repeat == "wek" or repeat == "wkd") and repeatd == "frv":
             self.add_error("repeatd", "Don't use repeat forever with daily/weekly/specific weekdays. In that case, use daily task instead")
 
-        if repeat != "nvr" and repeatd == "spc" and (type(repeatnumber) is not str or repeatnumber <= 0):
+        if repeat != "nvr" and repeatd == "spc" and (type(repeatnumber) is not int or repeatnumber <= 0):
             self.add_error("repeatnumber", "If set to repeat a specific amount of time, the number of repetitions must be higher than 0")
 
         if repeat != "nvr" and repeatd == "utl" and repeatutil <= Day:

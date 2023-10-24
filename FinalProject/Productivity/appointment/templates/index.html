@@ -484,7 +484,7 @@
   <main class="d-flex flex-nowrap">
     
 <!-- First Column -->
-   <div label="alltodo" class="d-flex flex-column flex-shrink-0 p-3 text-bg-dark" class="d-flex flex-column flex-shrink-0 p-3 text-bg-dark" style="width: 350px; height: 700px; overflow-y: auto;">
+   <div label="alltodo" class="d-flex flex-column flex-shrink-0 p-3 text-bg-dark" style="width: 350px; height: 700px; overflow-y: auto;">
   {% for item in alltodo %}
       <div label="item">
 
@@ -497,28 +497,28 @@
   for the sake of making the daily creation of the timebox faster-->
 
   <!-- conditionals for ungency-->
-    {% if item.urgency == "vh" and item.progress != "dn"%} <span class="glyphicon glyphicon-time" style="color:red"></span>&nbsp;
-    {% elif item.urgency == "h" and item.progress != "dn"%} <span class="glyphicon glyphicon-time" style="color:orange"></span>&nbsp;
-    {% elif item.urgency == "m" and item.progress != "dn"%} <span class="glyphicon glyphicon-time" style="color:green"></span>&nbsp;
-    {% elif item.urgency == "l" and item.progress != "dn"%} <span class="glyphicon glyphicon-time" style="color:blue"></span>&nbsp;
-    {% elif item.urgency == "vl" and item.progress != "dn"%} <span class="glyphicon glyphicon-time" style="color:LightBlue"></span>&nbsp;{% endif %}
+    {% if item.urgency == "5" and item.progress != "dn"%} <span class="glyphicon glyphicon-time" style="color:red"></span>&nbsp;
+    {% elif item.urgency == "4" and item.progress != "dn"%} <span class="glyphicon glyphicon-time" style="color:orange"></span>&nbsp;
+    {% elif item.urgency == "3" and item.progress != "dn"%} <span class="glyphicon glyphicon-time" style="color:green"></span>&nbsp;
+    {% elif item.urgency == "2" and item.progress != "dn"%} <span class="glyphicon glyphicon-time" style="color:blue"></span>&nbsp;
+    {% elif item.urgency == "1" and item.progress != "dn"%} <span class="glyphicon glyphicon-time" style="color:LightBlue"></span>&nbsp;{% endif %}
 
   <!-- conditionals for importance-->
-    {% if item.importance == "vh" and item.progress != "dn"%} <span class="glyphicon glyphicon-alert" style="color:red"></span>&nbsp;
-    {% elif item.importance == "h" and item.progress != "dn"%} <span class="glyphicon glyphicon-alert" style="color:orange"></span>&nbsp;
-    {% elif item.importance == "m" and item.progress != "dn"%} <span class="glyphicon glyphicon-alert" style="color:green"></span> &nbsp;
-    {% elif item.importance == "l" and item.progress != "dn"%} <span class="glyphicon glyphicon-alert" style="color: blue"></span>&nbsp;
-    {% elif item.importance == "vl" and item.progress != "dn"%} <span class="glyphicon glyphicon-alert" style="color: LightBlue"></span>&nbsp;
-    {% elif item.importance == "cr" and item.progress != "dn"%} <span class="glyphicon glyphicon-question-sign" style="color: orange"></span>&nbsp;{% endif %}
+    {% if item.importance == "5" and item.progress != "dn"%} <span class="glyphicon glyphicon-alert" style="color:red"></span>&nbsp;
+    {% elif item.importance == "4" and item.progress != "dn"%} <span class="glyphicon glyphicon-alert" style="color:orange"></span>&nbsp;
+    {% elif item.importance == "2" and item.progress != "dn"%} <span class="glyphicon glyphicon-alert" style="color:green"></span> &nbsp;
+    {% elif item.importance == "1" and item.progress != "dn"%} <span class="glyphicon glyphicon-alert" style="color: blue"></span>&nbsp;
+    {% elif item.importance == "0" and item.progress != "dn"%} <span class="glyphicon glyphicon-alert" style="color: LightBlue"></span>&nbsp;
+    {% elif item.importance == "3" and item.progress != "dn"%} <span class="glyphicon glyphicon-question-sign" style="color: orange"></span>&nbsp;{% endif %}
   
   <!-- conditionals for duration-->
-    {% if item.duration == "mi" and item.progress != "dn"%} <span class="glyphicon glyphicon-apple"> &nbsp;</span>
-    {% elif item.duration == "hs" and item.progress != "dn"%} <span class="glyphicon glyphicon-step-forward">&nbsp;</span>
-    {% elif item.duration == "ds" and item.progress != "dn"%} <span class="glyphicon glyphicon-fast-forward">&nbsp;</span>
-    {% elif item.duration == "wk" and item.progress != "dn"%} <span class="glyphicon glyphicon-forward">&nbsp;</span>
-    {% elif item.duration == "mn" and item.progress != "dn"%} <span class="glyphicon glyphicon-play">&nbsp;</span>
-    {% elif item.duration == "ys" and item.progress != "dn"%} <span class="glyphicon glyphicon-cog">&nbsp;</span>
-    {% elif item.duration == "pe" and item.progress != "dn"%} <span class="glyphicon glyphicon-retweet">&nbsp;</span>{% endif %}
+    {% if item.duration == "7" and item.progress != "dn"%} <span class="glyphicon glyphicon-apple"> &nbsp;</span>
+    {% elif item.duration == "6" and item.progress != "dn"%} <span class="glyphicon glyphicon-step-forward">&nbsp;</span>
+    {% elif item.duration == "5" and item.progress != "dn"%} <span class="glyphicon glyphicon-fast-forward">&nbsp;</span>
+    {% elif item.duration == "4" and item.progress != "dn"%} <span class="glyphicon glyphicon-forward">&nbsp;</span>
+    {% elif item.duration == "3" and item.progress != "dn"%} <span class="glyphicon glyphicon-play">&nbsp;</span>
+    {% elif item.duration == "2" and item.progress != "dn"%} <span class="glyphicon glyphicon-cog">&nbsp;</span>
+    {% elif item.duration == "1" and item.progress != "dn"%} <span class="glyphicon glyphicon-retweet">&nbsp;</span>{% endif %}
   <!-- conditionals for progress-->
     {% if item.progress == "dn"%} <span class="glyphicon glyphicon-ok" style="color: green"> </span> 
     {% elif item.progress == "nt"%} <span class="glyphicon glyphicon-off"> </span>  

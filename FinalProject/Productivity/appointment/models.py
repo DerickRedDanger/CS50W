@@ -1,5 +1,4 @@
 from __future__ import unicode_literals
-from django.contrib.auth.models import AbstractUser
 from django.db import models
 from datetime import datetime,timedelta,time
 from django.core.exceptions import ValidationError
@@ -44,30 +43,31 @@ print(f"start_choices = {start_choices}")
 print(f"end_choices = {end_choices}")
 
 # Choices for Urgency/Importance
-veryhight="vh"
-high="h"
-medium="m"
-low="l"
-verylow="vl"
-circumstantial="cr"
+veryhight="5"
+high="4"
+circumstantial="3"
+medium="2"
+low="1"
+verylow="0"
+
 priority_choices = [
         (veryhight, 'Essential'),
         (high, 'important'),
+        (circumstantial,'circumstantial'),
         (medium, 'desirable'),
         (low, 'Curiosity/interest'),
         (verylow,'trivial'),
-        (circumstantial,'circumstantial')
     ]
 
 
 
 
 
-veryclose="vh"
-close="h"
-medium="m"
-far="l"
-veryfar = "vl"
+veryclose="5"
+close="4"
+medium="3"
+far="2"
+veryfar = "1"
 urgency_choices = [
     (veryclose, 'Very Close'),
     (close, 'close'),
@@ -111,10 +111,11 @@ class Event(models.Model):
     day = models.DateField(u'Day of the event', help_text=u"Format: year-month-day",)
     start_time = models.TimeField(u'Starting time',choices= start_choices)
     end_time = models.TimeField(u'Ending time', choices = end_choices)
+    short_description = models.TextField(u"A quick description of the Event",blank=True, null=True)
     description = models.TextField(u"Event's description",blank=True, null=True)
     notes = models.TextField(u'Textual Notes', help_text=u'Textual Notes', blank=True, null=True)
     
-    importance = models.CharField(u"How vital is this event ? will It bring great benefits if done? Great demerits if not done?",
+    importance = models.CharField(u"How vital is this event? will It bring great benefits if done? Great demerits if not done?",
         max_length=2,
         choices= priority_choices,
         default=medium,
@@ -256,7 +257,9 @@ class Event(models.Model):
         if (repeat == "day" or repeat == "wek" or repeatd == "wkd") and repeatd == "frv":
             raise ValidationError ("Don't use repeat forever with daily/weekly/specific weekdays. In that case, use daily task instead")
 
-        if repeat != "nvr" and repeatd == "spc" and (type(repeatnumber) is not str or repeatnumber <= 0):
+        if repeat != "nvr" and repeatd == "spc" and (type(repeatnumber) is not int or repeatnumber <= 0):
+            print(f" repeat = {repeat}, repeatt = {repeatd}")
+            print(f"repeat number value = {repeatnumber} and type = {type(repeatnumber)} ")
             raise ValidationError ( "If set to repeat a specific amount of time, the number of repetitions must be higher than 0")
 
         if repeat != "nvr" and repeatd == "utl" and repeatutil <= Day:
@@ -568,13 +571,13 @@ class ListToDo(models.Model):
         )
     
     #Duration choices
-    minutes="mi"
-    hours="hs"
-    days="ds"
-    weeks="wk"
-    months="mn"
-    years="ys"
-    perpetual="Pe"
+    minutes="7"
+    hours="6"
+    days="5"
+    weeks="4"
+    months="3"
+    years="2"
+    perpetual="1"
     duration_choices = [
         (minutes, "Minutes"),
         (hours, "Hours"),
@@ -858,11 +861,11 @@ m2m_changed.connect(ListToDo_step_to_clearer, sender=ListToDo.step_to.through)
 class WhatToDoToday(models.Model):
 
     # need_to_do's choices:
-    Hv="Hv" # I need to do today / Piority and rewarding things/ things that can't wait
-    Dn="Dn" # I don't need to do today / Piority but not as rewarding and can wait compared to the others
-    Bw="Bw" # I need to do and will bring great rewards/ The most complex and most rewarding
-    Dl="Dl" # Needs to be done, but i don't need to do it myself
-    it="it" # if enough  time, task that aren't priority, but don't take much effort or long time, 
+    Bw="5" # I need to do today and will bring great rewards/ The most complex and most rewarding
+    Hv="4" # I need to do today / Piority and rewarding things/ things that can't wait
+    Dn="3" # I don't need to do today / Piority but not as rewarding and can wait compared to the others
+    Dl="2" # Needs to be done, but i don't need to do it myself
+    it="1" # if enough  time, task that aren't priority, but don't take much effort or long time, 
     # thus can be done in low production moments, but NOT during times of rest
     need_choices = [
         (Hv, 'Have to do today'),

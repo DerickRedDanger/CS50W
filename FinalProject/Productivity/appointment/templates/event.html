@@ -1,7 +1,112 @@
 {% extends 'base_calendar.html' %}
 
 {% block script%}
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+
+
+<style>
+  .list{
+    line-height: 100%;
+    padding: 20px;
+    margin: 5px;
+    border: 3px solid #1a1adb;
+}
+</style>
+
+
+
+
 <script>
+
+
+
+
+
+// on click event handler for page buttons
+document.addEventListener('click', event =>{
+  const element = event.target;
+
+  // If click on description
+    if (element.className == "desciption"){
+      // get the id of the popup
+      let id = element.dataset.id;
+      console.log(id);
+      // shows/hides the description
+      let description = document.getElementById("description"+id);
+      console.log(description);
+      if (description.style.display=="block" ){
+        description.style.display = "none";
+      } else {
+        description.style.display = "block"
+      };
+    };
+  //
+  // If click on note
+    if (element.className == "notes"){
+      // get the id of the popup
+      let id = element.dataset.id;
+      console.log(id);
+      // shows/hides the notes
+      let notes = document.getElementById("notes"+id);
+      console.log(notes);
+      if (notes.style.display=="block" ){
+        notes.style.display = "none";
+      } else {
+        notes.style.display = "block"
+      }
+      };
+  //
+  // If click on more
+    if (element.className == "more"){
+      // get the id of the popup
+      let id = element.dataset.id;
+      console.log("id")
+      console.log(id);
+      let des = document.getElementById("des"+id);
+      console.log("des")
+      console.log(des);
+      let not = document.getElementById("not"+id);
+      console.log("not")
+      console.log(not);
+      let notes = document.getElementById("notes"+id);
+      let description = document.getElementById("description"+id);
+      // shows/hides the description
+      if (element.value == "More info"){
+        element.value = "Less info";
+        try{
+          des.style.display = "block";
+        }catch{}
+        try{
+          not.style.display = "block";
+        }catch{}
+        
+        
+      } else if (element.value == "Less info") {
+        element.value = "More info";
+        try{
+          des.style.display = "none";
+        }catch{}
+        try{
+          not.style.display = "none";
+        }catch{}
+        try{
+          description.style.display = "none";
+        }catch{}
+        try{
+          notes.style.display = "none"
+        }catch{}
+      };
+    };
+  //
+});
+
+
+
+
+
 
   // Variables to cheking whether the form is incomplete
   // thus if submit should be disabled or not
@@ -344,6 +449,14 @@ function Time() {
 </p>
 
 <p>
+  {% if event.errors.short_description %}
+    {{event.errors.short_description}}<br>
+  {% endif %}
+  {{event.short_description.label_tag}}<br>
+  {{event.short_description}}
+</p>
+
+<p>
   {% if event.errors.description %}
     {{event.errors.description}}<br>
   {% endif %}
@@ -456,6 +569,7 @@ function Time() {
         <input type="reset" onclick="cancel()" value="Reset"> 
         &nbsp; &nbsp;
         <input type="button" onclick="cancel()" value="Cancel"><br>
+        
       </div>
     {% endif %} 
       <!-- Reset Button --> 
@@ -464,20 +578,49 @@ function Time() {
   <input id="submit" type="submit" value="Sumbit">
       </form>
 
+ <!-- Delete Button-->
+ {% if id != 0 %}
+ <button type="button" class="btn btn-danger"><a href="delete/event/{{ id }}" style="color:white">Delete</a></button>
+ {% endif %} 
 
- <!-- Sidenav -->
- <div id="LSOpenBtn" class="LSOpenBtn">
- <span style="font-size:30px;cursor:pointer" onclick="openRNav()">o<br>p<br>e<br>n</span> <br>
+ <!-- Right Sidenav - button -->
+ <div id="RSOpenBtn" class="RSOpenBtn" style="font-size:30px;cursor:pointer" data-open ='1' onclick="openRNav()">
+ o<br>p<br>e<br>n
   </div>
 
-     <!-- R Sidenav -->
-  <div id="RSidenav" class="RSidenav">
+     <!-- Right Sidenav -->
+  <div id="RSidenav" class="RSidenav ">
     <a href="javascript:void(0)" class="closebtn" onclick="closeRNav()">&times;</a>
-    <a href="#">About</a>
-    <a href="#">Services</a>
-    <a href="#">Clients</a>
-    <a href="#">Contact</a>
-  </div> 
+    {% for object in events%}
 
+    <div class="list" data-importance ="{{object.importance}}" data-year = "{{object.day.year}}" data-month = "{{object.day.month}}" data-day ="{{object.day.day}}"><a href="{{object.get_absolute_url}}"> {{object.title}}</a>
+     <br>{{object.day}} - {{object.start_time}} - {{object.end_time}} -
+    
+    {% if object.importance == "5" %} <span class="glyphicon glyphicon-alert" style="color:red"></span>&nbsp;<br>
+    {% elif object.importance == "4" %} <span class="glyphicon glyphicon-alert" style="color:orange"></span>&nbsp;<br>
+    {% elif object.importance == "2" %} <span class="glyphicon glyphicon-alert" style="color:green"></span> &nbsp;<br>
+    {% elif object.importance == "1" %} <span class="glyphicon glyphicon-alert" style="color: blue"></span>&nbsp;<br>
+    {% elif object.importance == "0" %} <span class="glyphicon glyphicon-alert" style="color: LightBlue"></span>&nbsp;<br>
+    {% elif object.importance == "3" %} <span class="glyphicon glyphicon-question-sign" style="color: orange"></span>&nbsp;<br>{% endif %}
+
+    {% if object.short_description %}
+    Short description: {{object.short_description}} <br>
+    {% endif %}
+
+    {% if object.description or object.notes %}
+    <input type="button" class = "more" id =' more{{object.id}}' style="background-color:grey;" data-id ='{{object.id}}' value="More info">
+    {% if object.description %}
+    <input type="button" class = "desciption" id="des{{object.id}}" style="background-color:grey;display:none;" data-id ='{{object.id}}' value="Description:" > 
+    <span style="display:none" id="description{{object.id}}"><br>{{object.description}}<br></span> 
+    {% endif %}
+    {% if object.notes%}
+    <input type="button" class = "notes" id = "not{{object.id}}" style="background-color:grey;display:none;" data-id ='{{object.id}}' value="Notes:" > 
+    <span style="display:none" id="notes{{object.id}}"> <br> {{object.notes}} <br></span>
+    {% endif %}
+    {% endif %}
+  </div>
+
+    {% endfor %}
+  </div> 
 
       {% endblock %}

@@ -41,9 +41,21 @@ function cancel(){
 // Sidenav - left
 
 function openLNav() {
-  document.getElementById("LSidenav").style.width = "250px";
-  document.getElementById("LSOpenBtn").style.marginLeft = "249px";
-  document.getElementById("main").style.marginLeft = "249px";
+  button = document.getElementById("LSOpenBtn")
+  if (button.value ="o<br>p<br>e<br>n"){
+  document.getElementById("LSidenav").style.width = "450px";
+  button.style.marginLeft = "449px";
+  button.value="c<br>l<br>o<br>s<br>e"
+  document.getElementById("main").style.marginLeft = "449px";
+  
+
+  } else if (button.value ="c<br>l<br>o<br>s<br>e"){
+  document.getElementById("LSidenav").style.width = "0";
+  button.style.marginLeft= "0";
+  button.value ="o<br>p<br>e<br>n"
+  document.getElementById("main").style.marginLeft= "0";
+  
+  }
 }
 
 function closeLNav() {
@@ -55,9 +67,27 @@ function closeLNav() {
 // Sidenav - right
 
 function openRNav() {
-  document.getElementById("RSidenav").style.width = "250px";
-  document.getElementById("LSOpenBtn").style.marginRight = "249px";
-  document.getElementById("main").style.marginRight = "249px";
+  button = document.getElementById("RSOpenBtn");
+  console.log(button);
+  console.log(button.innerHTML);
+
+  if (button.dataset.open == "1"){
+  console.log("open -> close");
+  document.getElementById("RSidenav").style.width = "450px";
+  button.style.marginRight = "449px";
+  button.innerHTML="c<br>l<br>o<br>s<br>e";
+  button.dataset.open = "0"
+  document.getElementById("main").style.marginRight = "449px";
+  
+  } else if (button.dataset.open == "0"){
+  console.log("close -> open");
+  document.getElementById("RSidenav").style.width = "0";
+  button.style.marginRight= "0";
+  button.innerHTML ="o<br>p<br>e<br>n";
+  button.dataset.open = "1"
+  document.getElementById("main").style.marginRight= "0";
+  
+  }
 }
 
 function closeRNav() {

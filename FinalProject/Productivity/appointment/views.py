@@ -154,6 +154,7 @@ def calendar(request,year=None, month=None):
         return HttpResponseRedirect(reverse("index"))
 
 def event(request,id):
+    events = models.Event.objects.all().order_by('-day','start_time','end_time')
     snackbar=""
     alert=""
     link=""
@@ -223,7 +224,7 @@ def event(request,id):
     # returns the html with the empty form is through GET or a correct POST
     # returns with the filled post if event wasn't valid to make it easier to fix.
     # return render(request, "forms.html",{"event":event,"start":start,"end":end,"error":error,"weekday":weekday,"repeat_choices":repeat_choices,"priority_choices":priority_choices,})
-    return render(request, "event.html",{"Snackbar":snackbar, "alert":alert, "link":link, "event":event,"id":id,"start_time":start_time,"end_time":end_time,"date":date,"dateu":dateu,"start":start,"end":end,"weekday":weekday,"repeat_choices":repeat_choices,"priority_choices":priority_choices,})
+    return render(request, "event.html",{"events":events,"Snackbar":snackbar, "alert":alert, "link":link, "event":event,"id":id,"start_time":start_time,"end_time":end_time,"date":date,"dateu":dateu,"start":start,"end":end,"weekday":weekday,"repeat_choices":repeat_choices,"priority_choices":priority_choices,})
 
     #if request.method == "GET":
      #   context={}
