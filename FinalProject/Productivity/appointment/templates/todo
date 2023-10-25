@@ -1,5 +1,14 @@
+create a search function for the sidebar in the test. 
+maybe create a sort function that sort two datasets at once
+
 Add the sidenav to all views, namely a right one that shows all objects to event/task/listtodo
 and modify the all todo from the index into a left sidenav
+
+on the sidenav of the dailytask, create a mini planner that shows all dailytask of the weak on their
+time frame in the planner
+
+Add a active/inactive to model.events (and possibly to others) to differenciate events that already passed
+(if it doesn't have repetitions or if the last repetition already passed) from the ones yet to come.
 
 create a filter and sort button for the all list to do in the index
 
@@ -8,7 +17,6 @@ create a windged to events,dailytask and listtodo that shows all of it's objects
 event rework complete, need to create validations to ensure the specific repetitions and util
 are after the day of the even and not null.
 
-add a reset buttom when editing a created event/task
 
 
 

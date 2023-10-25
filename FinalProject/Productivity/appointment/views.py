@@ -446,8 +446,9 @@ def check_overlap( fixed_start, fixed_end, new_start, new_end):
 def test(request):
     Snackbar = "This is a success"
     alert = "success"
+    events = models.Event.objects.all().order_by('-day','start_time','end_time')
 
-    return render(request, "test.html",{"Snackbar":Snackbar, "alert":alert})
+    return render(request, "test.html",{"events":events,"Snackbar":Snackbar, "alert":alert})
 
 def event_outdated(request,id):
     error=request.POST or None

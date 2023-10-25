@@ -593,7 +593,9 @@ function Time() {
     <a href="javascript:void(0)" class="closebtn" onclick="closeRNav()">&times;</a>
     {% for object in events%}
 
-    <div class="list" data-importance ="{{object.importance}}" data-year = "{{object.day.year}}" data-month = "{{object.day.month}}" data-day ="{{object.day.day}}"><a href="{{object.get_absolute_url}}"> {{object.title}}</a>
+    <div class="list" data-importance ="{{object.importance}}" data-year = "{{object.day.year}}"
+     data-month = "{{object.day.month}}" data-day ="{{object.day.day}}"><a href="{{object.get_absolute_url}}">
+     {{object.title}}</a>
      <br>{{object.day}} - {{object.start_time}} - {{object.end_time}} -
     
     {% if object.importance == "5" %} <span class="glyphicon glyphicon-alert" style="color:red"></span>&nbsp;<br>

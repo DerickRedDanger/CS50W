@@ -52,34 +52,204 @@ alert = {{alert}}<br>
 {% endif %}
 {% endif %}
 
+<!-- Right Sidenav - button -->
+<div id="RSOpenBtn" class="RSOpenBtn" style="font-size:30px;cursor:pointer" data-open ='1' onclick="openRNav()">
+  o<br>p<br>e<br>n
+   </div>
+ 
+      <!-- Right Sidenav -->
+   <div id="RSidenav" class="RSidenav ">
+    {% for object in events%}
 
+    <div class="list" data-importance ="{{object.importance}}" data-year = "{{object.day.year}}"
+     data-month = "{{object.day.month}}" data-day ="{{object.day.day}}"><a href="{{object.get_absolute_url}}">
+     {{object.title}}</a>
+     <br>{{object.day}} - {{object.start_time}} - {{object.end_time}} -
+    
+    {% if object.importance == "5" %} <span class="glyphicon glyphicon-alert" style="color:red"></span>&nbsp;<br>
+    {% elif object.importance == "4" %} <span class="glyphicon glyphicon-alert" style="color:orange"></span>&nbsp;<br>
+    {% elif object.importance == "2" %} <span class="glyphicon glyphicon-alert" style="color:green"></span> &nbsp;<br>
+    {% elif object.importance == "1" %} <span class="glyphicon glyphicon-alert" style="color: blue"></span>&nbsp;<br>
+    {% elif object.importance == "0" %} <span class="glyphicon glyphicon-alert" style="color: LightBlue"></span>&nbsp;<br>
+    {% elif object.importance == "3" %} <span class="glyphicon glyphicon-question-sign" style="color: orange"></span>&nbsp;<br>{% endif %}
 
- <!-- Sidenav -->
- <div id="main">
-  <span style="font-size:30px;cursor:pointer" onclick="openLNav()">&#9776; open</span> <br>
-  ------------------------------------------------------------------------------------------------------------------------
-  <span style="font-size:30px;cursor:pointer" onclick="openRNav()">&#9776; open</span> <br>
+    {% if object.short_description %}
+    Short description: {{object.short_description}} <br>
+    {% endif %}
+
+    {% if object.description or object.notes %}
+    <input type="button" class = "more" id =' more{{object.id}}' style="background-color:grey;" data-id ='{{object.id}}' value="More info">
+    {% if object.description %}
+    <input type="button" class = "desciption" id="des{{object.id}}" style="background-color:grey;display:none;" data-id ='{{object.id}}' value="Description:" > 
+    <span style="display:none" id="description{{object.id}}"><br>{{object.description}}<br></span> 
+    {% endif %}
+    {% if object.notes%}
+    <input type="button" class = "notes" id = "not{{object.id}}" style="background-color:grey;display:none;" data-id ='{{object.id}}' value="Notes:" > 
+    <span style="display:none" id="notes{{object.id}}"> <br> {{object.notes}} <br></span>
+    {% endif %}
+    {% endif %}
   </div>
-  <!-- L Sidenav -->
-  <div id="LSidenav" class="LSidenav">
-    <a href="javascript:void(0)" class="closebtn" onclick="closeLNav()">&times;</a>
-    <a href="#">About</a>
-    <a href="#">Services</a>
-    <a href="#">Clients</a>
-    <a href="#">Contact</a>
-  </div>
 
-  <!-- R Sidenav -->
-  <div id="RSidenav" class="RSidenav">
-    <a href="javascript:void(0)" class="closebtn" onclick="closeRNav()">&times;</a>
-    <a href="#">About</a>
-    <a href="#">Services</a>
-    <a href="#">Clients</a>
-    <a href="#">Contact</a>
-  </div>
+    {% endfor %}
+ </div>
+ <!---->
+ <div class="list" data-importance="2" data-year="2023" data-month="10" data-day="20"><a href="/event/114"> testingtoday</a>
+  <br>Oct. 20, 2023 - 5 a.m. - 5:15 a.m. -
+ 
+  <span class="glyphicon glyphicon-alert" style="color:green"></span> &nbsp;<br>
+ 
 
+ 
 
+ 
+</div>
+<!---->
+   </div>
 
+   <p>Click the button to sort the list by urgency:</p>
+   <p><button onclick="sortList('RSidenav','importance')">Sort</button></p>
+   <p>Click the button to sort the list by date:</p>
+   <p><button onclick="sortList('RSidenav','date')">Sort</button></p>
 </body>
+<!--
+  document.getElementById("RSidenav").children
+-->
 
+<script>
+  //Function adapted and modified from www.w3schools.com
+  function sortList(sidenav,dataset1) {
+    var list, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+    list = document.getElementById(sidenav);
+    switching = true;
+    //Set the sorting direction to ascending:
+    dir = "asc"; 
+    /*Make a loop that will continue until
+    no switching has been done:*/
+    while (switching) {
+      //start by saying: no switching is done:
+      switching = false;
+      rows = list.children;
+      //If set to sort by importance
+      if(dataset1 == "importance"){
+          /*Loop through all list's rows:*/
+          for (i = 0; i < (rows.length - 1); i++) {
+            //start by saying there should be no switching:
+            shouldSwitch = false;
+            /*Get the two elements you want to compare,
+            one from current row and one from the next:*/
+            x = rows[i].dataset.importance;
+            y = rows[i + 1].dataset.importance;
+            /*check if the two rows should switch place,
+            based on the direction, asc or desc:*/
+            if (dir == "asc") {
+              if (Number(x) > Number(y)) {
+              //if so, mark as a switch and break the loop:
+              shouldSwitch = true;
+              break;
+            }
+          } else if (dir == "desc") {
+            if (Number(x) < Number(y)) {
+              //if so, mark as a switch and break the loop:
+              shouldSwitch = true;
+              break;
+            }
+          }
+          }
+        }
+      
+      //If set to sort by date
+      if(dataset1 == "date"){
+          /*Loop through all list's rows:*/
+          for (i = 0; i < (rows.length - 1); i++) {
+            //start by saying there should be no switching:
+            shouldSwitch = false;
+            /*from the two elements you want to compare,
+            one from current row and one from the next
+            get their dataset for year,month and day:*/
+            x_year = rows[i].dataset.year;
+            y_year = rows[i + 1].dataset.year;
+            x_month = rows[i].dataset.month;
+            y_month = rows[i + 1].dataset.month;
+            x_day = rows[i].dataset.day;
+            y_day = rows[i + 1].dataset.day;
+            
+            if (dir == "asc") {
+            // Check if X_year is higher than Y's
+              if (Number(x_year) > Number(y_year)) {
+              //if so, mark as a switch and break the loop:
+              shouldSwitch = true;
+              break;
+            // if both year is the same
+            } else if (Number(x_year) == Number(y_year)) {
+              // check their month
+              if (Number(x_month) > Number(y_month)) {
+                //if so, mark as a switch and break the loop:
+                shouldSwitch = true;
+                break;
+              // if again, they are the same, check their day
+              } else if (Number(x_month) == Number(y_month)) {
+                if (Number(x_day) > Number(y_day)) {
+                  //if so, mark as a switch and break the loop:
+                  shouldSwitch = true;
+                  break;
+              }
+            }
+          }
+
+            } else if (dir == "desc") {
+              if (Number(x_year) < Number(y_year)) {
+                //if so, mark as a switch and break the loop:
+                shouldSwitch = true;
+                break;
+              } else if (Number(x_year) == Number(y_year)) {
+                if (Number(x_month) < Number(y_month)) {
+                  //if so, mark as a switch and break the loop:
+                  shouldSwitch = true;
+                  break;
+                } else if (Number(x_month) == Number(y_month)) {
+                  if (Number(x_day) < Number(y_day)) {
+                    //if so, mark as a switch and break the loop:
+                    shouldSwitch = true;
+                    break;
+                }
+              }
+            }
+          }
+        }
+      }
+      if (shouldSwitch) {
+        /*If a switch has been marked, make the switch
+        and mark that a switch has been done:*/
+        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+        switching = true;
+        //Each time a switch is done, increase this count by 1:
+        switchcount ++;      
+      } else {
+        /*If no switching has been done AND the direction is "asc",
+        set the direction to "desc" and run the while loop again.*/
+        if (switchcount == 0 && dir == "asc") {
+          dir = "desc";
+          switching = true;
+        }
+      }
+    }
+  }
+
+  /*
+  if (dir == "asc") {
+          if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+            //if so, mark as a switch and break the loop:
+            shouldSwitch= true;
+            break;
+          }
+        } else if (dir == "desc") {
+          if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+            //if so, mark as a switch and break the loop:
+            shouldSwitch = true;
+            break;
+          }
+        }
+  */
+  </script>
 {% endblock %}
+
