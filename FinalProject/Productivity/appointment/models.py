@@ -237,7 +237,6 @@ class Event(models.Model):
 
         try:
 
-
             non_unique_name = Event.objects.filter(title=self.title).exclude(id=self.id)
             print(f"self.pk = {self.pk}")
             print(f"non_unique_name with id = {non_unique_name}")

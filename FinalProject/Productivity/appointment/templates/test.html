@@ -59,10 +59,26 @@ alert = {{alert}}<br>
  
       <!-- Right Sidenav -->
    <div id="RSidenav" class="RSidenav ">
+
+    <!-- Search's input -->
+    <div>
+      <input type="text" id="search" onkeyup="Search(Case,where)" placeholder="Search for names.." title="Type in a name">
+      
+      <select name="search_options" id="search_options" onchange="updateSearch();Search(Case,where);">
+        <option value="title" selected=""> Title only </option>
+      
+        <option value="date"> Title and date </option>
+      
+        <option value="everywhere" >Title, date, descriptions and note</option>
+      </select>
+
+      <label for="Case">Case sensitive?</label>
+        <input type="checkbox" name="Case" id="Case" onclick="updateSearch();Search(Case,where);">
+    </div>
     {% for object in events%}
 
-    <div class="list" data-importance ="{{object.importance}}" data-year = "{{object.day.year}}"
-     data-month = "{{object.day.month}}" data-day ="{{object.day.day}}"><a href="{{object.get_absolute_url}}">
+    <div class="list" data-importance ="{{object.importance}}" data-date ="{{object.day}}" data-year = "{{object.day.year}}"
+     data-month = "{{object.day.month}}" data-day ="{{object.day.day}}" data-deadline="{{object.deadline_date}}"> <a href="{{object.get_absolute_url}}">
      {{object.title}}</a>
      <br>{{object.day}} - {{object.start_time}} - {{object.end_time}} -
     
@@ -92,11 +108,7 @@ alert = {{alert}}<br>
 
     {% endfor %}
  </div>
- <!---->
- <div class="list" data-importance="2" data-year="2023" data-month="10" data-day="20"><a href="/event/114"> testingtoday</a>
-  <br>Oct. 20, 2023 - 5 a.m. - 5:15 a.m. -
  
-  <span class="glyphicon glyphicon-alert" style="color:green"></span> &nbsp;<br>
  
 
  
@@ -160,7 +172,7 @@ alert = {{alert}}<br>
       //If set to sort by date
       if(dataset1 == "date"){
           /*Loop through all list's rows:*/
-          for (i = 0; i < (rows.length - 1); i++) {
+          for (i = 1; i < (rows.length - 1); i++) {
             //start by saying there should be no switching:
             shouldSwitch = false;
             /*from the two elements you want to compare,
@@ -251,5 +263,84 @@ alert = {{alert}}<br>
         }
   */
   </script>
+
+
+<script>
+
+  function updateSearch(){
+    if (document.getElementById("Case").checked){
+      Case = "sensitive"
+    } else{
+      Case = ""
+    }
+
+    where = document.getElementById("search_options").value
+  }
+
+  let Case = "";
+  let where = "title"
+
+  function Search(Case,where) {
+    var search, filter, list, row, a, i, txtValue; 
+    search = document.getElementById("search");
+    if (Case == "sensitive"){
+      filter = search.value;
+    } else {
+      filter = search.value.toUpperCase();
+    }
+    list = document.getElementById("RSidenav");
+    row = list.children;
+    if (where == "everywhere"){
+      for (i = 1; i < row.length; i++) {
+          a = row[i];
+          txtValue = a.textContent;
+          if (Case != "sensitive"){
+            txtValue = txtValue.toUpperCase();
+          }  
+          console.log(txtValue);
+          if (txtValue.indexOf(filter) > -1) {
+              row[i].style.display = "";
+          } else {
+              row[i].style.display = "none";
+          }
+      }
+
+    } else if (where == "title"){
+      for (i = 1; i < row.length; i++) {
+        a = row[i].getElementsByTagName("a")[0];
+        console.log(a); 
+        txtValue = a.textContent;
+        if (Case != "sensitive"){
+          txtValue = txtValue.toUpperCase();
+        }  
+        console.log(txtValue);
+        if (txtValue.indexOf(filter) > -1) {
+            row[i].style.display = "";
+        } else {
+            row[i].style.display = "none";
+        }
+    }
+
+    } else if (where == "date"){
+      for (i = 1; i < row.length; i++) {
+        a = row[i].getElementsByTagName("a")[0];
+        b = row[i];
+        txtValue = a.textContent +" "+ b.dataset.date +" "+ b.dataset.deadline;
+        if (Case != "sensitive"){
+          txtValue = txtValue.toUpperCase();
+        }  
+        console.log(txtValue);
+        if (txtValue.indexOf(filter) > -1) {
+            row[i].style.display = "";
+        } else {
+            row[i].style.display = "none";
+        }
+    }
+    }
+}
+  </script>
+
+  
+
 {% endblock %}
 

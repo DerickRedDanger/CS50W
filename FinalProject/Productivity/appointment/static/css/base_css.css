@@ -178,10 +178,30 @@
 
 }
 
-
 #main {
   transition: .5s;
   padding: 16px;
+}
+
+/* --- Sidenav - List --- */
+.list{
+  line-height: 100%;
+  padding: 15px 20px;
+  margin: 5px;
+  border: 3px solid #1a1adb;
+}
+
+/* --- Sidenav - SearchBar --- */
+#search {
+  background-position: 10px 12px;
+  width: 85%;
+  left:10px;
+  right:10px;
+  font-size: 16px;
+  padding: 12px 20px 12px 40px;
+  background-color: #111;
+  border: 1px solid #dddddd4b;
+  margin-bottom: 12px;
 }
   /* Use Ctr + f5 to refresh the statics files*/
  
