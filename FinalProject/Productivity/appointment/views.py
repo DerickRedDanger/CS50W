@@ -118,6 +118,9 @@ def calendar(request,year=None, month=None):
     if request.method == "GET":
         # use today's date for the calendar
         d = datetime.today()
+        if year == 0 and month == 0:
+            year = d.year
+            month = d.month
 
         context={}
         
@@ -224,7 +227,7 @@ def event(request,id):
     # returns the html with the empty form is through GET or a correct POST
     # returns with the filled post if event wasn't valid to make it easier to fix.
     # return render(request, "forms.html",{"event":event,"start":start,"end":end,"error":error,"weekday":weekday,"repeat_choices":repeat_choices,"priority_choices":priority_choices,})
-    return render(request, "event.html",{"events":events,"Snackbar":snackbar, "alert":alert, "link":link, "event":event,"id":id,"start_time":start_time,"end_time":end_time,"date":date,"dateu":dateu,"start":start,"end":end,"weekday":weekday,"repeat_choices":repeat_choices,"priority_choices":priority_choices,})
+    return render(request, "event.html",{"list":events,"Snackbar":snackbar, "alert":alert, "link":link, "event":event,"id":id,"start_time":start_time,"end_time":end_time,"date":date,"dateu":dateu,"start":start,"end":end,"weekday":weekday,"repeat_choices":repeat_choices,"priority_choices":priority_choices,})
 
     #if request.method == "GET":
      #   context={}
@@ -268,7 +271,7 @@ def dailytask(request,id):
                                         "priority_choices":priority_choices,"id":id,})
 
 def listtodo(request,id):
-
+    Listtodo= models.ListToDo.objects.all().order_by('deadline','urgency','-deadline_date','progress')
     snackbar=""
     alert=""
     link=""
@@ -317,10 +320,10 @@ def listtodo(request,id):
     except:
         deadline_date=None
         print("no obj.day")
-    snack=""
 
 
-    return render(request,"todo.html",{"Snackbar":snackbar, "alert":alert, "link":link,"id":id,"form":form,"repeat_choices":repeat_choices,"priority_choices":priority_choices,"deadline_date":deadline_date})
+
+    return render(request,"todo.html",{"Snackbar":snackbar, "alert":alert, "link":link,"list":Listtodo,"id":id,"form":form,"repeat_choices":repeat_choices,"priority_choices":priority_choices,"deadline_date":deadline_date})
 
 def planner(request):
     x = datetime.now()

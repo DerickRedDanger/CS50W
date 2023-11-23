@@ -115,3 +115,23 @@ if(start[1] == ':'){
   console.log(`hours = ${hours}:`);
   console.log(`minutes =${mins}`);
 }
+
+console.log(`a[first] !== b[first] = ${a.dataset[first]} !== ${b.dataset[first]}`)
+        if (first=="date"){
+          if(a.dataset[first].getTime() !== b.dataset[first].getTime()) {
+            return Number(a.dataset[first].getTime()) - Number(b.dataset[first].getTime());
+          } else if (second != 0){
+            return Number(a.dataset[second]) - Number(b.dataset[second]);
+          }}
+        else{
+          if(a.dataset[first] !== b.dataset[first]) {
+            console.log(`Number(a.dataset[first]) - Number(b.dataset[first]) =${Number(a.dataset[first]) - Number(b.dataset[first])}`)
+            console.log(`Number(a.dataset[first]) - Number(b.dataset[first]) =${Number(a.dataset[first])} - ${Number(b.dataset[first])}`)
+            return Number(a.dataset[first]) - Number(b.dataset[first]);
+          } else if (second != 0){
+            if (second=="date"){
+              return Number(a.dataset[second].getTime()) - Number(b.dataset[second].getTime());
+            }
+            return Number(a.dataset[second]) - Number(b.dataset[second]);
+          }}
+        } 

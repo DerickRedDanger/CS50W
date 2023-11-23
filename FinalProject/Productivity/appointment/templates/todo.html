@@ -149,10 +149,10 @@
 {% block content %}
 
 {% if id != 0 %}
-    <form id="dailytask" style="margin-top: 30px;" action="/listtodo/{{id}}" method="post" >
+    <form id="dailytask" style="" action="/listtodo/{{id}}" method="post" >
       <h4> Editing/Viewing a Todo task: </h4>
       {% else %}
-    <form id="dailytask" style="margin-top: 30px;" action="/listtodo/0" method="post" >
+    <form id="dailytask" style="" action="/listtodo/0" method="post" >
     <h4> Creating a new Todo task: </h4>
     {% endif %}
     {% csrf_token %}
@@ -351,20 +351,87 @@
 
 
 
- <!-- Sidenav -->
- <div id="LSOpenBtn" class="LSOpenBtn">
-  <span style="font-size:30px;cursor:pointer" onclick="openRNav()">o<br>p<br>e<br>n</span> <br>
+ <!-- Right Sidenav - button -->
+<div id="RSOpenBtn" class="RSOpenBtn" style="font-size:30px;cursor:pointer" data-open ='1' onclick="openRNav()">
+  o<br>p<br>e<br>n
    </div>
  
-      <!-- R Sidenav -->
-   <div id="RSidenav" class="RSidenav">
-     <a href="javascript:void(0)" class="closebtn" onclick="closeRNav()">&times;</a>
-     <a href="#">About</a>
-     <a href="#">Services</a>
-     <a href="#">Clients</a>
-     <a href="#">Contact</a>
-   </div> 
+      <!-- Right Sidenav -->
+   <div id="RSidenav" class="RSidenav ">
 
+    <!-- Sort button -->
+    <div class="list sort">
+    <p>Sort:
+    <button id = "sort_importance" data-arrow="up" onclick="sortList('RSidenav','importance');arrowUpdate('importance');" style="background-color:grey"> by importance &uarr; </button>
+    <button id = "sort_deadline_date" data-arrow="up" onclick="sortList('RSidenav','deadline_date');arrowUpdate('deadline_date');" style="background-color:grey"> by deadline &uarr;</button> </p>
+    <button id = "sort_duration" data-arrow="up" onclick="sortList('RSidenav','duration');arrowUpdate('duration');" style="background-color:grey"> by duration &uarr; </button>
+    <button id = "sort_urgency" data-arrow="up" onclick="sortList('RSidenav','urgency');arrowUpdate('urgency');" style="background-color:grey"> by urgency &uarr; </button>
+    <button id = "sort_progress" data-arrow="up" onclick="sortList('RSidenav','progress');arrowUpdate('progress');" style="background-color:grey"> by progress &uarr; </button>
+    
+    <label for="Case">Show Milestones?</label>
+    <!-- !!! create a function that hides/shows todo's that are a milestone to another's todo !!! -->
+    <input type="checkbox" name="Case" id="Case" onclick="updateSearch();Search(Case,where);">
+
+
+    <!-- Search's input -->
+    
+      <input type="text" id="search" onkeyup="Search(Case,where)" placeholder="Search for ..." title="Search" value=" ">
+      
+      <!-- search's options -->
+      <select name="search_options" id="search_options" style="background-color:grey" onchange="updateSearch();Search(Case,where);">
+        <option value="title" selected=""> Title only </option>
+      
+        <option value="date"> Title and deadline </option>
+      
+        <option value="everywhere" >Title, date, descriptions and note</option>
+      </select>
+      
+      <!-- if search should be case sensitive or not-->
+      <label for="Case">Case sensitive?</label>
+        <input type="checkbox" name="Case" id="Case" onclick="updateSearch();Search(Case,where);">
+    </div>
+
+    <!-- go throught the objects in the list, displaying their information -->
+    {% for object in list%}
+
+    <div class="list" data-importance ="{{object.importance}}" data-date ="{{object.day}}" data-year = "{{object.day.year}}"
+     data-month = "{{object.day.month}}" data-day ="{{object.day.day}}" data-deadline="{{object.deadline_date}}"> <a href="{{object.get_absolute_url}}">
+     {{object.title}}</a>
+     <br>{{object.day}} - {{object.start_time}} - {{object.end_time}} -
+    
+    <!-- Symbols to speed up the reading of importance -->
+    {% if object.importance == "5" %} <span class="glyphicon glyphicon-alert" style="color:red"></span>&nbsp;<br>
+    {% elif object.importance == "4" %} <span class="glyphicon glyphicon-alert" style="color:orange"></span>&nbsp;<br>
+    {% elif object.importance == "2" %} <span class="glyphicon glyphicon-alert" style="color:green"></span> &nbsp;<br>
+    {% elif object.importance == "1" %} <span class="glyphicon glyphicon-alert" style="color: blue"></span>&nbsp;<br>
+    {% elif object.importance == "0" %} <span class="glyphicon glyphicon-alert" style="color: LightBlue"></span>&nbsp;<br>
+    {% elif object.importance == "3" %} <span class="glyphicon glyphicon-question-sign" style="color: orange"></span>&nbsp;<br>{% endif %}
+
+    <!-- If object has a short description, show it. -->
+    {% if object.short_description %}
+    Short description: {{object.short_description}} <br>
+    {% endif %}
+    
+    <!-- If object have description,notes or both, show the more option  -->
+    {% if object.description or object.notes %}
+    <input type="button" class = "more" id =' more{{object.id}}' style="background-color:grey;" data-id ='{{object.id}}' value="More info">
+    
+    <!-- If object has description -->
+    {% if object.description %}
+    <input type="button" class = "desciption" id="des{{object.id}}" style="background-color:grey;display:none;" data-id ='{{object.id}}' value="Description:" > 
+    <span style="display:none" id="description{{object.id}}"><br>{{object.description}}<br></span> 
+    {% endif %}
+
+    <!-- If object has notes -->
+    {% if object.notes%}
+    <input type="button" class = "notes" id = "not{{object.id}}" style="background-color:grey;display:none;" data-id ='{{object.id}}' value="Notes:" > 
+    <span style="display:none" id="notes{{object.id}}"> <br> {{object.notes}} <br></span>
+    {% endif %}
+    {% endif %}
+  </div>
+
+    {% endfor %}
+ </div>
 
 
 {% endblock %}

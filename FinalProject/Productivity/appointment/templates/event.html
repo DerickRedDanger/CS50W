@@ -1,396 +1,20 @@
 {% extends 'base_calendar.html' %}
 
-{% block script%}
 
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
-
-
-
-
-<script>
-
-
-
-
-
-// on click event handler for page buttons
-document.addEventListener('click', event =>{
-  const element = event.target;
-
-  // If click on description
-    if (element.className == "desciption"){
-      // get the id of the popup
-      let id = element.dataset.id;
-      console.log(id);
-      // shows/hides the description
-      let description = document.getElementById("description"+id);
-      console.log(description);
-      if (description.style.display=="block" ){
-        description.style.display = "none";
-      } else {
-        description.style.display = "block"
-      };
-    };
-  //
-  // If click on note
-    if (element.className == "notes"){
-      // get the id of the popup
-      let id = element.dataset.id;
-      console.log(id);
-      // shows/hides the notes
-      let notes = document.getElementById("notes"+id);
-      console.log(notes);
-      if (notes.style.display=="block" ){
-        notes.style.display = "none";
-      } else {
-        notes.style.display = "block"
-      }
-      };
-  //
-  // If click on more
-    if (element.className == "more"){
-      // get the id of the popup
-      let id = element.dataset.id;
-      console.log("id")
-      console.log(id);
-      let des = document.getElementById("des"+id);
-      console.log("des")
-      console.log(des);
-      let not = document.getElementById("not"+id);
-      console.log("not")
-      console.log(not);
-      let notes = document.getElementById("notes"+id);
-      let description = document.getElementById("description"+id);
-      // shows/hides the description
-      if (element.value == "More info"){
-        element.value = "Less info";
-        try{
-          des.style.display = "block";
-        }catch{}
-        try{
-          not.style.display = "block";
-        }catch{}
-        
-        
-      } else if (element.value == "Less info") {
-        element.value = "More info";
-        try{
-          des.style.display = "none";
-        }catch{}
-        try{
-          not.style.display = "none";
-        }catch{}
-        try{
-          description.style.display = "none";
-        }catch{}
-        try{
-          notes.style.display = "none"
-        }catch{}
-      };
-    };
-  //
-});
-
-
-
-
-
-
-  // Variables to cheking whether the form is incomplete
-  // thus if submit should be disabled or not
-  var numb = false;
-  var rp = false;
-  var hm = false;
-  var spc = false;
-  var util = false;
-  var time = false;
-
-  function check(){
-    if (numb == false && rp == false && hm == false && spc == false && util == false){
-    submit.disabled = false;
-    console.log(`numb = ${numb}, rp = ${rp}, hm = ${hm}, spc = ${spc}, util = ${util}`)
-    console.log("enabled")
-  } else {
-    submit.disabled = true;
-    console.log(`numb = ${numb}, rp = ${rp}, hm = ${hm}, spc = ${spc}, util = ${util}`)
-    console.log("disabled")
-  }
-};
-
-  document.addEventListener("DOMContentLoaded",Rp());
-  document.addEventListener("DOMContentLoaded",Hm());
-  document.addEventListener("DOMContentLoaded",Spc());
-
-  document.getElementById("id_repeat").addEventListener("change",Rp);
-  document.getElementById("id_repeat").addEventListener("change",Hm);
-
-  document.getElementById("id_repeatd").addEventListener("change",Hm);
-
-  document.getElementById("id_repeatnumber").addEventListener("change", Numb);
-
-  document.getElementById("id_repeatutil").addEventListener("change", Util);
-  document.getElementById("id_day").addEventListener("change", Util);
-
-  //-------------- check this if not using the forms
-  document.getElementById("id_start_time").addEventListener("change", Time);
-  document.getElementById("id_end_time").addEventListener("change", Time);
- 
-  
-
-  let weekdays = document.querySelectorAll("#id_repeat,#id_monday,#id_tuesday,#id_wednesday,#id_thursday,#id_friday,#id_saturday,#id_sunday")
-
-  for (const day of weekdays) {
-        day.addEventListener('change', Spc)
-    }
-
-  function Rp() {
-    // Get the repeat element
-    var repeat = document.getElementById("id_repeat");
-    // Get the specific element
-    var specific = document.getElementById("SW");
-    // Get the howmany element
-    var howmany = document.getElementById("R");
-    // Get the util element
-    var util = document.getElementById("U");
-    // Get the num element
-    var num = document.getElementById("num");
-    // Get the submit buttom
-    var submit = document.getElementById("submit");
-    // Get the specific number of times option
-    var spc = document.getElementById("spc");
-    // Get the forever explanation element
-    var expl = document.getElementById("explanation");
-    // Get the howmany element's choice value
-    var howmany_choice = document.getElementById("id_repeatd");
-
-    switch (repeat.value) {
-
-      case "day":
-      case "wek":
-          rp = false;
-          specific.style.display = "none";
-          howmany.style.display="block";
-          expl.style.display = "none";
-          if (howmany_choice.value == "frv"){
-            rp = true;
-            expl.style.display = 'block';}
-        break;
-          
-      case "nvr":
-          specific.style.display = "none";
-          howmany.style.display="none";
-          util.style.display = "none";
-          num.style.display="none";
-          rp = false;
-          expl.style.display = 'none';
-          break; 
-
-      case "wkd":
-          specific.style.display = "block";
-          howmany.style.display="block";
-          rp = false;
-          expl.style.display = 'none';
-          if (howmany_choice.value == "frv"){
-            rp = true;
-            expl.style.display = 'block';}
-          break;
-     
-        default:
-          specific.style.display = "none";
-          howmany.style.display="block";
-          rp = false;
-          expl.style.display = 'none';
-    }
-    console.log('rp')
-    console.log(rp)
-    check()
-  };
-
-
-
-  function Hm() {
-
-    // Get the howmany element
-    var howmany_choice = document.getElementById("id_repeatd");
-    // Get the util element
-    var util = document.getElementById("U");
-    // Get the num element
-    var num = document.getElementById("num");
-    // Get the repeat element
-    var repeat = document.getElementById("id_repeat");
-  
-  switch (howmany_choice.value) {
-
-    
-      
-    case "frv":
-      util.style.display = "none";
-      num.style.display="none";
-      hm = false;
-      if (repeat.value == "frv"|| repeat.value =="wek"){
-        hm = true;}
-      break
-
-    case "spc": 
-      util.style.display = "none";
-      num.style.display="block";
-      hm = false;
-      break
-      
-    default:
-      util.style.display = "block";
-      num.style.display="none";
-      hm = false;
-    }
-    console.log("hm")
-    console.log(hm)
-    check()
-    Rp()
-    Util()
-  };
-
-function Numb(){
-  // get the repeatnumber element
-  var number = document.getElementById("id_repeatnumber")
-  // Get the howmany element
-  var howmany_choice = document.getElementById("id_repeatd");
-  // Get the forever explanation element
-  var expl = document.getElementById("explanation2");
-
-  if ( howmany_choice.value == "spc" && number.value <= 0){
-    numb = true
-    expl.style.display = 'block';
-    //-----------
-  } else {
-    numb = false
-    expl.style.display = 'none';
-  }
-  console.log("numb")
-  console.log(numb)
-  check()
-};
-
-function Spc(){
-  // Get the howmany element
-  var repeat = document.getElementById("id_repeat");
-  // Get the howmany element
-  var sunday = document.getElementById("id_sunday");
-  // Get the howmany element
-  var monday = document.getElementById("id_monday");
-  // Get the howmany element
-  var tuesday = document.getElementById("id_tuesday");
-  // Get the howmany element
-  var wednesday = document.getElementById("id_wednesday");
-  // Get the howmany element
-  var thursday = document.getElementById("id_thursday");
-  // Get the howmany element
-  var friday = document.getElementById("id_friday");
-  // Get the howmany element
-  var saturday = document.getElementById("id_saturday");
-  //console.log(repeat);
-  //console.log(sunday);
-  //console.log(monday);
-  //console.log(tuesday);
-  //console.log(wednesday);
-  //console.log(thursday);
-  //console.log(friday);
-  //console.log(saturday);
-
-  
-  if (repeat.value == "wkd" && sunday.checked == false && monday.checked == false && tuesday.checked== false && wednesday.checked == false && thursday.checked == false && friday.checked== false && saturday.checked== false ){
-    spc = true;
-
-  } else {
-  spc = false;
-  //console.log ('else')
-  }
-  console.log("spc")
-  console.log(spc)
-  check()
-}
-  
-function Util(){
-  // Get the repeat element
-  var repeat = document.getElementById("id_repeat");
-  // Get the howmany element
-  var howmany_choice = document.getElementById("id_repeatd");
-  // Get the day element
-  var day = document.getElementById("id_day")
-  // Get the repeatutil element
-  var til = document.getElementById("id_repeatutil");
-  // Get the forever explanation element
-  var expl = document.getElementById("explanation3");
-  if ( howmany_choice.value == "utl" && repeat.value != 'nvr'){
-  if (til.value <= day.value){
-    util = true
-    expl.style.display = 'block';
-    console.log('til <= day')
-    console.log(til.value)
-    console.log(day.value)
-    console.log("util")
-    console.log(util)
-  } else if (til.value > day.value) {
-    util = false
-    console.log('til >= day')
-    console.log(til.value)
-    console.log(day.value)
-    console.log("util")
-    console.log(util)
-    expl.style.display = 'none';
-  } else {
-    util = false
-    console.log('not til <= day nor til >= day')
-    console.log(til.value)
-    console.log(day.value)
-    console.log("util")
-    console.log(util)
-  }
-  } else{
-    util = false
-  } check()
-  }
-
-function Time() {
-  // Get the start_time element
-  var start = document.getElementById("id_start_time");
-  // Get the end_time element
-  var end = document.getElementById("id_end_time");
-  if (start.value >= end.value){
-    time = true
-    console.log('start >= end')
-    console.log(start.value)
-    console.log(end.value)
-    console.log("time")
-    console.log(time)
-  } else if ( start < end){
-    time = false
-    console.log('start <= end')
-    console.log(start.value)
-    console.log(end.value)
-    console.log("time")
-    console.log(time)
-  } else {
-    time = true
-    console.log('not start >= end nor start <= end')
-    console.log(start.value)
-    console.log(end.value)
-    console.log("time")
-    console.log(time)
-  }
-  check()
-}
-</script>
-{% endblock %}
 
 {% block content %}
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+
+
 <!-- if this is the page of a existing event -->
 {% if id != 0 %}
-    <form id="event" style="margin-top: 30px;" action="/event/{{id}}" method="post" >
+    <form id="event" style="" action="/event/{{id}}" method="post" >
       <h4> Editing/Viewing a event: </h4>
       {% else %}
-    <form id="event" style="margin-top: 30px;" action="/event/0" method="post" >
+    <form id="event" style="" action="/event/0" method="post" >
     <h4> Creating a new event: </h4>
     {% endif %}
     
@@ -574,17 +198,38 @@ function Time() {
  {% endif %} 
 
  <!-- Right Sidenav - button -->
- <div id="RSOpenBtn" class="RSOpenBtn" style="font-size:30px;cursor:pointer" data-open ='1' onclick="openRNav()">
- o<br>p<br>e<br>n
-  </div>
+<div id="RSOpenBtn" class="RSOpenBtn" style="font-size:30px;cursor:pointer" data-open ='1' onclick="openRNav()">
+  o<br>p<br>e<br>n
+   </div>
+ 
+      <!-- Right Sidenav -->
+   <div id="RSidenav" class="RSidenav ">
 
-     <!-- Right Sidenav -->
-  <div id="RSidenav" class="RSidenav ">
-    <a href="javascript:void(0)" class="closebtn" onclick="closeRNav()">&times;</a>
-    {% for object in events%}
+    <!-- Sort button -->
+    <div class="list sort">
+    <p>Sort:
+    <button id = "sort_importance" data-arrow="up" onclick="sortList('RSidenav','importance');arrowUpdate('importance');" style="background-color:grey"> by importance &uarr; </button>
+    <button id = "sort_date" data-arrow="up" onclick="sortList('RSidenav','date');arrowUpdate('date');" style="background-color:grey"> by date &uarr;</button> </p>
 
-    <div class="list" data-importance ="{{object.importance}}" data-year = "{{object.day.year}}"
-     data-month = "{{object.day.month}}" data-day ="{{object.day.day}}"><a href="{{object.get_absolute_url}}">
+    <!-- Search's input -->
+    
+      <input type="text" id="search" onkeyup="Search(Case,where)" placeholder="Search for ..." title="Search" value=" ">
+      
+      <select name="search_options" id="search_options" style="background-color:grey" onchange="updateSearch();Search(Case,where);">
+        <option value="title" selected=""> Title only </option>
+      
+        <option value="date"> Title and date </option>
+      
+        <option value="everywhere" >Title, date, descriptions and note</option>
+      </select>
+
+      <label for="Case">Case sensitive?</label>
+        <input type="checkbox" name="Case" id="Case" onclick="updateSearch();Search(Case,where);">
+    </div>
+    {% for object in list%}
+
+    <div class="list" id="list{{ forloop.counter }}" data-importance ="{{object.importance}}" data-date ="{{object.day}}" data-year = "{{object.day.year}}"
+     data-month = "{{object.day.month}}" data-day ="{{object.day.day}}" data-deadline="{{object.deadline_date}}"> <a href="{{object.get_absolute_url}}">
      {{object.title}}</a>
      <br>{{object.day}} - {{object.start_time}} - {{object.end_time}} -
     
@@ -613,6 +258,352 @@ function Time() {
   </div>
 
     {% endfor %}
-  </div> 
+ </div>
 
       {% endblock %}
+
+{% block script%}
+<script>
+
+    // Variables for the search function.
+      // Not vital,but without it, typing in the search doesn't activate the function until
+      // "Case" is checked or choose another "where", after which the variables would be initialised and work correctly
+    var Case = "";
+    var where = "title";
+
+
+
+
+    
+    // on click event handler for page buttons
+    document.getElementById("RSidenav").addEventListener('click', event =>{
+      const element = event.target;
+      console.log(`element =${element}`)
+      console.log(`element.className =${element.classname}`)
+      // If click on description
+        if (element.className == "desciption"){
+          // get the id of the popup
+          let id = element.dataset.id;
+          console.log(id);
+          // shows/hides the description
+          let description = document.getElementById("description"+id);
+          console.log(description);
+          if (description.style.display=="block" ){
+            description.style.display = "none";
+          } else {
+            description.style.display = "block"
+          };
+        };
+      //
+      // If click on note
+        if (element.className == "notes"){
+          // get the id of the popup
+          let id = element.dataset.id;
+          console.log(id);
+          // shows/hides the notes
+          let notes = document.getElementById("notes"+id);
+          console.log(notes);
+          if (notes.style.display=="block" ){
+            notes.style.display = "none";
+          } else {
+            notes.style.display = "block"
+          }
+          };
+      //
+      // If click on more
+        if (element.className == "more"){
+          // get the id of the popup
+          let id = element.dataset.id;
+          console.log("id")
+          console.log(id);
+          let des = document.getElementById("des"+id);
+          console.log("des")
+          console.log(des);
+          let not = document.getElementById("not"+id);
+          console.log("not")
+          console.log(not);
+          let notes = document.getElementById("notes"+id);
+          let description = document.getElementById("description"+id);
+          // shows/hides the description
+          if (element.value == "More info"){
+            element.value = "Less info";
+            try{
+              des.style.display = "block";
+            }catch{}
+            try{
+              not.style.display = "block";
+            }catch{}
+            
+            
+          } else if (element.value == "Less info") {
+            element.value = "More info";
+            try{
+              des.style.display = "none";
+            }catch{}
+            try{
+              not.style.display = "none";
+            }catch{}
+            try{
+              description.style.display = "none";
+            }catch{}
+            try{
+              notes.style.display = "none"
+            }catch{}
+          };
+        };
+      //
+    });
+
+
+
+
+
+      // Variables to cheking whether the form is incomplete
+      // thus if submit should be disabled or not
+      var numb = false;
+      var rp = false;
+      var hm = false;
+      var spc = false;
+      var util = false;
+      var time = false;
+
+      function check(){
+        if (numb == false && rp == false && hm == false && spc == false && util == false){
+        submit.disabled = false;
+        console.log(`numb = ${numb}, rp = ${rp}, hm = ${hm}, spc = ${spc}, util = ${util}`)
+        console.log("enabled")
+      } else {
+        submit.disabled = true;
+        console.log(`numb = ${numb}, rp = ${rp}, hm = ${hm}, spc = ${spc}, util = ${util}`)
+        console.log("disabled")
+      }
+    };
+    document.addEventListener("DOMContentLoaded", function() {
+      Search(Case,where);
+      Rp();
+      Hm();
+      Spc();
+      document.getElementById("id_repeat").addEventListener("change",Rp);
+      document.getElementById("id_repeat").addEventListener("change",Hm);
+      document.getElementById("id_repeatd").addEventListener("change",Hm);
+      document.getElementById("id_repeatnumber").addEventListener("change", Numb);
+      document.getElementById("id_repeatutil").addEventListener("change", Util);
+      document.getElementById("id_day").addEventListener("change", Util);
+
+      let weekdays = document.querySelectorAll("#id_repeat,#id_monday,#id_tuesday,#id_wednesday,#id_thursday,#id_friday,#id_saturday,#id_sunday");
+
+      for (const day of weekdays) {
+            day.addEventListener('change', Spc)
+            console.log(`${day}`)
+        };
+    });
+
+      function Rp() {
+        // Get the repeat element
+        var repeat = document.getElementById("id_repeat");
+        // Get the specific element
+        var specific = document.getElementById("SW");
+        // Get the howmany element
+        var howmany = document.getElementById("R");
+        // Get the util element
+        var util = document.getElementById("U");
+        // Get the num element
+        var num = document.getElementById("num");
+        // Get the submit buttom
+        var submit = document.getElementById("submit");
+        // Get the specific number of times option
+        var spc = document.getElementById("spc");
+        // Get the forever explanation element
+        var expl = document.getElementById("explanation");
+        // Get the howmany element's choice value
+        var howmany_choice = document.getElementById("id_repeatd");
+
+        switch (repeat.value) {
+
+          case "day":
+          case "wek":
+              rp = false;
+              specific.style.display = "none";
+              howmany.style.display="block";
+              expl.style.display = "none";
+              if (howmany_choice.value == "frv"){
+                rp = true;
+                expl.style.display = 'block';}
+            break;
+              
+          case "nvr":
+              specific.style.display = "none";
+              howmany.style.display="none";
+              util.style.display = "none";
+              num.style.display="none";
+              rp = false;
+              expl.style.display = 'none';
+              break; 
+
+          case "wkd":
+              specific.style.display = "block";
+              howmany.style.display="block";
+              rp = false;
+              expl.style.display = 'none';
+              if (howmany_choice.value == "frv"){
+                rp = true;
+                expl.style.display = 'block';}
+              break;
+        
+            default:
+              specific.style.display = "none";
+              howmany.style.display="block";
+              rp = false;
+              expl.style.display = 'none';
+        }
+        console.log('rp')
+        console.log(rp)
+        check()
+      };
+
+
+
+      function Hm() {
+
+        // Get the howmany element
+        var howmany_choice = document.getElementById("id_repeatd");
+        // Get the util element
+        var util = document.getElementById("U");
+        // Get the num element
+        var num = document.getElementById("num");
+        // Get the repeat element
+        var repeat = document.getElementById("id_repeat");
+      
+      switch (howmany_choice.value) {
+
+        
+          
+        case "frv":
+          util.style.display = "none";
+          num.style.display="none";
+          hm = false;
+          if (repeat.value == "frv"|| repeat.value =="wek"){
+            hm = true;}
+          break
+
+        case "spc": 
+          util.style.display = "none";
+          num.style.display="block";
+          hm = false;
+          break
+          
+        default:
+          util.style.display = "block";
+          num.style.display="none";
+          hm = false;
+        }
+        console.log("hm")
+        console.log(hm)
+        check()
+        Rp()
+        Util()
+      };
+
+    function Numb(){
+      // get the repeatnumber element
+      var number = document.getElementById("id_repeatnumber")
+      // Get the howmany element
+      var howmany_choice = document.getElementById("id_repeatd");
+      // Get the forever explanation element
+      var expl = document.getElementById("explanation2");
+
+      if ( howmany_choice.value == "spc" && number.value <= 0){
+        numb = true
+        expl.style.display = 'block';
+        //-----------
+      } else {
+        numb = false
+        expl.style.display = 'none';
+      }
+      console.log("numb")
+      console.log(numb)
+      check()
+    };
+
+    function Spc(){
+      // Get the howmany element
+      var repeat = document.getElementById("id_repeat");
+      // Get the howmany element
+      var sunday = document.getElementById("id_sunday");
+      // Get the howmany element
+      var monday = document.getElementById("id_monday");
+      // Get the howmany element
+      var tuesday = document.getElementById("id_tuesday");
+      // Get the howmany element
+      var wednesday = document.getElementById("id_wednesday");
+      // Get the howmany element
+      var thursday = document.getElementById("id_thursday");
+      // Get the howmany element
+      var friday = document.getElementById("id_friday");
+      // Get the howmany element
+      var saturday = document.getElementById("id_saturday");
+      //console.log(repeat);
+      //console.log(sunday);
+      //console.log(monday);
+      //console.log(tuesday);
+      //console.log(wednesday);
+      //console.log(thursday);
+      //console.log(friday);
+      //console.log(saturday);
+
+      
+      if (repeat.value == "wkd" && sunday.checked == false && monday.checked == false && tuesday.checked== false && wednesday.checked == false && thursday.checked == false && friday.checked== false && saturday.checked== false ){
+        spc = true;
+
+      } else {
+      spc = false;
+      //console.log ('else')
+      }
+      console.log("spc")
+      console.log(spc)
+      check()
+    };
+      
+    function Util(){
+      // Get the repeat element
+      var repeat = document.getElementById("id_repeat");
+      // Get the howmany element
+      var howmany_choice = document.getElementById("id_repeatd");
+      // Get the day element
+      var day = document.getElementById("id_day")
+      // Get the repeatutil element
+      var til = document.getElementById("id_repeatutil");
+      // Get the forever explanation element
+      var expl = document.getElementById("explanation3");
+      if ( howmany_choice.value == "utl" && repeat.value != 'nvr'){
+      if (til.value <= day.value){
+        util = true
+        expl.style.display = 'block';
+        console.log('til <= day')
+        console.log(til.value)
+        console.log(day.value)
+        console.log("util")
+        console.log(util)
+      } else if (til.value > day.value) {
+        util = false
+        console.log('til >= day')
+        console.log(til.value)
+        console.log(day.value)
+        console.log("util")
+        console.log(util)
+        expl.style.display = 'none';
+      } else {
+        util = false
+        console.log('not til <= day nor til >= day')
+        console.log(til.value)
+        console.log(day.value)
+        console.log("util")
+        console.log(util)
+      }
+      } else{
+        util = false
+      } check()
+      };
+
+</script>
+{% endblock %}

@@ -4,10 +4,10 @@
 {% block content %}
 
 {% if id != 0 %}
-    <form id="dailytask" style="margin-top: 30px;" action="/dailytask/{{form.id}}" method="post" >
+    <form id="dailytask" style="" action="/dailytask/{{form.id}}" method="post" >
       <h4> Editing/Viewing a daily task: </h4>
       {% else %}
-    <form id="dailytask" style="margin-top: 30px;" action="/dailytask/0" method="post" >
+    <form id="dailytask" style="" action="/dailytask/0" method="post" >
     <h4> Creating a new daily task: </h4>
     {% endif %}
     {% csrf_token %}

@@ -1,10 +1,12 @@
+Remove all the javascript funtcions inside the html (like on click) and separate them into the script.
+
 create a search function for the sidebar in the test. 
 maybe create a sort function that sort two datasets at once
 
 Add the sidenav to all views, namely a right one that shows all objects to event/task/listtodo
 and modify the all todo from the index into a left sidenav
 
-on the sidenav of the dailytask, create a mini planner that shows all dailytask of the weak on their
+on the sidenav of the dailytask, create a mini planner that shows all dailytask of the week on their
 time frame in the planner
 
 Add a active/inactive to model.events (and possibly to others) to differenciate events that already passed

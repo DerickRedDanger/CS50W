@@ -1,7 +1,7 @@
 {% extends 'base_calendar.html' %}
 {% block script%}
   <script>
-
+console.log("it worked!")
     </script>
 {% endblock %}
 {% block style%}
@@ -12,6 +12,10 @@
     </style> 
 {% endblock%}
 {% block content %}
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
 
 <body>
     <h2>Snackbar / Toast</h2>
@@ -60,11 +64,17 @@ alert = {{alert}}<br>
       <!-- Right Sidenav -->
    <div id="RSidenav" class="RSidenav ">
 
-    <!-- Search's input -->
+    <!-- Sort button -->
     <div>
-      <input type="text" id="search" onkeyup="Search(Case,where)" placeholder="Search for names.." title="Type in a name">
+      Sort:<div id="sort">
+    <button id = "sort_importance" class="sort_button" data-criteria="importance" data-orders="asc" data-priority=-1 > by importance </button>
+    <button id = "sort_date" class="sort_button" data-criteria="date" data-orders="asc" data-priority=-1 > by date </button>
+    </div>
+    <!-- Search's input -->
+    
+      <input type="text" id="search" onkeyup="Search(Case,where)" placeholder="Search for ..." title="Search">
       
-      <select name="search_options" id="search_options" onchange="updateSearch();Search(Case,where);">
+      <select name="search_options" id="search_options" style="background-color:grey" onchange="updateSearch();Search(Case,where);">
         <option value="title" selected=""> Title only </option>
       
         <option value="date"> Title and date </option>
@@ -128,219 +138,232 @@ alert = {{alert}}<br>
 -->
 
 <script>
-  //Function adapted and modified from www.w3schools.com
-  function sortList(sidenav,dataset1) {
-    var list, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
-    list = document.getElementById(sidenav);
-    switching = true;
-    //Set the sorting direction to ascending:
-    dir = "asc"; 
-    /*Make a loop that will continue until
-    no switching has been done:*/
-    while (switching) {
-      //start by saying: no switching is done:
-      switching = false;
-      rows = list.children;
-      //If set to sort by importance
-      if(dataset1 == "importance"){
-          /*Loop through all list's rows:*/
-          for (i = 0; i < (rows.length - 1); i++) {
-            //start by saying there should be no switching:
-            shouldSwitch = false;
-            /*Get the two elements you want to compare,
-            one from current row and one from the next:*/
-            x = rows[i].dataset.importance;
-            y = rows[i + 1].dataset.importance;
-            /*check if the two rows should switch place,
-            based on the direction, asc or desc:*/
-            if (dir == "asc") {
-              if (Number(x) > Number(y)) {
-              //if so, mark as a switch and break the loop:
-              shouldSwitch = true;
-              break;
-            }
-          } else if (dir == "desc") {
-            if (Number(x) < Number(y)) {
-              //if so, mark as a switch and break the loop:
-              shouldSwitch = true;
-              break;
-            }
-          }
-          }
-        }
-      
-      //If set to sort by date
-      if(dataset1 == "date"){
-          /*Loop through all list's rows:*/
-          for (i = 1; i < (rows.length - 1); i++) {
-            //start by saying there should be no switching:
-            shouldSwitch = false;
-            /*from the two elements you want to compare,
-            one from current row and one from the next
-            get their dataset for year,month and day:*/
-            x_year = rows[i].dataset.year;
-            y_year = rows[i + 1].dataset.year;
-            x_month = rows[i].dataset.month;
-            y_month = rows[i + 1].dataset.month;
-            x_day = rows[i].dataset.day;
-            y_day = rows[i + 1].dataset.day;
-            
-            if (dir == "asc") {
-            // Check if X_year is higher than Y's
-              if (Number(x_year) > Number(y_year)) {
-              //if so, mark as a switch and break the loop:
-              shouldSwitch = true;
-              break;
-            // if both year is the same
-            } else if (Number(x_year) == Number(y_year)) {
-              // check their month
-              if (Number(x_month) > Number(y_month)) {
-                //if so, mark as a switch and break the loop:
-                shouldSwitch = true;
-                break;
-              // if again, they are the same, check their day
-              } else if (Number(x_month) == Number(y_month)) {
-                if (Number(x_day) > Number(y_day)) {
-                  //if so, mark as a switch and break the loop:
-                  shouldSwitch = true;
-                  break;
-              }
-            }
-          }
 
-            } else if (dir == "desc") {
-              if (Number(x_year) < Number(y_year)) {
-                //if so, mark as a switch and break the loop:
-                shouldSwitch = true;
-                break;
-              } else if (Number(x_year) == Number(y_year)) {
-                if (Number(x_month) < Number(y_month)) {
-                  //if so, mark as a switch and break the loop:
-                  shouldSwitch = true;
-                  break;
-                } else if (Number(x_month) == Number(y_month)) {
-                  if (Number(x_day) < Number(y_day)) {
-                    //if so, mark as a switch and break the loop:
-                    shouldSwitch = true;
-                    break;
-                }
-              }
-            }
-          }
-        }
-      }
-      if (shouldSwitch) {
-        /*If a switch has been marked, make the switch
-        and mark that a switch has been done:*/
-        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-        switching = true;
-        //Each time a switch is done, increase this count by 1:
-        switchcount ++;      
-      } else {
-        /*If no switching has been done AND the direction is "asc",
-        set the direction to "desc" and run the while loop again.*/
-        if (switchcount == 0 && dir == "asc") {
-          dir = "desc";
-          switching = true;
-        }
-      }
-    }
-  }
+  
 
-  /*
-  if (dir == "asc") {
-          if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
-            //if so, mark as a switch and break the loop:
-            shouldSwitch= true;
-            break;
-          }
-        } else if (dir == "desc") {
-          if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
-            //if so, mark as a switch and break the loop:
-            shouldSwitch = true;
-            break;
-          }
-        }
-  */
+  
   </script>
-
+  <button id = "sort_importance" data-criteria="importance" data-order="desc" data-place="0" onclick="sortList('RSidenav','importance');arrowUpdate('importance');" style="background-color:grey"> by importance &uarr; </button>
+  <button id = "sort_date" data-arrow="up" onclick="sortList('RSidenav','date');arrowUpdate('date');" style="background-color:grey"> by date &uarr;</button> </p>
 
 <script>
 
-  function updateSearch(){
-    if (document.getElementById("Case").checked){
-      Case = "sensitive"
-    } else{
-      Case = ""
+  // Getting a array of the sort buttons to use in the sort functions
+  let sort_buttons = Array.from(document.getElementById('sort').children)
+  console.log(`Sort buttons are = ${sort_buttons}`)
+  console.dir(sort_buttons)
+
+  let buttons_original_Html = [];
+  for( i=0; i < sort_buttons.length; i++){
+    buttons_original_Html.push(sort_buttons[i].innerHTML);
+  }
+  console.dir(buttons_original_Html)
+
+
+  let criteria = [0,0,0]
+  let orders = [0,0,0]
+  let clicks = [0,0,0]
+
+  // Creats a array of objects based on criteria and orders, make
+  let sort_rules = criteria.map((item, index) => ({criteria: item, orders: orders[index], clicks: clicks[index]}));
+  console.dir(sort_rules)
+
+  // to do a function once the DOM is loaded
+  document.addEventListener("DOMContentLoaded", function() {
+    inicialize_buttons();
+    console.log("sort buttons")
+    console.dir(sort_buttons)
+    for (let i = 0; i < sort_buttons.length; i++) {
+      sort_buttons[i].addEventListener('click', function() {
+        console.dir(this)
+        Sort_rules_update(this);
+        sort_list();
+        sort_button_upate();
+
+
+
+        
+
+          // Your code here
+      });
+    }
+    // !!!!!!
+    // Need to add the Sort_rules_Update, sort function and sort_button_upate to each button
+    // and mdify the sort function to work with the sort_rules array
+    // Once tests are completed, move the this addevent listened, inicialize_buttons(),
+    // Sort_rules_Update(), sort_button_upate() and the script abve to base_scripts
+    //!!!!
+  });
+
+  function inicialize_buttons(){
+    for (let i = 0; i < sort_buttons.length; i++) {
+      let newElementBeforeButton = document.createElement('span');
+      let Button = sort_buttons[i];
+      newElementBeforeButton.id ="+" + sort_buttons[i].id;
+      newElementBeforeButton.innerHTML = '';
+
+      Button.parentNode.insertBefore(newElementBeforeButton, Button);
+
+      let newElementAfterButton = document.createElement('span');
+      newElementAfterButton.id = sort_buttons[i].id + "+";
+      newElementAfterButton.innerHTML = '';
+
+      Button.parentNode.insertBefore(newElementAfterButton, Button.nextSibling);
+    }
+  }
+  
+
+
+  first = 0;
+  second = 0;
+  third = 0;
+  order1 = "desc";
+  order2 = "desc";
+  order3 = "desc";
+
+  // Function to upadate the sort rules, based on the sort button clicked
+  function Sort_rules_update(element){
+
+    //Loop inside sort_rules and check if this element's criteria is inside it.
+    for (let i = 0; i < sort_rules.length; i++) {
+      // If it find a empty criteria overwrite it with this element's, 
+      // update the elements priority to i and break.
+      if (sort_rules[i].criteria === 0){
+        sort_rules[i].criteria = element.dataset.criteria;
+        sort_rules[i].orders = element.dataset.orders;
+        sort_rules[i].clicks++ ;
+        element.dataset.priority = i
+        break
+        // If this element is already inside it, check if this is the third time it's clicked
+        // If it's reset it to 0, reset the button's dataset to the initial and break
+      } else if (sort_rules[i].criteria === element.dataset.criteria)
+        if (sort_rules[i].clicks >= 2){
+          sort_rules[i].criteria = 0;
+          sort_rules[i].orders = 0;
+          sort_rules[i].clicks = 0;
+          element.dataset.orders = "asc"
+          element.dataset.priority = -1
+          break
+          
+          // if it isn't the third time, increase the number of times it was clicked
+          // update the element's dataset.orders and break
+        } else {
+          element.dataset.orders = "desc"
+          sort_rules[i].orders = element.dataset.orders;
+          sort_rules[i].clicks++ ;
+          break
+        }
     }
 
-    where = document.getElementById("search_options").value
+    // Loops inside the sort_rule again, checking for empty criterias. If found,
+    // check if there is another criteria after it, if there is, replace the current with the next
+    // criteria and reset the next. effectively moving empty criterias to the end of the array.
+    for (let i = 0; i < sort_rules.length; i++) {
+      if (sort_rules[i].criteria === 0 && i + 1 < sort_rules.length && sort_rules[i+1].criteria !==0){
+        sort_rules[i].criteria = sort_rules[i+1].criteria;
+        sort_rules[i].orders = sort_rules[i+1].orders;
+        sort_rules[i].clicks = sort_rules[i+1].clicks;
+        sort_rules[i+1].criteria = 0;
+        sort_rules[i+1].orders = 0;
+        sort_rules[i+1].clicks = 0;
+      }
+    }
+
+    // Updates the buttons dataset
+    for (let i = 0; i < sort_buttons.length; i++){
+      let button_inside_rule = "0"
+      for (let j = 0; j < sort_rules.length; j++){
+        if (sort_rules[j].criteria == sort_buttons[i].dataset.criteria){
+          button_inside_rule= "1"
+          sort_buttons[i].dataset.priority=j
+        }
+      }
+        if(button_inside_rule == "0"){
+          sort_buttons[i].dataset.priority=-1
+        }
+    }
   }
 
-  let Case = "";
-  let where = "title"
+  // Function that updates the sort button's value based on it's presence/or lack in the sort rules
+  function sort_button_upate(){
+    frontOptions = ["1°", "2°", "3°"]
+    behindOptions = ["&uarr;", "&darr;"]
 
-  function Search(Case,where) {
-    var search, filter, list, row, a, i, txtValue; 
-    search = document.getElementById("search");
-    if (Case == "sensitive"){
-      filter = search.value;
-    } else {
-      filter = search.value.toUpperCase();
-    }
-    list = document.getElementById("RSidenav");
-    row = list.children;
-    if (where == "everywhere"){
-      for (i = 1; i < row.length; i++) {
-          a = row[i];
-          txtValue = a.textContent;
-          if (Case != "sensitive"){
-            txtValue = txtValue.toUpperCase();
-          }  
-          console.log(txtValue);
-          if (txtValue.indexOf(filter) > -1) {
-              row[i].style.display = "";
-          } else {
-              row[i].style.display = "none";
+
+    // Loops thought the buttons inside the array
+    for (let i = 0; i < sort_buttons.length; i++) {
+      // get it's criteria, order, and the Id of the span before and after it.
+      let priority = sort_buttons[i].dataset.priority;
+      let order = sort_buttons[i].dataset.orders;
+      let element = sort_buttons[i]
+      console.log(`element`)
+      console.dir(element)
+      console.log(`priority = ${priority}`)
+      console.log(`order = ${order}`)
+
+
+      switch (priority) {
+        // if the criteria is -1 (not in the sort rule)
+        // the element before and after it has it's HTML =""
+        case "-1":
+          console.log("case -1")
+          if(element.innerHTML!== buttons_original_Html[i]){
+            element.innerHTML = buttons_original_Html[i]
+            }
+          break;
+        // othersie the element before has it's HTML to it's priority's order
+        case "0":
+          console.log("case 0")
+          if(order == "asc" && element.innerHTML !== frontOptions[0] + " " + buttons_original_Html[i] + " " + behindOptions[0]){
+            element.innerHTML = frontOptions[0] + " " + buttons_original_Html[i] + " " + behindOptions[0];
+
+          } else if (order == "desc" && element.innerHTML!==frontOptions[0] + " " + buttons_original_Html[i] + " " + behindOptions[1]){
+            element.innerHTML = frontOptions[0] + " " + buttons_original_Html[i] + " " + behindOptions[1];
           }
+          break;
+
+        case "1":
+          console.log("case 1")
+          if(order == "asc" && element.innerHTML!==frontOptions[1] + " " + buttons_original_Html[i] + " " + behindOptions[0]){
+            element.innerHTML = frontOptions[1] + " " + buttons_original_Html[i] + " " + behindOptions[0];
+
+          } else if (order == "desc" && element.innerHTML!==frontOptions[1] + " " + buttons_original_Html[i] + " " + behindOptions[1]){
+            element.innerHTML = frontOptions[1] + " " + buttons_original_Html[i] + " " + behindOptions[1];
+          }
+          break;
+
+        case "2":
+        console.log("case 2")
+          if(order == "asc" && element.innerHTML!==frontOptions[2] + " " + buttons_original_Html[i] + " " + behindOptions[0]){
+            element.innerHTML = frontOptions[2] + " " + buttons_original_Html[i] + " " + behindOptions[0];
+
+          } else if (order == "desc" && element.innerHTML !== frontOptions[2] + " " + buttons_original_Html[i] + " " + behindOptions[1]){
+            element.innerHTML = frontOptions[2] + " " + buttons_original_Html[i] + " " + behindOptions[1];
+          }
+          break;
+
+        default:
+          break;
       }
+    }
+  }
 
-    } else if (where == "title"){
-      for (i = 1; i < row.length; i++) {
-        a = row[i].getElementsByTagName("a")[0];
-        console.log(a); 
-        txtValue = a.textContent;
-        if (Case != "sensitive"){
-          txtValue = txtValue.toUpperCase();
-        }  
-        console.log(txtValue);
-        if (txtValue.indexOf(filter) > -1) {
-            row[i].style.display = "";
-        } else {
-            row[i].style.display = "none";
-        }
-    }
-
-    } else if (where == "date"){
-      for (i = 1; i < row.length; i++) {
-        a = row[i].getElementsByTagName("a")[0];
-        b = row[i];
-        txtValue = a.textContent +" "+ b.dataset.date +" "+ b.dataset.deadline;
-        if (Case != "sensitive"){
-          txtValue = txtValue.toUpperCase();
-        }  
-        console.log(txtValue);
-        if (txtValue.indexOf(filter) > -1) {
-            row[i].style.display = "";
-        } else {
-            row[i].style.display = "none";
-        }
-    }
-    }
-}
-  </script>
 
   
+  </script>
+
+  <div id="myDiv">
+    <p data-day="Monday" data-priority="high">Task 1</p>
+    <p data-day="Tuesday" data-priority="low">Task 2</p>
+    <p data-day="Wednesday" data-priority="medium">Task 3</p>
+</div>
+</body>
+<script>
+let div = document.querySelector('#myDiv');
+let elements = Array.from(div.children);
+console.log(elements);
+console.log("it worked");
+</script>
 
 {% endblock %}
 

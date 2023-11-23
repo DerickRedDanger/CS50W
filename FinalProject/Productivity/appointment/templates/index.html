@@ -190,14 +190,15 @@
   function today(start){
 
     //
-    if(start == "start"){
-    document.getElementById('table').innerHTML=`
-    <tr>
-      <th>Time</th>
-      <th>Task</th>
-      <th>Daily</th>
-      <th>Event</th>
-    </tr>`
+    if(start == "restart"){
+      document.getElementById('table').innerHTML=`
+      <tr>
+        <th>Time</th>
+        <th>Task</th>
+        <th>Daily</th>
+        <th>Event</th>
+      </tr>`
+    }
     fetch('/planner')
     .then(response=>response.json())
     .then(data=>{
@@ -277,16 +278,8 @@
           
 
         }
-      
-
-
-
-
-
-     
-
     })
-  }}
+  }
   // shows the todo list
   function todo(){
     
@@ -475,12 +468,6 @@
 {% block content %}
 
 <p>
-  <label for="id_steps">This is the planner:</label>
-  <br>
-  <!-- Not sure if Using form is the best idea, since i will have
-  to make this url excempt from csrf, which is less secure.
-  Should look for other options later on.-->
-
   <main class="d-flex flex-nowrap">
     
 <!-- First Column -->
