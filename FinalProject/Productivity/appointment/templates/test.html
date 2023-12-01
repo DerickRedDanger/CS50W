@@ -100,7 +100,7 @@ alert = {{alert}}<br>
     {% elif object.importance == "3" %} <span class="glyphicon glyphicon-question-sign" style="color: orange"></span>&nbsp;<br>{% endif %}
 
     {% if object.short_description %}
-    Short description: {{object.short_description}} <br>
+    Quick description: {{object.short_description}} <br>
     {% endif %}
 
     {% if object.description or object.notes %}
@@ -148,206 +148,6 @@ alert = {{alert}}<br>
 
 <script>
 
-  // Getting a array of the sort buttons to use in the sort functions
-  let sort_buttons = Array.from(document.getElementById('sort').children)
-  console.log(`Sort buttons are = ${sort_buttons}`)
-  console.dir(sort_buttons)
-
-  let buttons_original_Html = [];
-  for( i=0; i < sort_buttons.length; i++){
-    buttons_original_Html.push(sort_buttons[i].innerHTML);
-  }
-  console.dir(buttons_original_Html)
-
-
-  let criteria = [0,0,0]
-  let orders = [0,0,0]
-  let clicks = [0,0,0]
-
-  // Creats a array of objects based on criteria and orders, make
-  let sort_rules = criteria.map((item, index) => ({criteria: item, orders: orders[index], clicks: clicks[index]}));
-  console.dir(sort_rules)
-
-  // to do a function once the DOM is loaded
-  document.addEventListener("DOMContentLoaded", function() {
-    inicialize_buttons();
-    console.log("sort buttons")
-    console.dir(sort_buttons)
-    for (let i = 0; i < sort_buttons.length; i++) {
-      sort_buttons[i].addEventListener('click', function() {
-        console.dir(this)
-        Sort_rules_update(this);
-        sort_list();
-        sort_button_upate();
-
-
-
-        
-
-          // Your code here
-      });
-    }
-    // !!!!!!
-    // Need to add the Sort_rules_Update, sort function and sort_button_upate to each button
-    // and mdify the sort function to work with the sort_rules array
-    // Once tests are completed, move the this addevent listened, inicialize_buttons(),
-    // Sort_rules_Update(), sort_button_upate() and the script abve to base_scripts
-    //!!!!
-  });
-
-  function inicialize_buttons(){
-    for (let i = 0; i < sort_buttons.length; i++) {
-      let newElementBeforeButton = document.createElement('span');
-      let Button = sort_buttons[i];
-      newElementBeforeButton.id ="+" + sort_buttons[i].id;
-      newElementBeforeButton.innerHTML = '';
-
-      Button.parentNode.insertBefore(newElementBeforeButton, Button);
-
-      let newElementAfterButton = document.createElement('span');
-      newElementAfterButton.id = sort_buttons[i].id + "+";
-      newElementAfterButton.innerHTML = '';
-
-      Button.parentNode.insertBefore(newElementAfterButton, Button.nextSibling);
-    }
-  }
-  
-
-
-  first = 0;
-  second = 0;
-  third = 0;
-  order1 = "desc";
-  order2 = "desc";
-  order3 = "desc";
-
-  // Function to upadate the sort rules, based on the sort button clicked
-  function Sort_rules_update(element){
-
-    //Loop inside sort_rules and check if this element's criteria is inside it.
-    for (let i = 0; i < sort_rules.length; i++) {
-      // If it find a empty criteria overwrite it with this element's, 
-      // update the elements priority to i and break.
-      if (sort_rules[i].criteria === 0){
-        sort_rules[i].criteria = element.dataset.criteria;
-        sort_rules[i].orders = element.dataset.orders;
-        sort_rules[i].clicks++ ;
-        element.dataset.priority = i
-        break
-        // If this element is already inside it, check if this is the third time it's clicked
-        // If it's reset it to 0, reset the button's dataset to the initial and break
-      } else if (sort_rules[i].criteria === element.dataset.criteria)
-        if (sort_rules[i].clicks >= 2){
-          sort_rules[i].criteria = 0;
-          sort_rules[i].orders = 0;
-          sort_rules[i].clicks = 0;
-          element.dataset.orders = "asc"
-          element.dataset.priority = -1
-          break
-          
-          // if it isn't the third time, increase the number of times it was clicked
-          // update the element's dataset.orders and break
-        } else {
-          element.dataset.orders = "desc"
-          sort_rules[i].orders = element.dataset.orders;
-          sort_rules[i].clicks++ ;
-          break
-        }
-    }
-
-    // Loops inside the sort_rule again, checking for empty criterias. If found,
-    // check if there is another criteria after it, if there is, replace the current with the next
-    // criteria and reset the next. effectively moving empty criterias to the end of the array.
-    for (let i = 0; i < sort_rules.length; i++) {
-      if (sort_rules[i].criteria === 0 && i + 1 < sort_rules.length && sort_rules[i+1].criteria !==0){
-        sort_rules[i].criteria = sort_rules[i+1].criteria;
-        sort_rules[i].orders = sort_rules[i+1].orders;
-        sort_rules[i].clicks = sort_rules[i+1].clicks;
-        sort_rules[i+1].criteria = 0;
-        sort_rules[i+1].orders = 0;
-        sort_rules[i+1].clicks = 0;
-      }
-    }
-
-    // Updates the buttons dataset
-    for (let i = 0; i < sort_buttons.length; i++){
-      let button_inside_rule = "0"
-      for (let j = 0; j < sort_rules.length; j++){
-        if (sort_rules[j].criteria == sort_buttons[i].dataset.criteria){
-          button_inside_rule= "1"
-          sort_buttons[i].dataset.priority=j
-        }
-      }
-        if(button_inside_rule == "0"){
-          sort_buttons[i].dataset.priority=-1
-        }
-    }
-  }
-
-  // Function that updates the sort button's value based on it's presence/or lack in the sort rules
-  function sort_button_upate(){
-    frontOptions = ["1°", "2°", "3°"]
-    behindOptions = ["&uarr;", "&darr;"]
-
-
-    // Loops thought the buttons inside the array
-    for (let i = 0; i < sort_buttons.length; i++) {
-      // get it's criteria, order, and the Id of the span before and after it.
-      let priority = sort_buttons[i].dataset.priority;
-      let order = sort_buttons[i].dataset.orders;
-      let element = sort_buttons[i]
-      console.log(`element`)
-      console.dir(element)
-      console.log(`priority = ${priority}`)
-      console.log(`order = ${order}`)
-
-
-      switch (priority) {
-        // if the criteria is -1 (not in the sort rule)
-        // the element before and after it has it's HTML =""
-        case "-1":
-          console.log("case -1")
-          if(element.innerHTML!== buttons_original_Html[i]){
-            element.innerHTML = buttons_original_Html[i]
-            }
-          break;
-        // othersie the element before has it's HTML to it's priority's order
-        case "0":
-          console.log("case 0")
-          if(order == "asc" && element.innerHTML !== frontOptions[0] + " " + buttons_original_Html[i] + " " + behindOptions[0]){
-            element.innerHTML = frontOptions[0] + " " + buttons_original_Html[i] + " " + behindOptions[0];
-
-          } else if (order == "desc" && element.innerHTML!==frontOptions[0] + " " + buttons_original_Html[i] + " " + behindOptions[1]){
-            element.innerHTML = frontOptions[0] + " " + buttons_original_Html[i] + " " + behindOptions[1];
-          }
-          break;
-
-        case "1":
-          console.log("case 1")
-          if(order == "asc" && element.innerHTML!==frontOptions[1] + " " + buttons_original_Html[i] + " " + behindOptions[0]){
-            element.innerHTML = frontOptions[1] + " " + buttons_original_Html[i] + " " + behindOptions[0];
-
-          } else if (order == "desc" && element.innerHTML!==frontOptions[1] + " " + buttons_original_Html[i] + " " + behindOptions[1]){
-            element.innerHTML = frontOptions[1] + " " + buttons_original_Html[i] + " " + behindOptions[1];
-          }
-          break;
-
-        case "2":
-        console.log("case 2")
-          if(order == "asc" && element.innerHTML!==frontOptions[2] + " " + buttons_original_Html[i] + " " + behindOptions[0]){
-            element.innerHTML = frontOptions[2] + " " + buttons_original_Html[i] + " " + behindOptions[0];
-
-          } else if (order == "desc" && element.innerHTML !== frontOptions[2] + " " + buttons_original_Html[i] + " " + behindOptions[1]){
-            element.innerHTML = frontOptions[2] + " " + buttons_original_Html[i] + " " + behindOptions[1];
-          }
-          break;
-
-        default:
-          break;
-      }
-    }
-  }
-
 
   
   </script>
@@ -364,6 +164,16 @@ let elements = Array.from(div.children);
 console.log(elements);
 console.log("it worked");
 </script>
+
+<div style="background-color:lightblue"> test 1</div>
+<div style="background-color:lightblue; outline: 2px solid red;"> test 2</div>
+<br>
+<button style="box-shadow: 0px 0px 2px 2px grey inset;"> test 3 </button>
+<button style ="box-shadow: none;"> test 4 </button>
+<button class="active" aria-pressed="true"> Base button </button>
+<button class=".disabled"> Base button </button>
+
+<h1 style:"text-shadow: 2px 2px 2px grey;"> Testing shadow in a text on html </h1>
 
 {% endblock %}
 

@@ -63,11 +63,11 @@
 </p>
 
 <p>
-  {% if event.errors.short_description %}
-    {{event.errors.short_description}}<br>
+  {% if event.errors.quick_description %}
+    {{event.errors.quick_description}}<br>
   {% endif %}
-  {{event.short_description.label_tag}}<br>
-  {{event.short_description}}
+  {{event.quick_description.label_tag}}<br>
+  {{event.quick_description}}
 </p>
 
 <p>
@@ -206,14 +206,16 @@
    <div id="RSidenav" class="RSidenav ">
 
     <!-- Sort button -->
-    <div class="list sort">
-    <p>Sort:
-    <button id = "sort_importance" data-arrow="up" onclick="sortList('RSidenav','importance');arrowUpdate('importance');" style="background-color:grey"> by importance &uarr; </button>
-    <button id = "sort_date" data-arrow="up" onclick="sortList('RSidenav','date');arrowUpdate('date');" style="background-color:grey"> by date &uarr;</button> </p>
+    <div>
+      Sort:<div id="sort">
+    <button id = "sort_importance" class="sort_button states-3 clicks-0" data-criteria="importance" data-orders="asc" data-priority=-1 data-clicks=0 > by importance </button>
+    <button id = "sort_date" class="sort_button states-3 clicks-0" data-criteria="date" data-orders="asc" data-priority=-1 data-clicks=0 > by date </button>
+    <button id = "sort_repeat" class="sort_button states-3 clicks-0" data-criteria="repeat" data-orders="asc" data-priority=-1 data-clicks=0 > if they repeat and if repeat forever</button>
+    </div>
 
     <!-- Search's input -->
     
-      <input type="text" id="search" onkeyup="Search(Case,where)" placeholder="Search for ..." title="Search" value=" ">
+      <input type="text" id="search" onkeyup="Search(Case,where)" placeholder="Search for ..." title="Search" value="">
       
       <select name="search_options" id="search_options" style="background-color:grey" onchange="updateSearch();Search(Case,where);">
         <option value="title" selected=""> Title only </option>
@@ -226,10 +228,13 @@
       <label for="Case">Case sensitive?</label>
         <input type="checkbox" name="Case" id="Case" onclick="updateSearch();Search(Case,where);">
     </div>
+    <!-- Creating a list of the objects inside the RSideNav -->
     {% for object in list%}
 
     <div class="list" id="list{{ forloop.counter }}" data-importance ="{{object.importance}}" data-date ="{{object.day}}" data-year = "{{object.day.year}}"
-     data-month = "{{object.day.month}}" data-day ="{{object.day.day}}" data-deadline="{{object.deadline_date}}"> <a href="{{object.get_absolute_url}}">
+     data-month = "{{object.day.month}}" data-day ="{{object.day.day}}" data-deadline="{{object.deadline_date}}" 
+     data-repeat="{% if object.repeat == "nvr" %}0{% elif object.repeat != "nvr" and object.repeatd != "frv" %}1{% elif object.repeat != "nvr" and object.repeatd == "frv" %}2{% endif %}">
+     <a href="{{object.get_absolute_url}}">
      {{object.title}}</a>
      <br>{{object.day}} - {{object.start_time}} - {{object.end_time}} -
     
@@ -240,8 +245,8 @@
     {% elif object.importance == "0" %} <span class="glyphicon glyphicon-alert" style="color: LightBlue"></span>&nbsp;<br>
     {% elif object.importance == "3" %} <span class="glyphicon glyphicon-question-sign" style="color: orange"></span>&nbsp;<br>{% endif %}
 
-    {% if object.short_description %}
-    Short description: {{object.short_description}} <br>
+    {% if object.quick_description %}
+    Short description: {{object.quick_description}} <br>
     {% endif %}
 
     {% if object.description or object.notes %}
@@ -265,94 +270,7 @@
 {% block script%}
 <script>
 
-    // Variables for the search function.
-      // Not vital,but without it, typing in the search doesn't activate the function until
-      // "Case" is checked or choose another "where", after which the variables would be initialised and work correctly
-    var Case = "";
-    var where = "title";
-
-
-
-
     
-    // on click event handler for page buttons
-    document.getElementById("RSidenav").addEventListener('click', event =>{
-      const element = event.target;
-      console.log(`element =${element}`)
-      console.log(`element.className =${element.classname}`)
-      // If click on description
-        if (element.className == "desciption"){
-          // get the id of the popup
-          let id = element.dataset.id;
-          console.log(id);
-          // shows/hides the description
-          let description = document.getElementById("description"+id);
-          console.log(description);
-          if (description.style.display=="block" ){
-            description.style.display = "none";
-          } else {
-            description.style.display = "block"
-          };
-        };
-      //
-      // If click on note
-        if (element.className == "notes"){
-          // get the id of the popup
-          let id = element.dataset.id;
-          console.log(id);
-          // shows/hides the notes
-          let notes = document.getElementById("notes"+id);
-          console.log(notes);
-          if (notes.style.display=="block" ){
-            notes.style.display = "none";
-          } else {
-            notes.style.display = "block"
-          }
-          };
-      //
-      // If click on more
-        if (element.className == "more"){
-          // get the id of the popup
-          let id = element.dataset.id;
-          console.log("id")
-          console.log(id);
-          let des = document.getElementById("des"+id);
-          console.log("des")
-          console.log(des);
-          let not = document.getElementById("not"+id);
-          console.log("not")
-          console.log(not);
-          let notes = document.getElementById("notes"+id);
-          let description = document.getElementById("description"+id);
-          // shows/hides the description
-          if (element.value == "More info"){
-            element.value = "Less info";
-            try{
-              des.style.display = "block";
-            }catch{}
-            try{
-              not.style.display = "block";
-            }catch{}
-            
-            
-          } else if (element.value == "Less info") {
-            element.value = "More info";
-            try{
-              des.style.display = "none";
-            }catch{}
-            try{
-              not.style.display = "none";
-            }catch{}
-            try{
-              description.style.display = "none";
-            }catch{}
-            try{
-              notes.style.display = "none"
-            }catch{}
-          };
-        };
-      //
-    });
 
 
 

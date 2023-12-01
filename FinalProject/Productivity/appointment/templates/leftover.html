@@ -135,3 +135,79 @@ console.log(`a[first] !== b[first] = ${a.dataset[first]} !== ${b.dataset[first]}
             return Number(a.dataset[second]) - Number(b.dataset[second]);
           }}
         } 
+
+
+        function inicialize_buttons(){
+          for (let i = 0; i < sort_buttons.length; i++) {
+            let newElementBeforeButton = document.createElement('span');
+            let Button = sort_buttons[i];
+            newElementBeforeButton.id ="+" + sort_buttons[i].id;
+            newElementBeforeButton.innerHTML = '';
+      
+            Button.parentNode.insertBefore(newElementBeforeButton, Button);
+      
+            let newElementAfterButton = document.createElement('span');
+            newElementAfterButton.id = sort_buttons[i].id + "+";
+            newElementAfterButton.innerHTML = '';
+      
+            Button.parentNode.insertBefore(newElementAfterButton, Button.nextSibling);
+          }
+        }
+
+
+
+
+
+        var buttons = document.getElementsByTagName("button");
+        for (i=0; i< buttons.length;i++){
+          if(buttons[i].classList.contains("sort_button")){
+            console.log(document.readyState)
+            buttons[i].classList.add("states-3");
+            buttons[i].classList.add("clicks-0");
+            console.log("working up to here 1")
+            buttons[i].addEventListener('click', function(){
+              button_onclick_state_change(this);
+            });
+            console.log("working up to here 2")
+        }
+        
+        }
+
+
+
+        // Buttons
+
+  function button_onclick_state_change(element){
+    console.log ("triggering - button_onclick_state_change")
+    console.log(element)
+    // Checks if the button element has a class for 2 or 3 diferent states
+    if (element.classList.contains("states-2") || element.classList.contains("states-3")) {
+
+      // if it wasn't clicked yet, remove the class and add the class to 1 click
+      if (element.classList.contains("clicks-0")){
+        element.classList.remove("clicks-0")
+        element.classList.add("clicks-1")
+
+      // if it was clicked, check if it was clicked once
+      } else if (element.classList.contains("clicks-1")){
+
+        // check if it's a two state if it's, reset to 0 clicks
+        if ( element.classList.contains("states-2")){
+          element.classList.remove("clicks-1")
+          element.classList.add("clicks-0")
+
+        // if it isn't, it can only be a 3 state, so change to 2 clicks
+        } else {
+          element.classList.remove("clicks-1")
+          element.classList.add("clicks-2")
+        }
+
+      // if it wasn't clicked only once or twice, check if it was click 3 times
+      } else if (element.classList.contains("clicks-2")){
+
+        // if it was, it can only be a 3 state, so reset it to 0 clicks
+        element.classList.remove("clicks-2")
+        element.classList.add("clicks-0")
+      }
+  }
+}

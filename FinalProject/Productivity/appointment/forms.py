@@ -27,7 +27,7 @@ for hour in hours:
 class eventForm(forms.ModelForm):
     class Meta:
         model = models.Event
-        fields = ['title','day','start_time','end_time','short_description','description','notes','importance','repeat','repeat_wkd','repeatd','repeatutil','repeatnumber','color',
+        fields = ['title','day','start_time','end_time','quick_description','description','notes','importance','repeat','repeat_wkd','repeatd','repeatutil','repeatnumber','color',
                 'monday','tuesday','wednesday','thursday','friday','saturday','sunday',]
         widgets = {
             'day' : forms.DateInput(attrs = {'placeholder': 'Year-Month-Day'}),
@@ -35,7 +35,7 @@ class eventForm(forms.ModelForm):
             #'end_time' : forms.TimeInput(attrs = {'placeholder': 'Hour:Minute'}),
             'start_time': forms.Select(choices=start_choices),
             'end_time': forms.Select(choices=end_choices),
-            'short_description':forms.Textarea(attrs={'cols': 90, 'rows': 3}),
+            'quick_description':forms.Textarea(attrs={'cols': 90, 'rows': 3}),
             'description': forms.Textarea(attrs={'cols': 90, 'rows': 5}),
             'notes':forms.Textarea(attrs={'cols': 90, 'rows': 3}),
         }

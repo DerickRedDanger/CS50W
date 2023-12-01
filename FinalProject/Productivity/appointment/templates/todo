@@ -1,3 +1,9 @@
+finish creating the javascript and css for clicked buttons, 
+    (state-2, state-3, clicks-0, clicks-1, clicks-2) as well as a :active for all buttons
+    add the funtion to all button and the classes state-2/3 depending of the case
+
+finish setting the todo's list
+
 Remove all the javascript funtcions inside the html (like on click) and separate them into the script.
 
 create a search function for the sidebar in the test. 

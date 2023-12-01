@@ -111,7 +111,7 @@ class Event(models.Model):
     day = models.DateField(u'Day of the event', help_text=u"Format: year-month-day",)
     start_time = models.TimeField(u'Starting time',choices= start_choices)
     end_time = models.TimeField(u'Ending time', choices = end_choices)
-    short_description = models.TextField(u"A quick description of the Event",blank=True, null=True)
+    quick_description = models.TextField(u"A quick description of the Event",blank=True, null=True)
     description = models.TextField(u"Event's description",blank=True, null=True)
     notes = models.TextField(u'Textual Notes', help_text=u'Textual Notes', blank=True, null=True)
     
@@ -677,19 +677,19 @@ class ListToDo(models.Model):
     )
 
     #progress choices:
-    nts="nt"
-    inp="ip"
-    done="dn"
-    fo="fo"
     fn="fn"
+    nts="nt"
+    fo="fo"
+    inp="ip"
     har="hd"
+    done="dn"
     progress_choices = [
-        (nts, "Not Started"),
-        (inp, "In Progress"),
-        (done, "Done"),
-        (fo, "forgotten"),
         (fn, "forgotten and not started"),
+        (nts, "Not Started"),
+        (fo, "forgotten"),
+        (inp, "In Progress"),
         (har,"Hardship"),
+        (done, "Done"),
     ]
     progress= models.CharField(u"What's the progress on this task?",
         max_length=2,
